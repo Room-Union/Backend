@@ -35,7 +35,7 @@ public class SwaggerConfig {
                         .type(SecurityScheme.Type.HTTP)
                         .scheme("bearer")
                         .bearerFormat("JWT")))
-        .info(new Info().title("RoomUnion Swagger API 명세서").version("1.0").description("RoomUnion Swagger API"));
+        .info(new Info().title("방구석연합 Swagger API 명세서").version("1.0").description("RoomUnion Swagger API"));
   }
 
   @Bean
