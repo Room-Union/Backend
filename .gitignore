@@ -54,13 +54,15 @@ cmake-build-*/
 *.iws
 
 # IntelliJ
-out/
+#out/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 
 # JIRA plugin
 atlassian-ide-plugin.xml
+
+.idea
 
 # Cursive Clojure plugin
 .idea/replstate.xml

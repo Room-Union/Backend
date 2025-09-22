@@ -5,6 +5,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import org.codeit.roomunion.user.domain.model.User;
 import org.hibernate.annotations.NaturalId;
 
 @Getter
@@ -26,5 +27,9 @@ public class UserEntity {
     private String description;
 
     protected UserEntity() {
+    }
+
+    public static User toDomain(UserEntity userEntity) {
+        return null;
     }
 }
