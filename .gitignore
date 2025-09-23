@@ -54,7 +54,10 @@ cmake-build-*/
 *.iws
 
 # IntelliJ
+<<<<<<< HEAD
 #out/
+=======
+>>>>>>> 0efc476 (Feature/member (#2))
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -62,8 +65,11 @@ cmake-build-*/
 # JIRA plugin
 atlassian-ide-plugin.xml
 
+<<<<<<< HEAD
 .idea
 
+=======
+>>>>>>> 0efc476 (Feature/member (#2))
 # Cursive Clojure plugin
 .idea/replstate.xml
 

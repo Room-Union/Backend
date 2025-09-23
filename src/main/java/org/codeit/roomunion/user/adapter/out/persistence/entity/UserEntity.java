@@ -1,5 +1,6 @@
 package org.codeit.roomunion.user.adapter.out.persistence.entity;
 
+<<<<<<< HEAD
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
@@ -16,6 +17,18 @@ import java.util.List;
 @Table(name = "users")
 public class UserEntity {
 
+=======
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import org.hibernate.annotations.NaturalId;
+
+@Getter
+@Table(name = "users")
+public class UserEntity {
+>>>>>>> 0efc476 (Feature/member (#2))
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,6 +38,7 @@ public class UserEntity {
 
     private String password;
 
+<<<<<<< HEAD
     private String nickname;
 
     private Gender gender;
@@ -61,4 +75,14 @@ public class UserEntity {
     public User toDomain() {
         return User.of(id, email, password, nickname, gender);
     }
+=======
+    private String name;
+
+    private String nickname;
+
+    private String description;
+
+    protected UserEntity() {
+    }
+>>>>>>> 0efc476 (Feature/member (#2))
 }
