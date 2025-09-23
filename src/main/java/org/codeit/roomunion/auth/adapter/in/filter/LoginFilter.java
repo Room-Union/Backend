@@ -24,7 +24,7 @@ import java.util.Map;
 @Component
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final long EXPIRATION = Duration.ofHours(24).toMillis();
+    private final long EXPIRATION = Duration.ofHours(24).toMillis() * 7; // 7 days
 
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
