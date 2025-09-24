@@ -5,8 +5,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.codeit.roomunion.common.exception.ErrorCode;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
+import org.codeit.roomunion.common.exception.ErrorCode;
 import org.codeit.roomunion.common.jwt.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,13 +15,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 
-@Component
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final long EXPIRATION = Duration.ofHours(24).toMillis() * 7; // 7 days
@@ -30,10 +28,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final ObjectMapper objectMapper;
 
-    public LoginFilter(JwtUtil jwtUtil, AuthenticationManager authenticationManager, ObjectMapper objectMapper) {
+    public LoginFilter(JwtUtil jwtUtil, AuthenticationManager authenticationManager) {
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
-        this.objectMapper = objectMapper;
+        this.objectMapper = new ObjectMapper();
         setFilterProcessesUrl("/auth/login");
     }
 

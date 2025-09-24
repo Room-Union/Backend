@@ -1,14 +1,12 @@
 package org.codeit.roomunion.user.adapter.out.persistence.entity;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import org.codeit.roomunion.user.domain.model.User;
 import org.hibernate.annotations.NaturalId;
 
 @Getter
+@Entity
 @Table(name = "users")
 public class UserEntity {
     @Id
