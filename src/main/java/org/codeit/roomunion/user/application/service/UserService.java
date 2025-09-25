@@ -1,5 +1,6 @@
 package org.codeit.roomunion.user.application.service;
 
+<<<<<<< HEAD
 import org.codeit.roomunion.auth.application.port.out.CustomPasswordEncoder;
 import org.codeit.roomunion.common.exception.UserNotFoundException;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
@@ -21,10 +22,25 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
     public UserService(UserRepository userRepository, CustomPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+=======
+import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
+import org.codeit.roomunion.user.application.port.out.UserRepository;
+import org.codeit.roomunion.user.domain.model.User;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UserService implements UserQueryUseCase {
+
+    private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
     }
 
     @Override
     public User getByEmail(String email) {
+<<<<<<< HEAD
         return findByEmail(email)
             .orElseThrow(UserNotFoundException::new);
     }
@@ -62,4 +78,8 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
         return findByEmail(email).isPresent();
     }
 
+=======
+        return userRepository.getByEmail(email);
+    }
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
 }

@@ -44,9 +44,16 @@ public class JwtService {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
+<<<<<<< HEAD
             .verifyWith(jwtUtil.getSecretKey())
             .build()
             .parseSignedClaims(token)
             .getPayload();
+=======
+                .verifyWith(jwtUtil.getSecretKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
     }
 }

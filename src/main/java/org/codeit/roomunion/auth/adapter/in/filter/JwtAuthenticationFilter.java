@@ -31,9 +31,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
+<<<<<<< HEAD
         @NonNull HttpServletRequest request,
         @NonNull HttpServletResponse response,
         @NonNull FilterChain filterChain
+=======
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
     ) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
 
@@ -51,9 +57,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             validateToken(response, jwtToken, userDetails);
 
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+<<<<<<< HEAD
                 userDetails,
                 null,
                 userDetails.getAuthorities()
+=======
+                    userDetails,
+                    null,
+                    userDetails.getAuthorities()
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
             );
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
@@ -80,15 +92,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void setErrorResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
         String errorResponse = objectMapper.writeValueAsString(createErrorResponse(errorCode));
         response.setStatus(errorCode.getStatusCode());
+<<<<<<< HEAD
         response.setContentType("application/json; charset=UTF-8");
+=======
+        response.setContentType("application/json");
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
 
         response.getWriter().write(errorResponse);
     }
 
     private Map<String, Object> createErrorResponse(ErrorCode errorCode) {
         return Map.of(
+<<<<<<< HEAD
             "code", errorCode.getCode(),
             "message", errorCode.getMessage()
+=======
+                "code", errorCode.getCode(),
+                "message", errorCode.getMessage()
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
         );
     }
 }

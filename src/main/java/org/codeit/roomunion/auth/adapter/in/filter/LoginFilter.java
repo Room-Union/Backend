@@ -5,7 +5,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+<<<<<<< HEAD
 import lombok.extern.slf4j.Slf4j;
+=======
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.common.exception.ErrorCode;
 import org.codeit.roomunion.common.jwt.JwtUtil;
@@ -21,7 +24,10 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 
+<<<<<<< HEAD
 @Slf4j
+=======
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final long EXPIRATION = Duration.ofHours(24).toMillis() * 7; // 7 days
@@ -30,6 +36,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final ObjectMapper objectMapper;
 
+<<<<<<< HEAD
     public LoginFilter(
         JwtUtil jwtUtil,
         AuthenticationManager authenticationManager
@@ -38,6 +45,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         this.authenticationManager = authenticationManager;
         this.objectMapper = new ObjectMapper();
         setFilterProcessesUrl("/v1/auth/login");
+=======
+    public LoginFilter(JwtUtil jwtUtil, AuthenticationManager authenticationManager) {
+        this.jwtUtil = jwtUtil;
+        this.authenticationManager = authenticationManager;
+        this.objectMapper = new ObjectMapper();
+        setFilterProcessesUrl("/auth/login");
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
     }
 
     @Override
@@ -57,7 +71,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String token = jwtUtil.createJwt(userId, email, EXPIRATION);
         String bearer = "Bearer " + token;
         response.addHeader("Authorization", bearer);
+<<<<<<< HEAD
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+=======
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
     }
 
     @Override
@@ -66,15 +83,24 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String errorResponse = objectMapper.writeValueAsString(createErrorResponse(errorCode));
         response.setStatus(errorCode.getStatusCode());
+<<<<<<< HEAD
         response.setContentType("application/json; charset=UTF-8");
+=======
+        response.setContentType("application/json");
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
 
         response.getWriter().write(errorResponse);
     }
 
     private Map<String, Object> createErrorResponse(ErrorCode errorCode) {
         return Map.of(
+<<<<<<< HEAD
             "code", errorCode.getCode(),
             "message", errorCode.getMessage()
+=======
+                "code", errorCode.getCode(),
+                "message", errorCode.getMessage()
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
         );
     }
 

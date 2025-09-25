@@ -1,5 +1,12 @@
 package org.codeit.roomunion.auth.config;
 
+<<<<<<< HEAD
+=======
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;

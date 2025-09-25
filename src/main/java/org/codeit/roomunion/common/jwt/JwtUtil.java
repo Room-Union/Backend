@@ -27,30 +27,56 @@ public class JwtUtil {
 
     public String getEmail(String token) {
         return Jwts.parser()
+<<<<<<< HEAD
             .verifyWith(secretKey)
             .build()
             .parseSignedClaims(token)
             .getPayload()
             .get("email", String.class);
+=======
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("email", String.class);
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
     }
 
     public Boolean isExpired(String token) {
         return Jwts.parser()
+<<<<<<< HEAD
             .verifyWith(secretKey)
             .build()
             .parseSignedClaims(token)
             .getPayload()
             .getExpiration()
             .before(new Date());
+=======
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getExpiration()
+                .before(new Date());
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
     }
 
     public String createJwt(Long userId, String email, Long expiration) {
         return Jwts.builder()
+<<<<<<< HEAD
             .claim("sub", userId.toString())
             .claim("email", email)
             .issuedAt(new Date(System.currentTimeMillis()))
             .expiration(new Date(System.currentTimeMillis() + expiration))
             .signWith(secretKey)
             .compact();
+=======
+                .claim("sub", userId.toString())
+                .claim("email", email)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(secretKey)
+                .compact();
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
     }
 }

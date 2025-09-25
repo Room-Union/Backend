@@ -25,7 +25,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+<<<<<<< HEAD
     private static final String[] PUBLIC_ENDPOINTS = {"/v1/users/sign-up", "/v1/auth/login"};
+=======
+    private static final String[] PUBLIC_ENDPOINTS = {"/users/sign-up", "/auth/login", "/users/nickname/check"};
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
     private static final String[] SWAGGER_ENDPOINTS = {"/swagger-ui/**", "/v3/api-docs/**"};
 
     private final CorsConfig corsConfig;
@@ -37,6 +41,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         LoginFilter loginFilter = new LoginFilter(jwtUtil, authenticationManager(authenticationConfiguration));
         http
+<<<<<<< HEAD
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
             .httpBasic(AbstractHttpConfigurer::disable)
@@ -45,11 +50,22 @@ public class SecurityConfig {
             .authorizeHttpRequests(SecurityConfig::authorizeHttpRequests)
             .addFilterAfter(loginFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+=======
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(SecurityConfig::authorizeHttpRequests)
+                .addFilterAfter(loginFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
         return http.build();
     }
 
     private static void authorizeHttpRequests(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry request) {
         request
+<<<<<<< HEAD
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
             .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
@@ -65,5 +81,22 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+=======
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
+                .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                .anyRequest()
+                .authenticated();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
     }
 }

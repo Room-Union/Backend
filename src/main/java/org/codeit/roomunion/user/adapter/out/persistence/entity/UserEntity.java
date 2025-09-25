@@ -1,6 +1,7 @@
 package org.codeit.roomunion.user.adapter.out.persistence.entity;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
@@ -22,10 +23,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+=======
+import jakarta.persistence.*;
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
 import lombok.Getter;
+import org.codeit.roomunion.user.domain.model.User;
 import org.hibernate.annotations.NaturalId;
 
 @Getter
+@Entity
 @Table(name = "users")
 public class UserEntity {
 >>>>>>> 0efc476 (Feature/member (#2))
@@ -84,5 +90,12 @@ public class UserEntity {
 
     protected UserEntity() {
     }
+<<<<<<< HEAD
 >>>>>>> 0efc476 (Feature/member (#2))
+=======
+
+    public static User toDomain(UserEntity userEntity) {
+        return null;
+    }
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
 }

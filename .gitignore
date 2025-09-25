@@ -55,9 +55,13 @@ cmake-build-*/
 
 # IntelliJ
 <<<<<<< HEAD
+<<<<<<< HEAD
 #out/
 =======
 >>>>>>> 0efc476 (Feature/member (#2))
+=======
+#out/
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -66,10 +70,15 @@ cmake-build-*/
 atlassian-ide-plugin.xml
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 .idea
 
 =======
 >>>>>>> 0efc476 (Feature/member (#2))
+=======
+.idea
+
+>>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
 # Cursive Clojure plugin
 .idea/replstate.xml
 
