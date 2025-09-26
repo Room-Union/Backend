@@ -1,4 +1,4 @@
-package org.codeit.roomunion.common.config.S3;
+package org.codeit.roomunion.common.adapter.out.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Uuid {
+public class UuidEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
