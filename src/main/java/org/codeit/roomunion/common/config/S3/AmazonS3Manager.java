@@ -5,6 +5,8 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.codeit.roomunion.common.adapter.out.persistence.entity.UuidEntity;
+import org.codeit.roomunion.common.adapter.out.persistence.jpa.UuidRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +19,7 @@ public class AmazonS3Manager {
 
     private final AmazonS3 amazonS3;
 
-    private final AmazonConfig amazonConfig;
+    private final S3Properties s3Properties;
 
     private final UuidRepository uuidRepository;
 
@@ -26,24 +28,20 @@ public class AmazonS3Manager {
         metadata.setContentType(file.getContentType());
         metadata.setContentLength(file.getSize());
         try {
-            amazonS3.putObject(new PutObjectRequest(amazonConfig.getBucket(), keyName, file.getInputStream(), metadata));
+            amazonS3.putObject(new PutObjectRequest(s3Properties.getBucket(), keyName, file.getInputStream(), metadata));
         }catch (IOException e){
             log.error("error at AmazonS3Manager uploadFile : {}", (Object) e.getStackTrace());
         }
 
-        return amazonS3.getUrl(amazonConfig.getBucket(), keyName).toString();
+        return amazonS3.getUrl(s3Properties.getBucket(), keyName).toString();
     }
 
-    // keyName 생성
-
-    // 프로필 이미지 keyName
-    public String generateProfile(Uuid uuid) {
-        return amazonConfig.getProfilePath() + '/' + uuid.getUuid();
+    public String generateProfile(UuidEntity uuidEntity) {
+        return s3Properties.getPath().getProfile() + '/' + uuidEntity.getUuid();
     }
 
-    // 크루(모임) 이미지 keyName
-    public String generateCrew(Uuid uuid) {
-        return amazonConfig.getCrewPath() + '/' + uuid.getUuid();
+    public String generateCrew(UuidEntity uuidEntity) {
+        return s3Properties.getPath().getCrew() + '/' + uuidEntity.getUuid();
     }
 
 }

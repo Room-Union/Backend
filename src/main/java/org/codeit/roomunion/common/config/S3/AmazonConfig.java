@@ -8,51 +8,35 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@Getter
+@RequiredArgsConstructor
 public class AmazonConfig {
 
-    private AWSCredentials awsCredentials;
+    private final AmazonProperties amazonProperties;
 
-    @Value("${cloud.aws.credentials.accessKey}")
-    private String accessKey;
-
-    @Value("${cloud.aws.credentials.secretKey}")
-    private String secretKey;
-
-    @Value("${cloud.aws.region.static}")
-    private String region;
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
-
-    @Value("${cloud.aws.s3.path.profile}")
-    private String profilePath;
-
-    @Value("${cloud.aws.s3.path.crew}")
-    private String crewPath;
-
-    @PostConstruct
-    public void init() {
-        this.awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
+    @Bean
+    public AWSCredentials awsCredentials() {
+        return new BasicAWSCredentials(
+            amazonProperties.getCredentials().getAccessKey(),
+            amazonProperties.getCredentials().getSecretKey()
+        );
     }
 
     @Bean
-    public AmazonS3 amazonS3() {
-        AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
+    public AWSCredentialsProvider awsCredentialsProvider(AWSCredentials credentials) {
+        return new AWSStaticCredentialsProvider(credentials);
+    }
 
+    @Bean
+    public AmazonS3 amazonS3(AWSCredentialsProvider provider) {
         return AmazonS3ClientBuilder.standard()
-            .withRegion(region)
-            .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+            .withRegion(amazonProperties.getRegion().getStaticRegion())
+            .withCredentials(provider)
             .build();
-    }
-
-    @Bean
-    public AWSCredentialsProvider awsCredentialsProvider() {
-        return new AWSStaticCredentialsProvider(awsCredentials);
     }
 }
