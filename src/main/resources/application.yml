@@ -46,9 +46,9 @@ cloud:
         profile: profile
         crew: crew
     region:
-      static: ${CLOUD_AWS_REGION_STATIC}
+      static-region: ${CLOUD_AWS_REGION_STATIC}
     stack:
       auto: false
     credentials:
-      accessKey: ${AWS_ACCESS_KEY_ID}
-      secretKey: ${AWS_SECRET_ACCESS_KEY}
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
