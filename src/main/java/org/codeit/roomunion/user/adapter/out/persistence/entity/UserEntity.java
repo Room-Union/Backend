@@ -14,6 +14,7 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 public class UserEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,13 +36,27 @@ public class UserEntity {
     protected UserEntity() {
     }
 
-    public static UserEntity from(UserCreateCommand userCreateCommand) {
-        UserEntity userEntity = new UserEntity();
-        userEntity.email = userCreateCommand.getEmail();
-        userEntity.password = userCreateCommand.getPassword();
-        userEntity.nickname = userCreateCommand.getNickname();
-        userEntity.gender = userCreateCommand.getGender();
-        userEntity.description = userCreateCommand.getDescription();
+    private UserEntity(Long id, String email, String password, String nickname, Gender gender, String description, List<UserCategoryEntity> userCategories) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.gender = gender;
+        this.description = description;
+        this.userCategories = userCategories;
+    }
+
+    public static UserEntity of(UserCreateCommand userCreateCommand, String nickname) {
+        UserEntity userEntity = new UserEntity(
+            null,
+            userCreateCommand.getEmail(),
+            userCreateCommand.getPassword(),
+            nickname,
+            userCreateCommand.getGender(),
+            userCreateCommand.getDescription(),
+            List.of()
+        );
+
         userEntity.userCategories = createUserCategoryEntities(userCreateCommand, userEntity);
         return userEntity;
     }
