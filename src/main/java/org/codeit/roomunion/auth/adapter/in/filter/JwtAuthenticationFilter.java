@@ -80,7 +80,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void setErrorResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
         String errorResponse = objectMapper.writeValueAsString(createErrorResponse(errorCode));
         response.setStatus(errorCode.getStatusCode());
-        response.setContentType("application/json");
+        response.setContentType("application/json; charset=UTF-8");
 
         response.getWriter().write(errorResponse);
     }

@@ -8,10 +8,10 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public record JoinUserRequest(String email, String password, Gender gender, String categories, String description) {
+public record JoinUserRequest(String email, String password, String nickname, Gender gender, String categories) {
 
     public UserCreateCommand toCommand() {
-        return UserCreateCommand.of(email, password, gender, parseCategories(categories), description);
+        return UserCreateCommand.of(email, password, nickname, gender, parseCategories(categories));
     }
 
     private Set<Category> parseCategories(String categories) {

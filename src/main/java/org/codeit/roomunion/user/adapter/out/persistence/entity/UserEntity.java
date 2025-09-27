@@ -28,35 +28,21 @@ public class UserEntity {
 
     private Gender gender;
 
-    private String description;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserCategoryEntity> userCategories = new ArrayList<>();
 
     protected UserEntity() {
     }
 
-    private UserEntity(Long id, String email, String password, String nickname, Gender gender, String description, List<UserCategoryEntity> userCategories) {
-        this.id = id;
+    private UserEntity(String email, String password, String nickname, Gender gender) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.gender = gender;
-        this.description = description;
-        this.userCategories = userCategories;
     }
 
-    public static UserEntity of(UserCreateCommand userCreateCommand, String nickname) {
-        UserEntity userEntity = new UserEntity(
-            null,
-            userCreateCommand.getEmail(),
-            userCreateCommand.getPassword(),
-            nickname,
-            userCreateCommand.getGender(),
-            userCreateCommand.getDescription(),
-            List.of()
-        );
-
+    public static UserEntity of(UserCreateCommand userCreateCommand) {
+        UserEntity userEntity = new UserEntity(userCreateCommand.getEmail(), userCreateCommand.getPassword(), userCreateCommand.getNickname(), userCreateCommand.getGender());
         userEntity.userCategories = createUserCategoryEntities(userCreateCommand, userEntity);
         return userEntity;
     }
@@ -69,6 +55,6 @@ public class UserEntity {
     }
 
     public User toDomain() {
-        return User.of(id, email, password, nickname, gender, description);
+        return User.of(id, email, password, nickname, gender);
     }
 }

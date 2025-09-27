@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface UserRepository {
 
-    User create(UserCreateCommand userCreateCommand, String nickname);
+    User create(UserCreateCommand userCreateCommand);
 
     Optional<User> findByEmail(String email);
 

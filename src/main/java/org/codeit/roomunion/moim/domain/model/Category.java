@@ -1,8 +1,6 @@
 package org.codeit.roomunion.moim.domain.model;
 
 public enum Category {
-    TEST,
-    TEST1,
-    TEST2,
+    CULTURE_ART, GAME, SELF_DEVELOPMENT, COMMUNICATION, INFO_ECONOMY, HOBBY,
     ;
 }
