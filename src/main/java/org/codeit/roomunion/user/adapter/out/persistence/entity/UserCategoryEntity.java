@@ -7,9 +7,9 @@ import org.codeit.roomunion.moim.domain.model.Category;
 @Getter
 @Entity
 @Table(
-        name = "user_categories",
-        indexes = @Index(name = "idx_user_id", columnList = "user_id"),
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "category"})
+    name = "user_categories",
+    indexes = @Index(name = "idx_user_id", columnList = "user_id"),
+    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "category"})
 )
 public class UserCategoryEntity {
 
@@ -22,7 +22,7 @@ public class UserCategoryEntity {
     private UserEntity user;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private Category category;
 
     protected UserCategoryEntity() {
