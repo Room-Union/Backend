@@ -42,8 +42,8 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
 
         // TODO 이미지 업로드 로직 추가 필요
         // TODO 등록 전 이메일 검증 완료되었는지 확인 필요
-
-        return userRepository.create(userCreateCommand.encodePassword(passwordEncoder));
+        String encodedPassword = passwordEncoder.encode(userCreateCommand.getPassword());
+        return userRepository.create(userCreateCommand.replaceEncodePassword(encodedPassword));
     }
 
     private void validateEmailAndNicknameExists(UserCreateCommand userCreateCommand) {

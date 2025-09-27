@@ -1,7 +1,6 @@
 package org.codeit.roomunion.user.domain.command;
 
 import lombok.Getter;
-import org.codeit.roomunion.auth.application.port.out.CustomPasswordEncoder;
 import org.codeit.roomunion.moim.domain.model.Category;
 import org.codeit.roomunion.user.domain.model.Gender;
 
@@ -27,7 +26,7 @@ public class UserCreateCommand {
         return new UserCreateCommand(email, password, nickname, gender, categories);
     }
 
-    public UserCreateCommand encodePassword(CustomPasswordEncoder passwordEncoder) {
-        return of(email, passwordEncoder.encode(password), nickname, gender, categories);
+    public UserCreateCommand replaceEncodePassword(String encodedPassword) {
+        return of(email, encodedPassword, nickname, gender, categories);
     }
 }
