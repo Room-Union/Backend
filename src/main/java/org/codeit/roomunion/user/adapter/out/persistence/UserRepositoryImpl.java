@@ -19,8 +19,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User create(UserCreateCommand userCreateCommand, String nickname) {
-        UserEntity userEntity = UserEntity.of(userCreateCommand, nickname);
+    public User create(UserCreateCommand userCreateCommand) {
+        UserEntity userEntity = UserEntity.of(userCreateCommand);
         return userJpaRepository.save(userEntity)
                 .toDomain();
     }

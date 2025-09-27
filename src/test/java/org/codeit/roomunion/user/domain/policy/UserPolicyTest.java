@@ -35,9 +35,9 @@ class UserPolicyTest {
         UserCreateCommand command = UserCreateCommandFixture.create(
             "test@example.com",
             "Password123!",
+            "nickname",
             Gender.MALE,
-            Set.of(Category.TEST, Category.TEST1),
-            "테스트 사용자입니다."
+            Set.of(Category.GAME, Category.INFO_ECONOMY)
         );
 
         // when & then
@@ -62,9 +62,9 @@ class UserPolicyTest {
             UserCreateCommand command = UserCreateCommandFixture.create(
                 validEmail,
                 "Password123!",
+                "nickname",
                 Gender.MALE,
-                Set.of(Category.TEST, Category.TEST1),
-                "테스트 사용자입니다."
+                Set.of(Category.GAME, Category.INFO_ECONOMY)
             );
 
             // when & then
@@ -87,9 +87,9 @@ class UserPolicyTest {
             UserCreateCommand command = UserCreateCommandFixture.create(
                 invalidEmail,
                 "Password123!",
+                "nickname",
                 Gender.MALE,
-                Set.of(Category.TEST, Category.TEST1),
-                "테스트 사용자입니다."
+                Set.of(Category.GAME, Category.INFO_ECONOMY)
             );
 
             // when & then
@@ -107,8 +107,7 @@ class UserPolicyTest {
         @ValueSource(strings = {
             "Password123!",
             "Strong123@",
-            "Valid1234#",
-            "Test123$abc"
+            "Valid1234#"
         })
         @DisplayName("유효한 비밀번호인 경우 예외가 발생하지 않아야 한다")
         void validate_ShouldNotThrowException_WhenPasswordIsValid(String validPassword) {
@@ -116,9 +115,9 @@ class UserPolicyTest {
             UserCreateCommand command = UserCreateCommandFixture.create(
                 "test@example.com",
                 validPassword,
+                "nickname",
                 Gender.MALE,
-                Set.of(Category.TEST, Category.TEST1),
-                "테스트 사용자입니다."
+                Set.of(Category.GAME, Category.INFO_ECONOMY)
             );
 
             // when & then
@@ -141,9 +140,9 @@ class UserPolicyTest {
             UserCreateCommand command = UserCreateCommandFixture.create(
                 "test@example.com",
                 invalidPassword,
+                "nickname",
                 Gender.MALE,
-                Set.of(Category.TEST, Category.TEST1),
-                "테스트 사용자입니다."
+                Set.of(Category.GAME, Category.INFO_ECONOMY)
             );
 
             // when & then
@@ -164,9 +163,9 @@ class UserPolicyTest {
             UserCreateCommand command = UserCreateCommandFixture.create(
                 "test@example.com",
                 "Password123!",
+                "nickname",
                 Gender.MALE,
-                Set.of(Category.TEST, Category.TEST1),
-                "테스트 사용자입니다."
+                Set.of(Category.GAME, Category.INFO_ECONOMY)
             );
 
             // when & then
@@ -182,9 +181,9 @@ class UserPolicyTest {
             UserCreateCommand command = UserCreateCommandFixture.create(
                 "test@example.com",
                 "Password123!",
+                "nickname",
                 Gender.MALE,
-                invalidCategories,
-                "테스트 사용자입니다."
+                invalidCategories
             );
 
             // when & then
@@ -197,7 +196,8 @@ class UserPolicyTest {
             return Stream.of(
                 Arguments.of((Object) null),                    // null
                 Arguments.of(Set.of()),                        // 빈 리스트
-                Arguments.of(Set.of(Category.TEST))           // 1개
+                Arguments.of(Set.of(Category.GAME)),           // 1개
+                Arguments.of(Set.of(Category.GAME, Category.INFO_ECONOMY, Category.HOBBY)) // 3개 이상
             );
         }
     }

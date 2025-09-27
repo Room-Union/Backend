@@ -7,8 +7,8 @@ import java.util.Set;
 
 public class UserCreateCommandFixture {
 
-    public static UserCreateCommand create(String email, String password, Gender gender, Set<Category> categories, String description) {
-        return UserCreateCommand.of(email, password, gender, categories, description);
+    public static UserCreateCommand create(String email, String password, String nickname, Gender gender, Set<Category> categories) {
+        return UserCreateCommand.of(email, password, nickname, gender, categories);
     }
 
 }
