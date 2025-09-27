@@ -32,7 +32,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
         this.objectMapper = new ObjectMapper();
-        setFilterProcessesUrl("/auth/login");
+        setFilterProcessesUrl("/v1/auth/login");
     }
 
     @Override
@@ -52,6 +52,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String token = jwtUtil.createJwt(userId, email, EXPIRATION);
         String bearer = "Bearer " + token;
         response.addHeader("Authorization", bearer);
+        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
     @Override
@@ -60,7 +61,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String errorResponse = objectMapper.writeValueAsString(createErrorResponse(errorCode));
         response.setStatus(errorCode.getStatusCode());
-        response.setContentType("application/json");
+        response.setContentType("application/json; charset=UTF-8");
 
         response.getWriter().write(errorResponse);
     }
