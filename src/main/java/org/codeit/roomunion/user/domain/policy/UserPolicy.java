@@ -12,7 +12,10 @@ public class UserPolicy {
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?\":{}|<>]).{8,}$");
     private static final int REQUIRED_CATEGORY_COUNT = 2;
 
-    public void validate(UserCreateCommand userCreateCommand) { // TODO 현준님 예외 변경하면 여기도 바꾸기
+    private UserPolicy() {
+    }
+
+    public static void validate(UserCreateCommand userCreateCommand) { // TODO 현준님 예외 변경하면 여기도 바꾸기
         if (isNotValidateEmail(userCreateCommand)) {
             throw new IllegalArgumentException("Invalid email format");
         }
@@ -32,7 +35,7 @@ public class UserPolicy {
         return !EMAIL_PATTERN.matcher(userCreateCommand.getEmail()).matches();
     }
 
-    private boolean isNotRequiredCategorySize(Set<Category> categories) {
+    private static boolean isNotRequiredCategorySize(Set<Category> categories) {
         if (categories == null || categories.isEmpty()) {
             return true;
         }

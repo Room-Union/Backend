@@ -4,7 +4,6 @@ import org.codeit.roomunion.moim.domain.model.Category;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.command.UserCreateCommandFixture;
 import org.codeit.roomunion.user.domain.model.Gender;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,13 +20,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UserPolicyTest {
 
-    private UserPolicy userPolicy;
-
-    @BeforeEach
-    void setUp() {
-        userPolicy = new UserPolicy();
-    }
-
     @Test
     @DisplayName("모든 조건이 유효한 경우 예외가 발생하지 않아야 한다")
     void validate_ShouldNotThrowException_WhenAllConditionsAreValid() {
@@ -41,7 +33,7 @@ class UserPolicyTest {
         );
 
         // when & then
-        assertThatCode(() -> userPolicy.validate(command))
+        assertThatCode(() -> UserPolicy.validate(command))
             .doesNotThrowAnyException();
     }
 
@@ -68,7 +60,7 @@ class UserPolicyTest {
             );
 
             // when & then
-            assertThatCode(() -> userPolicy.validate(command))
+            assertThatCode(() -> UserPolicy.validate(command))
                 .doesNotThrowAnyException();
         }
 
@@ -93,7 +85,7 @@ class UserPolicyTest {
             );
 
             // when & then
-            assertThatThrownBy(() -> userPolicy.validate(command))
+            assertThatThrownBy(() -> UserPolicy.validate(command))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Invalid email format");
         }
@@ -121,7 +113,7 @@ class UserPolicyTest {
             );
 
             // when & then
-            assertThatCode(() -> userPolicy.validate(command))
+            assertThatCode(() -> UserPolicy.validate(command))
                 .doesNotThrowAnyException();
         }
 
@@ -146,7 +138,7 @@ class UserPolicyTest {
             );
 
             // when & then
-            assertThatThrownBy(() -> userPolicy.validate(command))
+            assertThatThrownBy(() -> UserPolicy.validate(command))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one special character");
         }
@@ -169,7 +161,7 @@ class UserPolicyTest {
             );
 
             // when & then
-            assertThatCode(() -> userPolicy.validate(command))
+            assertThatCode(() -> UserPolicy.validate(command))
                 .doesNotThrowAnyException();
         }
 
@@ -187,7 +179,7 @@ class UserPolicyTest {
             );
 
             // when & then
-            assertThatThrownBy(() -> userPolicy.validate(command))
+            assertThatThrownBy(() -> UserPolicy.validate(command))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("At least two categories must be selected");
         }

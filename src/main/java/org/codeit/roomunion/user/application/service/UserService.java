@@ -37,8 +37,7 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
 
     @Override
     public User join(UserCreateCommand userCreateCommand, MultipartFile profileImage) {
-        UserPolicy policy = new UserPolicy();
-        policy.validate(userCreateCommand);
+        UserPolicy.validate(userCreateCommand);
         validateEmailAndNicknameExists(userCreateCommand);
 
         // TODO 이미지 업로드 로직 추가 필요
