@@ -1,4 +1,4 @@
-package org.codeit.roomunion.common.config.S3;
+package org.codeit.roomunion.common.config.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;

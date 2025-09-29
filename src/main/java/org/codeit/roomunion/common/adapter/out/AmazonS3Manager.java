@@ -1,4 +1,4 @@
-package org.codeit.roomunion.common.config.S3;
+package org.codeit.roomunion.common.adapter.out;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -6,7 +6,8 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.codeit.roomunion.common.adapter.out.persistence.entity.UuidEntity;
-import org.codeit.roomunion.common.adapter.out.persistence.jpa.UuidRepository;
+import org.codeit.roomunion.common.adapter.out.persistence.jpa.UuidJpaRepository;
+import org.codeit.roomunion.common.config.S3.S3Properties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +22,7 @@ public class AmazonS3Manager {
 
     private final S3Properties s3Properties;
 
-    private final UuidRepository uuidRepository;
+    private final UuidJpaRepository uuidJpaRepository;
 
     public String uploadFile(String keyName, MultipartFile file){
         ObjectMetadata metadata = new ObjectMetadata();
