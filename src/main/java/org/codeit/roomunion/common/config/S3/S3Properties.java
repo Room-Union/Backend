@@ -18,11 +18,19 @@ public class S3Properties {
     @Getter
     public static class Path {
         private final String profile;
+<<<<<<< HEAD
         private final String meeting;
 
         public Path(String profile, String meeting) {
             this.profile = profile;
             this.meeting = meeting;
+=======
+        private final String crew;
+
+        public Path(String profile, String crew) {
+            this.profile = profile;
+            this.crew = crew;
+>>>>>>> 5f18479 (:sparkles: S3 설정 및 이미지 업로드 기능 구현 (#5))
         }
 
     }

@@ -5,7 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+<<<<<<< HEAD
 import org.codeit.roomunion.common.domain.model.Uuid;
+=======
+>>>>>>> 5f18479 (:sparkles: S3 설정 및 이미지 업로드 기능 구현 (#5))
 
 @Entity
 @Builder
@@ -20,6 +23,7 @@ public class UuidEntity {
 
     @Column(unique = true)
     private String uuid;
+<<<<<<< HEAD
 
     public static UuidEntity from(Uuid uuid) {
         return UuidEntity.builder()
@@ -32,4 +36,6 @@ public class UuidEntity {
     }
 
 
+=======
+>>>>>>> 5f18479 (:sparkles: S3 설정 및 이미지 업로드 기능 구현 (#5))
 }

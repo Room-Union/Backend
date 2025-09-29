@@ -16,7 +16,11 @@ public class AmazonProperties {
     }
 
     @Getter
+<<<<<<< HEAD
     public static class Credentials {
+=======
+    public static class Credentials{
+>>>>>>> 5f18479 (:sparkles: S3 설정 및 이미지 업로드 기능 구현 (#5))
         private final String accessKey;
         private final String secretKey;
 

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.common.exception.ErrorCode;
 import org.codeit.roomunion.common.jwt.JwtUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -30,12 +31,13 @@ import java.util.Map;
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final long EXPIRATION = Duration.ofHours(24).toMillis() * 7; // 7 days
+    private final long EXPIRATION;
 
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final ObjectMapper objectMapper;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     public LoginFilter(
         JwtUtil jwtUtil,
@@ -47,9 +49,18 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         setFilterProcessesUrl("/v1/auth/login");
 =======
     public LoginFilter(JwtUtil jwtUtil, AuthenticationManager authenticationManager) {
+=======
+    public LoginFilter(
+        JwtUtil jwtUtil,
+        AuthenticationManager authenticationManager,
+        @Value("${spring.jwt.access-token-expire-time}") long expiration
+    ) {
+>>>>>>> 5f18479 (:sparkles: S3 설정 및 이미지 업로드 기능 구현 (#5))
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
         this.objectMapper = new ObjectMapper();
+        this.EXPIRATION = expiration;
+
         setFilterProcessesUrl("/auth/login");
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
     }

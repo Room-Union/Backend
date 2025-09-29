@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.auth.adapter.in.filter.JwtAuthenticationFilter;
 import org.codeit.roomunion.auth.adapter.in.filter.LoginFilter;
 import org.codeit.roomunion.common.jwt.JwtUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -37,9 +38,12 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
 
+    @Value("${spring.jwt.access-token-expire-time}")
+    private long accessTokenExpireTime;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        LoginFilter loginFilter = new LoginFilter(jwtUtil, authenticationManager(authenticationConfiguration));
+        LoginFilter loginFilter = new LoginFilter(jwtUtil, authenticationManager(authenticationConfiguration), accessTokenExpireTime);
         http
 <<<<<<< HEAD
             .csrf(AbstractHttpConfigurer::disable)
