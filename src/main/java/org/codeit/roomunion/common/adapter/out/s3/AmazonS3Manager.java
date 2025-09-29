@@ -36,13 +36,6 @@ public class AmazonS3Manager {
 
         return amazonS3.getUrl(s3Properties.getBucket(), keyName).toString();
     }
-
-    public String generateProfile(UuidEntity uuidEntity) {
-        return s3Properties.getPath().getProfile() + '/' + uuidEntity.getUuid();
-    }
-
-    public String generateCrew(UuidEntity uuidEntity) {
-        return s3Properties.getPath().getCrew() + '/' + uuidEntity.getUuid();
-    }
+    
 
 }
