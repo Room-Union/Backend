@@ -1,4 +1,4 @@
-package org.codeit.roomunion.common.adapter.out;
+package org.codeit.roomunion.common.adapter.out.s3;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
