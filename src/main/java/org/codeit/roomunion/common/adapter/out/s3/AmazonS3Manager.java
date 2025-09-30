@@ -49,7 +49,18 @@ public class AmazonS3Manager {
         return amazonS3.getUrl(s3Properties.getBucket(), keyName).toString();
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+
+    public String profileImageKey(UuidEntity uuidEntity) {
+        return s3Properties.getPath().getProfile() + "/" + uuidEntity.getUuid();
+    }
+
+    public String crewImageKey(UuidEntity uuidEntity) {
+        return s3Properties.getPath().getCrew() + '/' + uuidEntity.getUuid();
+    }
+>>>>>>> c9ee85d (:recycle: AmazonS3Manager에 S3 Path 복구 (#7))
     
 
 >>>>>>> 5f18479 (:sparkles: S3 설정 및 이미지 업로드 기능 구현 (#5))
