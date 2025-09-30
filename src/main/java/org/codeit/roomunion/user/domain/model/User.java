@@ -25,4 +25,8 @@ public class User {
     public static User of(Long id, String email, String password, String name, String nickname, String description) {
         return new User(id, email, password, name, nickname, description);
     }
+
+    public String profileImageKey(S3Properties s3Properties, UuidEntity uuidEntity) {
+        return s3Properties.getPath().getProfile() + "/" + uuidEntity.getUuid();
+    }
 }

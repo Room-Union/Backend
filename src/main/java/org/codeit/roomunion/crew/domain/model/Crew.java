@@ -6,6 +6,7 @@ import org.codeit.roomunion.common.adapter.out.persistence.entity.UuidEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 @Getter
 public class Crew {
     private Long id;
@@ -36,6 +37,5 @@ public class Crew {
         this.userId = userId;
         this.platformURL = platformURL;
         this.createdAt = createdAt;
-    }
 
 }
