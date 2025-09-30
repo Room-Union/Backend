@@ -2,8 +2,13 @@ package org.codeit.roomunion.user.adapter.out.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.codeit.roomunion.crew.adapter.out.persistence.entity.CrewEntity;
+import org.codeit.roomunion.crew.adapter.out.persistence.entity.CrewMemberEntity;
 import org.codeit.roomunion.user.domain.model.User;
 import org.hibernate.annotations.NaturalId;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -23,6 +28,9 @@ public class UserEntity {
     private String nickname;
 
     private String description;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CrewMemberEntity> crewMembers = new ArrayList<>();
 
     protected UserEntity() {
     }

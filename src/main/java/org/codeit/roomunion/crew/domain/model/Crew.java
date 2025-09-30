@@ -38,4 +38,8 @@ public class Crew {
         this.createdAt = createdAt;
     }
 
+    public static Crew of(Long id, String name, String description, String crewImage, int maxMemberCount, Long userId, List<String> platformURL, LocalDateTime createdAt) {
+        return new Crew(id, name, description, crewImage, maxMemberCount, userId, platformURL, createdAt);
+    }
+
 }
