@@ -93,10 +93,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String errorResponse = objectMapper.writeValueAsString(createErrorResponse(errorCode));
         response.setStatus(errorCode.getStatusCode());
 <<<<<<< HEAD
+<<<<<<< HEAD
         response.setContentType("application/json; charset=UTF-8");
 =======
         response.setContentType("application/json");
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+        response.setContentType("application/json; charset=UTF-8");
+>>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
 
         response.getWriter().write(errorResponse);
     }

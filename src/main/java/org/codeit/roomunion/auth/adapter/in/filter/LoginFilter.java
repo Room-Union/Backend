@@ -59,10 +59,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
         this.objectMapper = new ObjectMapper();
+<<<<<<< HEAD
         this.EXPIRATION = expiration;
 
         setFilterProcessesUrl("/auth/login");
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+        setFilterProcessesUrl("/v1/auth/login");
+>>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
     }
 
     @Override
@@ -83,9 +87,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String bearer = "Bearer " + token;
         response.addHeader("Authorization", bearer);
 <<<<<<< HEAD
+<<<<<<< HEAD
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 =======
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+>>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
     }
 
     @Override
@@ -95,10 +103,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String errorResponse = objectMapper.writeValueAsString(createErrorResponse(errorCode));
         response.setStatus(errorCode.getStatusCode());
 <<<<<<< HEAD
+<<<<<<< HEAD
         response.setContentType("application/json; charset=UTF-8");
 =======
         response.setContentType("application/json");
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+        response.setContentType("application/json; charset=UTF-8");
+>>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
 
         response.getWriter().write(errorResponse);
     }

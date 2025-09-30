@@ -1,7 +1,11 @@
 package org.codeit.roomunion.user.domain.command;
 
 import lombok.Getter;
+<<<<<<< HEAD
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+=======
+import org.codeit.roomunion.moim.domain.model.Category;
+>>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
 import org.codeit.roomunion.user.domain.model.Gender;
 
 import java.util.Set;
@@ -12,9 +16,15 @@ public class UserCreateCommand {
     private final String password;
     private final String nickname;
     private final Gender gender;
+<<<<<<< HEAD
     private final Set<MeetingCategory> categories;
 
     private UserCreateCommand(String email, String password, String nickname, Gender gender, Set<MeetingCategory> categories) {
+=======
+    private final Set<Category> categories;
+
+    private UserCreateCommand(String email, String password, String nickname, Gender gender, Set<Category> categories) {
+>>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
         this.email = email;
         this.password = password;
         this.nickname = nickname;
@@ -22,7 +32,11 @@ public class UserCreateCommand {
         this.categories = categories;
     }
 
+<<<<<<< HEAD
     public static UserCreateCommand of(String email, String password, String nickname, Gender gender, Set<MeetingCategory> categories) {
+=======
+    public static UserCreateCommand of(String email, String password, String nickname, Gender gender, Set<Category> categories) {
+>>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
         return new UserCreateCommand(email, password, nickname, gender, categories);
     }
 

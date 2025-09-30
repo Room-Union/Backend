@@ -27,10 +27,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     private static final String[] PUBLIC_ENDPOINTS = {"/v1/users/sign-up", "/v1/auth/login"};
 =======
     private static final String[] PUBLIC_ENDPOINTS = {"/users/sign-up", "/auth/login", "/users/nickname/check"};
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+    private static final String[] PUBLIC_ENDPOINTS = {"/v1/users/sign-up", "/v1/auth/login"};
+>>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
     private static final String[] SWAGGER_ENDPOINTS = {"/swagger-ui/**", "/v3/api-docs/**"};
 
     private final CorsConfig corsConfig;
@@ -94,13 +98,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

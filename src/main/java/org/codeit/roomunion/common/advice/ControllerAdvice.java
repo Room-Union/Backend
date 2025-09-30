@@ -20,6 +20,7 @@ import org.codeit.roomunion.common.advice.response.ErrorResponse;
 import org.codeit.roomunion.common.exception.BusinessException;
 import org.codeit.roomunion.common.exception.ErrorCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -99,5 +100,13 @@ public class ControllerAdvice {
         return ResponseEntity.status(errorCode.getStatusCode())
                 .body(ErrorResponse.from(errorCode));
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
+        log.error("HttpMessageNotReadableException: ", e);
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(ErrorResponse.from(errorCode));
     }
 }

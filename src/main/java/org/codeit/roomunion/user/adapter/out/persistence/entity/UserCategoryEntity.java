@@ -2,7 +2,11 @@ package org.codeit.roomunion.user.adapter.out.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+<<<<<<< HEAD
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+=======
+import org.codeit.roomunion.moim.domain.model.Category;
+>>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
 
 @Getter
 @Entity
@@ -23,11 +27,16 @@ public class UserCategoryEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
+<<<<<<< HEAD
     private MeetingCategory meetingCategory;
+=======
+    private Category category;
+>>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
 
     protected UserCategoryEntity() {
     }
 
+<<<<<<< HEAD
     UserCategoryEntity(UserEntity user, MeetingCategory meetingCategory) {
         this.user = user;
         this.meetingCategory = meetingCategory;
@@ -35,5 +44,14 @@ public class UserCategoryEntity {
 
     static UserCategoryEntity of(UserEntity user, MeetingCategory meetingCategory) {
         return new UserCategoryEntity(user, meetingCategory);
+=======
+    UserCategoryEntity(UserEntity user, Category category) {
+        this.user = user;
+        this.category = category;
+    }
+
+    static UserCategoryEntity of(UserEntity user, Category category) {
+        return new UserCategoryEntity(user, category);
+>>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
     }
 }
