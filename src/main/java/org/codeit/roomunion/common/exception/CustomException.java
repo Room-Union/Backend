@@ -1,0 +1,15 @@
+package org.codeit.roomunion.common.exception;
+
+import lombok.Getter;
+import org.codeit.roomunion.common.exception.model.BaseErrorCode;
+
+@Getter
+public class CustomException extends RuntimeException {
+
+    private final BaseErrorCode errorCode;
+
+    public CustomException(BaseErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
+    }
+}
