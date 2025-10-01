@@ -36,8 +36,7 @@ public class CrewService implements CrewCommandUseCase, CrewQueryUseCase {
 
     @Override
     public Crew create(CrewCreateCommand command, MultipartFile image) {
-        // 추후 예외는 ErrorCode로 변경 예정
-        if (command.getMaxMemberCount() < 1) {
+        if (command.getMaxMemberCount() < 2) {
             throw new CustomException(CrewErrorCode.INVALID_MAX_MEMBER_COUNT);
         }
 
@@ -77,7 +76,6 @@ public class CrewService implements CrewCommandUseCase, CrewQueryUseCase {
     @Transactional(readOnly = true)
     public Crew getByCrewId(Long crewId) {
         Crew crew = crewRepository.findById(crewId);
-        // 추후 예외는 ErrorCode로 변경 예정
         if (crew == null) {
             throw new CustomException(CrewErrorCode.CREW_NOT_FOUND);
         }
