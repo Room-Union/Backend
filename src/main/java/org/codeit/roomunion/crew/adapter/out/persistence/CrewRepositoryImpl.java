@@ -29,24 +29,15 @@ public class CrewRepositoryImpl implements CrewRepository {
     private final CrewJpaRepository crewJpaRepository;
     private final CrewMemberJpaRepository crewMemberJpaRepository;
     private final UserJpaRepository userJpaRepository;
-    private final AmazonS3Manager s3Manager;
-    private final UuidJpaRepository uuidJpaRepository;
 
     @Override
-    public Crew createCrew(CrewCreateCommand command, MultipartFile image) {
-        String imageUrl = null;
-        if (image != null && !image.isEmpty()) {
-            String uuid = UUID.randomUUID().toString();
-            UuidEntity savedUuid = uuidJpaRepository.save(
-                UuidEntity.builder().uuid(uuid).build()
-            );
-            imageUrl = s3Manager.uploadFile(s3Manager.crewImageKey(savedUuid), image);
-        }
+    public Crew createCrew(CrewCreateCommand command) {
 
         CrewEntity crewEntity = CrewEntity.builder()
             .name(command.getName())
             .description(command.getDescription())
-            .crewImage(imageUrl) // null이면 이미지 없음
+            .category(command.getCategory())
+            .crewImage(command.getImageUrl())
             .maxMemberCount(command.getMaxMemberCount())
             .platformUrls(command.getPlatformURL())
             .createdAt(LocalDateTime.now())
@@ -90,5 +81,10 @@ public class CrewRepositoryImpl implements CrewRepository {
 
         return entity.toDomain(hostUserId);
 
+    }
+
+    @Override
+    public boolean existsCrewNameForHost(Long userId, String name) {
+        return crewMemberJpaRepository.existsHostCrewName(userId, name, CrewRole.HOST);
     }
 }

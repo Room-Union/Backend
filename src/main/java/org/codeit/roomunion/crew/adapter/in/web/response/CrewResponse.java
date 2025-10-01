@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.crew.domain.model.Crew;
+import org.codeit.roomunion.crew.domain.model.enums.CrewCategory;
 import org.codeit.roomunion.user.domain.model.User;
 
 import java.time.LocalDateTime;
@@ -24,8 +25,8 @@ public class CrewResponse {
     @Schema(description = "모임 설명", example = "같이 개발하는 온라인 코딩 모임입니다.")
     private String description;
 
-//    @Schema(description = "모임 카테고리", example = "게임")
-//    private Category category;
+    @Schema(description = "모임 카테고리", example = "게임")
+    private CrewCategory category;
 
     @Schema(description = "최대 참여자 수", example = "10")
     private int maxMemberCount;
@@ -51,11 +52,12 @@ public class CrewResponse {
     @Schema(description = "모임 생성 시각")
     private LocalDateTime createdAt;
 
-    public static CrewResponse from(Crew crew, CustomUserDetails host, boolean isJoined) {
+    public static CrewResponse from(Crew crew, User host, boolean isJoined) {
         return CrewResponse.builder()
             .crewId(crew.getId())
             .name(crew.getName())
             .description(crew.getDescription())
+            .category(crew.getCategory())
             .maxMemberCount(crew.getMaxMemberCount())
             .isJoined(isJoined)
             .platformURL(crew.getPlatformURL())

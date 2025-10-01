@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.codeit.roomunion.crew.domain.model.Crew;
+import org.codeit.roomunion.crew.domain.model.enums.CrewCategory;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,10 @@ public class CrewEntity {
     @Column(name = "crew_image")
     private String crewImage;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CrewCategory category;
+
     @Column(nullable = false)
     @ColumnDefault("1")
     private int maxMemberCount;
@@ -48,9 +53,6 @@ public class CrewEntity {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    //@Enumerated(EnumType.STRING)
-    //@Column(nullable = false)
-    //private Category category;
 
     public Crew toDomain(Long hostUserId) {
         return Crew.of(
@@ -58,6 +60,7 @@ public class CrewEntity {
             this.getName(),
             this.getDescription(),
             this.getCrewImage(),
+            this.getCategory(),
             this.getMaxMemberCount(),
             hostUserId,
             this.getPlatformUrls(),

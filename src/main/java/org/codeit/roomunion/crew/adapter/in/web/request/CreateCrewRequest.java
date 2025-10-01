@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.codeit.roomunion.crew.domain.model.command.CrewCreateCommand;
+import org.codeit.roomunion.crew.domain.model.enums.CrewCategory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -29,9 +30,9 @@ public class CreateCrewRequest {
     @Schema(example = "온라인으로 코드 리뷰·스터디·프로젝트 협업을 진행합니다.")
     private String description;
 
-//    @NotBlank(message = "모임 카테고리 선택은 필수입니다.")
-//    @Schema(example = "게임")
-//    private Category category;
+    @NotBlank(message = "모임 카테고리 선택은 필수입니다.")
+    @Schema(example = "게임")
+    private CrewCategory category;
 
     @Min(value = 1, message = "최대 참여자 수는 1 이상이어야 합니다.")
     @Schema(example = "10")
@@ -41,15 +42,15 @@ public class CreateCrewRequest {
     @Schema(example = "[\"https://zoom.us/12345\", \"https://discord.gg/abcde\"]")
     private List<String> platformURL;
 
-    public CrewCreateCommand toCommand(Long userId, MultipartFile image) {
+    public CrewCreateCommand toCommand(Long userId) {
         return CrewCreateCommand.builder()
             .name(this.name)
             .description(this.description)
+            .category(this.category)
             .maxMemberCount(this.maxMemberCount)
             .platformURL(this.platformURL)
             .userId(userId)
             .build();
-//            .category(this.category)
     }
 
 

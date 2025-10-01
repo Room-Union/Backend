@@ -10,6 +10,7 @@ import org.codeit.roomunion.crew.application.port.in.CrewCommandUseCase;
 import org.codeit.roomunion.crew.domain.model.Crew;
 import org.codeit.roomunion.crew.domain.model.command.CrewCreateCommand;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
+import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -34,13 +36,11 @@ public class CrewController {
         @RequestPart("request") @Valid CreateCrewRequest request,
         @RequestPart(value = "image", required = false) MultipartFile image
     ) {
-        CrewCreateCommand command = request.toCommand(userDetails.getId(), image);
+        String email = userDetails.getUsername();
+        CrewCreateCommand command = request.toCommand(userDetails.getId());
         Crew crew = crewCommandUseCase.create(command, image);
-
-//        현재 로그인한 사용자를 User 도메인으로 조회
-//        User host = userQueryUseCase.getById(userDetails.getId());
-//        CrewResponse response = CrewResponse.from(crew, host, true);
-//        return ResponseEntity.ok(response);
+        User host = userQueryUseCase.getByEmail(email);
+        ResponseEntity.ok(CrewResponse.from(crew, host, true));
 
         return null;
 
