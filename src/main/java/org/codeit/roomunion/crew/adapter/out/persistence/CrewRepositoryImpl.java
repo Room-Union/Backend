@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.common.adapter.out.persistence.entity.UuidEntity;
 import org.codeit.roomunion.common.adapter.out.persistence.jpa.UuidJpaRepository;
 import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
+import org.codeit.roomunion.common.exception.CustomException;
+import org.codeit.roomunion.common.exception.UserNotFoundException;
 import org.codeit.roomunion.crew.adapter.out.persistence.entity.CrewEntity;
 import org.codeit.roomunion.crew.adapter.out.persistence.entity.CrewMemberEntity;
 import org.codeit.roomunion.crew.adapter.out.persistence.jpa.CrewJpaRepository;
@@ -12,6 +14,7 @@ import org.codeit.roomunion.crew.application.port.out.CrewRepository;
 import org.codeit.roomunion.crew.domain.model.Crew;
 import org.codeit.roomunion.crew.domain.model.command.CrewCreateCommand;
 import org.codeit.roomunion.crew.domain.model.enums.CrewRole;
+import org.codeit.roomunion.crew.exception.CrewErrorCode;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.codeit.roomunion.user.adapter.out.persistence.jpa.UserJpaRepository;
 import org.springframework.stereotype.Repository;
@@ -51,10 +54,11 @@ public class CrewRepositoryImpl implements CrewRepository {
     @Override
     public void saveCrewMemberAsHost(Long crewId, Long userId) {
         CrewEntity crew = crewJpaRepository.findById(crewId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 Crew입니다. crewId=" + crewId));
+            .orElseThrow(() -> new CustomException(CrewErrorCode.CREW_NOT_FOUND));
 
+        // TODO 현태님 UserErrorCode로 변경하시면 예외처리 적용
         UserEntity user = userJpaRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 User입니다. userId=" + userId));
+            .orElseThrow(UserNotFoundException::new);
 
         CrewMemberEntity crewMember = CrewMemberEntity.builder()
             .crew(crew)
