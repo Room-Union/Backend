@@ -31,7 +31,7 @@ public class CreateCrewRequest {
     private String description;
 
     @NotBlank(message = "모임 카테고리 선택은 필수입니다.")
-    @Schema(example = "게임")
+    @Schema(example = "GAME")
     private CrewCategory category;
 
     @Min(value = 1, message = "최대 참여자 수는 1 이상이어야 합니다.")

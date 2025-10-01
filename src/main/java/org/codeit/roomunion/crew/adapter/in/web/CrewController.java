@@ -40,9 +40,6 @@ public class CrewController {
         CrewCreateCommand command = request.toCommand(userDetails.getId());
         Crew crew = crewCommandUseCase.create(command, image);
         User host = userQueryUseCase.getByEmail(email);
-        ResponseEntity.ok(CrewResponse.from(crew, host, true));
-
-        return null;
-
+        return ResponseEntity.ok(CrewResponse.from(crew, host, true));
     }
 }
