@@ -97,9 +97,13 @@ class UserPolicyTest {
 
         @ParameterizedTest
         @ValueSource(strings = {
-            "Password123!",
-            "Strong123@",
-            "Valid1234#"
+            "Password1!",
+            "Strong12@",
+            "valid123#",
+            "Test456$",
+            "Good789+",
+            "Abcd123!",        // 8자 경계값 (최소값)
+            "Abcdefg12345!"    // 13자 경계값 (최대값)
         })
         @DisplayName("유효한 비밀번호인 경우 예외가 발생하지 않아야 한다")
         void validate_ShouldNotThrowException_WhenPasswordIsValid(String validPassword) {
@@ -119,11 +123,16 @@ class UserPolicyTest {
 
         @ParameterizedTest
         @ValueSource(strings = {
-            "weak",              // 너무 짧음
-            "password",          // 대문자, 숫자, 특수문자 없음
-            "PASSWORD123",       // 소문자, 특수문자 없음
+            "weak",              // 너무 짧음 (8자 미만)
+            "password",          // 숫자, 특수문자 없음
+            "PASSWORD123",       // 특수문자 없음
             "Password",          // 숫자, 특수문자 없음
-            "12345678!",         // 대소문자 없음
+            "12345678!",         // 문자 없음
+            "Abcdefgh",          // 숫자, 특수문자 없음
+            "123456789",         // 문자, 특수문자 없음
+            "!@#$%^*()_",        // 문자, 숫자 없음
+            "VeryLongPassword123!", // 너무 길음 (13자 초과)
+            "Pass1234567890123!", // 너무 길음 (13자 초과)
             ""                   // 빈 문자열
         })
         @DisplayName("유효하지 않은 비밀번호인 경우 예외가 발생해야 한다")
@@ -140,7 +149,7 @@ class UserPolicyTest {
             // when & then
             assertThatThrownBy(() -> UserPolicy.validate(command))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one special character");
+                .hasMessage("Password must be 8-13 characters long and contain letters, numbers, and special characters (!, @, #, $, %, ^, *, (, ), _, +, =, -, ~)");
         }
     }
 
