@@ -1,6 +1,6 @@
 package org.codeit.roomunion.user.domain.policy;
 
-import org.codeit.roomunion.moim.domain.model.Category;
+import org.codeit.roomunion.crew.domain.model.enums.CrewCategory;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 
 import java.util.Set;
@@ -35,7 +35,7 @@ public class UserPolicy {
         return !EMAIL_PATTERN.matcher(userCreateCommand.getEmail()).matches();
     }
 
-    private static boolean isNotRequiredCategorySize(Set<Category> categories) {
+    private static boolean isNotRequiredCategorySize(Set<CrewCategory> categories) {
         if (categories == null || categories.isEmpty()) {
             return true;
         }

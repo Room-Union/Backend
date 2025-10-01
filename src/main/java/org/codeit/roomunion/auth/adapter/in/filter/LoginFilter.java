@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.common.exception.ErrorCode;
 import org.codeit.roomunion.common.jwt.JwtUtil;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 
+@Slf4j
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final long EXPIRATION;
@@ -37,6 +39,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
         this.objectMapper = new ObjectMapper();
+        this.EXPIRATION = expiration;
         setFilterProcessesUrl("/v1/auth/login");
     }
 
