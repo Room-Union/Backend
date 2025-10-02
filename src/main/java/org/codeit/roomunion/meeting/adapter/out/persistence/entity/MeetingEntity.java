@@ -42,11 +42,11 @@ public class MeetingEntity {
     @ColumnDefault("1")
     private int maxMemberCount;
 
-    @OneToMany(mappedBy = "meetingId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MeetingMemberEntity> meetingMembers = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name = "meetingId_platform_urls", joinColumns = @JoinColumn(name = "meeting_id"))
+    @CollectionTable(name = "meeting_platform_urls", joinColumns = @JoinColumn(name = "meeting_id"))
     @Column(name = "platform_url", length = 500)
     private List<String> platformUrls = new ArrayList<>();
 
@@ -66,6 +66,10 @@ public class MeetingEntity {
             this.getPlatformUrls(),
             this.getCreatedAt()
         );
+    }
+
+    public void addMember(MeetingMemberEntity member) {
+        this.meetingMembers.add(member);
     }
 
 

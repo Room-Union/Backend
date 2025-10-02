@@ -1,10 +1,7 @@
 package org.codeit.roomunion.meeting.adapter.in.web.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
@@ -29,7 +26,7 @@ public class CreateMeetingRequest {
     @Schema(example = "온라인으로 코드 리뷰·스터디·프로젝트 협업을 진행합니다.")
     private String description;
 
-    @NotBlank(message = "모임 카테고리 선택은 필수입니다.")
+    @NotNull(message = "모임 카테고리 선택은 필수입니다.")
     @Schema(example = "GAME")
     private MeetingCategory category;
 
@@ -37,7 +34,7 @@ public class CreateMeetingRequest {
     @Schema(example = "10")
     private int maxMemberCount;
 
-    @NotNull(message = "플랫폼 URL은 최소 1개 이상 입력해야 합니다.")
+    @NotEmpty(message = "플랫폼 URL은 최소 1개 이상 입력해야 합니다.")
     @Schema(example = "[\"https://zoom.us/12345\", \"https://discord.gg/abcde\"]")
     private List<String> platformURL;
 

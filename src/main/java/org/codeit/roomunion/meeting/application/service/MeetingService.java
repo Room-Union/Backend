@@ -61,7 +61,6 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
         Meeting saved = meetingRepository.createMeeting(finalCommand);
 
-        meetingRepository.saveMeetingMemberAsHost(saved.getId(), command.getUserId());
 
         return saved;
     }
@@ -71,7 +70,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     public Meeting getBymeetingId(Long meetingId) {
         Meeting meeting = meetingRepository.findById(meetingId);
         // 추후 예외는 ErrorCode로 변경 예정
-        if (meeting == null) {
+        if (meeting.isEmpty()) {
             throw new CustomException(MeetingErrorCode.MEETING_NOT_FOUND);
         }
         return meeting;

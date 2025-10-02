@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -25,6 +26,27 @@ public class Meeting {
     private final List<String> platformURL;
 
     private final LocalDateTime createdAt;
+
+    private static final Meeting EMPTY = new Meeting(
+        0L, // 존재하지 않는 ID
+        "",  // 기본값
+        "",
+        null,
+        null,
+        0,
+        null,
+        Collections.emptyList(),
+        null
+
+    );
+
+    public static Meeting getEmpty() {
+        return EMPTY;
+    }
+
+    public boolean isEmpty() {
+        return this == EMPTY;
+    }
 
     private Meeting(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, Long userId, List<String> platformURL, LocalDateTime createdAt) {
         this.id = id;

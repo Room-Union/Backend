@@ -23,17 +23,16 @@ public class ControllerAdvice {
         BaseErrorCode errorCode = e.getErrorCode();
         log.error("CustomException: {}", e.getMessage());
         return ResponseEntity.status(errorCode.getStatus())
-            .body(BaseResponse.error(errorCode.getStatus().value(), e.getMessage()));
+            .body(BaseResponse.error(errorCode.getStatusValue(), e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse<Object>> handleValidationException(MethodArgumentNotValidException e) {
         BaseErrorCode errorCode = GlobalErrorCode.INVALID_INPUT_VALUE;
-        String errorMessages = e.getBindingResult().getFieldErrors().stream()
-            .map(ex -> String.format("[%s] %s", ex.getField(), ex.getDefaultMessage()))
-            .collect(Collectors.joining(" / "));
+        String errorMessages = getValidationErrorMessage(e);
         log.error("Validation 오류 발생: {}", errorMessages);
-        return ResponseEntity.status(errorCode.getStatus()).body(BaseResponse.error(errorCode.getStatus().value(), errorMessages));
+        return ResponseEntity.status(errorCode.getStatus()).
+            body(BaseResponse.error(errorCode.getStatus().value(), errorMessages));
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -41,7 +40,8 @@ public class ControllerAdvice {
         BaseErrorCode errorCode = GlobalErrorCode.INVALID_INPUT_VALUE;
         String detail = "필수 파라미터 누락: " + e.getParameterName();
         log.error("필수 요청 파라미터 누락: {}", detail);
-        return ResponseEntity.status(errorCode.getStatus()).body(BaseResponse.error(errorCode.getStatus().value(), detail));
+        return ResponseEntity.status(errorCode.getStatus()).
+            body(BaseResponse.error(errorCode.getStatus().value(), detail));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -58,5 +58,11 @@ public class ControllerAdvice {
         log.error("Server 오류 발생: ", e);
         return ResponseEntity.status(errorCode.getStatus())
             .body(BaseResponse.error(500, "서버 오류가 발생했습니다."));
+    }
+
+    private static String getValidationErrorMessage(MethodArgumentNotValidException e) {
+        return e.getBindingResult().getFieldErrors().stream()
+            .map(ex -> String.format("[%s] %s", ex.getField(), ex.getDefaultMessage()))
+            .collect(Collectors.joining(" / "));
     }
 }

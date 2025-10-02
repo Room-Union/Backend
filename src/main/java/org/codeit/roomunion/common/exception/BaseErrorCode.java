@@ -9,4 +9,8 @@ public interface BaseErrorCode {
     String getMessage();
 
     HttpStatus getStatus();
+
+    default int getStatusValue() {
+        return getStatus().value();
+    }
 }
