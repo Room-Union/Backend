@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.codeit.roomunion.crew.domain.model.command.CrewCreateCommand;
 import org.codeit.roomunion.crew.domain.model.enums.CrewCategory;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -52,8 +51,6 @@ public class CreateCrewRequest {
             .userId(userId)
             .build();
     }
-
-
 
 
 }

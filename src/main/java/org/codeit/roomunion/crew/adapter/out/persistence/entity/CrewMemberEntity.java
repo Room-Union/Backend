@@ -33,5 +33,4 @@ public class CrewMemberEntity {
     private CrewRole crewRole; // HOST / MEMBER
 
 
-
 }

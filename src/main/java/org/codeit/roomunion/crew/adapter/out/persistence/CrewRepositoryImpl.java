@@ -1,9 +1,6 @@
 package org.codeit.roomunion.crew.adapter.out.persistence;
 
 import lombok.RequiredArgsConstructor;
-import org.codeit.roomunion.common.adapter.out.persistence.entity.UuidEntity;
-import org.codeit.roomunion.common.adapter.out.persistence.jpa.UuidJpaRepository;
-import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.common.exception.UserNotFoundException;
 import org.codeit.roomunion.crew.adapter.out.persistence.entity.CrewEntity;
@@ -18,12 +15,9 @@ import org.codeit.roomunion.crew.exception.CrewErrorCode;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.codeit.roomunion.user.adapter.out.persistence.jpa.UserJpaRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -72,15 +66,15 @@ public class CrewRepositoryImpl implements CrewRepository {
 
     @Override
     public Crew findById(Long crewId) {
-        Optional<CrewEntity> optional  = crewJpaRepository.findById(crewId);
-        if (optional .isEmpty()) return null;
+        Optional<CrewEntity> optional = crewJpaRepository.findById(crewId);
+        if (optional.isEmpty()) return null;
 
         CrewEntity entity = optional.get();
 
         // HOST 유저 찾기
         Long hostUserId = crewMemberJpaRepository
             .findByCrewIdAndCrewRole(crewId, CrewRole.HOST)
-            .map(crewMemberEntity ->  crewMemberEntity.getUser().getId())
+            .map(crewMemberEntity -> crewMemberEntity.getUser().getId())
             .orElse(null);
 
         return entity.toDomain(hostUserId);

@@ -16,7 +16,7 @@ public record JoinUserRequest(String email, String password, String nickname, Ge
 
     private Set<CrewCategory> parseCategories(String categories) {
         return Arrays.stream(categories.split(","))
-                .map(CrewCategory::valueOf)
-                .collect(Collectors.toUnmodifiableSet());
+            .map(CrewCategory::valueOf)
+            .collect(Collectors.toUnmodifiableSet());
     }
 }

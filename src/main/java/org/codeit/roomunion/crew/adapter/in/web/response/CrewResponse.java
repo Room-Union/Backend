@@ -3,7 +3,6 @@ package org.codeit.roomunion.crew.adapter.in.web.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
-import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.crew.domain.model.Crew;
 import org.codeit.roomunion.crew.domain.model.enums.CrewCategory;
 import org.codeit.roomunion.user.domain.model.User;

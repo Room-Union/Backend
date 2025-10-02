@@ -24,13 +24,13 @@ public class AmazonS3Manager {
 
     private final UuidJpaRepository uuidJpaRepository;
 
-    public String uploadFile(String keyName, MultipartFile file){
+    public String uploadFile(String keyName, MultipartFile file) {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(file.getContentType());
         metadata.setContentLength(file.getSize());
         try {
             amazonS3.putObject(new PutObjectRequest(s3Properties.getBucket(), keyName, file.getInputStream(), metadata));
-        }catch (IOException e){
+        } catch (IOException e) {
             log.error("error at AmazonS3Manager uploadFile : {}", (Object) e.getStackTrace());
         }
 
@@ -44,6 +44,6 @@ public class AmazonS3Manager {
     public String crewImageKey(UuidEntity uuidEntity) {
         return s3Properties.getPath().getCrew() + '/' + uuidEntity.getUuid();
     }
-    
+
 
 }

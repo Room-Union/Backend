@@ -19,7 +19,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Map;
 
 @Slf4j
@@ -76,8 +75,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private Map<String, Object> createErrorResponse(ErrorCode errorCode) {
         return Map.of(
-                "code", errorCode.getCode(),
-                "message", errorCode.getMessage()
+            "code", errorCode.getCode(),
+            "message", errorCode.getMessage()
         );
     }
 

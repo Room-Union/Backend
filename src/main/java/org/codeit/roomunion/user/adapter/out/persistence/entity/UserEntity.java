@@ -2,11 +2,11 @@ package org.codeit.roomunion.user.adapter.out.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import org.codeit.roomunion.user.domain.model.User;
-import org.hibernate.annotations.NaturalId;
 import org.codeit.roomunion.crew.adapter.out.persistence.entity.CrewMemberEntity;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.model.Gender;
+import org.codeit.roomunion.user.domain.model.User;
+import org.hibernate.annotations.NaturalId;
 
 import java.util.ArrayList;
 import java.util.List;

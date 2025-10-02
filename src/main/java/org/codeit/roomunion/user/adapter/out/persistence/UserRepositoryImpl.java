@@ -22,7 +22,7 @@ public class UserRepositoryImpl implements UserRepository {
     public User create(UserCreateCommand userCreateCommand) {
         UserEntity userEntity = UserEntity.of(userCreateCommand);
         return userJpaRepository.save(userEntity)
-                .toDomain();
+            .toDomain();
     }
 
     @Override
