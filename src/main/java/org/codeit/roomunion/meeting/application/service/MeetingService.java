@@ -1,9 +1,9 @@
 package org.codeit.roomunion.meeting.application.service;
 
 import lombok.RequiredArgsConstructor;
-import org.codeit.roomunion.common.adapter.out.persistence.entity.UuidEntity;
-import org.codeit.roomunion.common.adapter.out.persistence.jpa.UuidJpaRepository;
 import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
+import org.codeit.roomunion.common.application.port.out.UuidRepository;
+import org.codeit.roomunion.common.domain.model.Uuid;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.common.exception.UserNotFoundException;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
@@ -28,7 +28,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
     private final MeetingRepository meetingRepository;
     private final AmazonS3Manager s3Manager;
-    private final UuidJpaRepository uuidJpaRepository;
+    private final UuidRepository uuidRepository;
     private final UserQueryUseCase userQueryUseCase;
 
     @Override
@@ -45,11 +45,9 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
         String imageUrl = null;
         if (image != null && !image.isEmpty()) {
-            String uuid = UUID.randomUUID().toString();
-            UuidEntity savedUuid = uuidJpaRepository.save(
-                UuidEntity.builder().uuid(uuid).build()
-            );
-            imageUrl = s3Manager.uploadFile(s3Manager.meetingImageKey(savedUuid), image);
+            Uuid uuid = uuidRepository.save(Uuid.of(UUID.randomUUID().toString()));
+            String key = Meeting.getImagePath(uuid.getValue()); // 도메인에서 경로 생성
+            imageUrl = s3Manager.uploadFile(key, image);
         }
         // TODO 현태님 예외처리 수정시 변경
         User host = userQueryUseCase.findByEmail(command.getHostEmail())
