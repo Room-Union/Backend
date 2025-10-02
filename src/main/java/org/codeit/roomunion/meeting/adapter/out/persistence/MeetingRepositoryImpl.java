@@ -1,6 +1,7 @@
 package org.codeit.roomunion.meeting.adapter.out.persistence;
 
 import lombok.RequiredArgsConstructor;
+import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.common.exception.UserNotFoundException;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingJpaRepository;
@@ -9,6 +10,7 @@ import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
+import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.codeit.roomunion.user.adapter.out.persistence.jpa.UserJpaRepository;
 import org.springframework.stereotype.Repository;
@@ -46,7 +48,7 @@ public class MeetingRepositoryImpl implements MeetingRepository {
                         String hostNickname = mm.getUser().getNickname();
                         return entity.toDomain(hostUserId, hostNickname);
                     })
-                    .orElseGet(() -> entity.toDomain(null, null));  // host 멤버 없을 때
+                    .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_HOST_NOT_FOUND));
             })
             .orElse(Meeting.getEmpty()); // 엔티티가 없을 때
     }
