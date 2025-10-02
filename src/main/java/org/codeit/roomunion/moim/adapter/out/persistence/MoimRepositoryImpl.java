@@ -73,7 +73,7 @@ public class MoimRepositoryImpl implements MoimRepository {
 
         // HOST 유저 찾기
         Long hostUserId = moimMemberJpaRepository
-            .findByMoimIdAndgetMoimRole(moimId, MoimRole.HOST)
+            .findByMoimIdAndMoimRole(moimId, MoimRole.HOST)
             .map(moimMemberEntity -> moimMemberEntity.getUser().getId())
             .orElse(null);
 

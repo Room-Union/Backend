@@ -59,7 +59,7 @@ public class MoimEntity {
             this.getId(),
             this.getName(),
             this.getDescription(),
-            this.getmoimImage(),
+            this.getMoimImage(),
             this.getCategory(),
             this.getMaxMemberCount(),
             hostUserId,

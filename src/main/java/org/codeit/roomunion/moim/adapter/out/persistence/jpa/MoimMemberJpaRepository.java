@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface MoimMemberJpaRepository extends JpaRepository<MoimMemberEntity, Long> {
-    Optional<MoimMemberEntity> findByMoimIdAndgetMoimRole(Long moimId, MoimRole moimRole);
+    Optional<MoimMemberEntity> findByMoimIdAndMoimRole(Long moimId, MoimRole moimRole);
 
     @Query("""
             select (count(mm) > 0)

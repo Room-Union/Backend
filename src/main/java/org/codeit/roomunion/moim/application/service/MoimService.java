@@ -72,7 +72,7 @@ public class MoimService implements MoimCommandUseCase, MoimQueryUseCase {
         Moim moim = moimRepository.findById(moimId);
         // 추후 예외는 ErrorCode로 변경 예정
         if (moim == null) {
-            throw new CustomException(MoimErrorCode.getMoim_NOT_FOUND);
+            throw new CustomException(MoimErrorCode.MOIM_NOT_FOUND);
         }
         return moim;
     }

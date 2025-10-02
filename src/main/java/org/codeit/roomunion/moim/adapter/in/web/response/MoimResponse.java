@@ -60,7 +60,7 @@ public class MoimResponse {
             .maxMemberCount(moim.getMaxMemberCount())
             .isJoined(isJoined)
             .platformURL(moim.getPlatformURL())
-            .moimImage(moim.getmoimImage())
+            .moimImage(moim.getMoimImage())
             .userId(host.getId())
 //            .profileImage(host.getProfileImage())
             .nickname(host.getNickname())
