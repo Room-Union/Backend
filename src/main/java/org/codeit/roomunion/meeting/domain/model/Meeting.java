@@ -9,6 +9,9 @@ import java.util.List;
 
 @Getter
 public class Meeting {
+
+    private static final String IMAGE_PATH_TEMPLATE = "meeting/%s";
+
     private final Long id;
 
     private final String name;
@@ -43,6 +46,10 @@ public class Meeting {
         null,
         ""
     );
+
+    public static String getImagePath(String uuid) {
+        return String.format(IMAGE_PATH_TEMPLATE, uuid);
+    }
 
     public static Meeting getEmpty() {
         return EMPTY;
