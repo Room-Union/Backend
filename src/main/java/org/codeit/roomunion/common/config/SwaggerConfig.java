@@ -15,32 +15,32 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
-  @Value("${server.servlet.context-path:}")
-  private String contextPath;
+    @Value("${server.servlet.context-path:}")
+    private String contextPath;
 
-  @Bean
-  public OpenAPI customOpenAPI() {
-    Server localServer = new Server();
-    localServer.setUrl(contextPath);
-    localServer.setDescription("Local Server");
+    @Bean
+    public OpenAPI customOpenAPI() {
+        Server localServer = new Server();
+        localServer.setUrl(contextPath);
+        localServer.setDescription("Local Server");
 
-    return new OpenAPI()
-        .addServersItem(localServer)
-        .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
-        .components(
-            new Components()
-                .addSecuritySchemes(
-                    "bearerAuth",
-                    new SecurityScheme()
-                        .type(SecurityScheme.Type.HTTP)
-                        .scheme("bearer")
-                        .bearerFormat("JWT")))
-        .info(new Info().title("방구석연합 Swagger API 명세서").version("1.0").description("RoomUnion Swagger API"));
-  }
+        return new OpenAPI()
+            .addServersItem(localServer)
+            .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+            .components(
+                new Components()
+                    .addSecuritySchemes(
+                        "bearerAuth",
+                        new SecurityScheme()
+                            .type(SecurityScheme.Type.HTTP)
+                            .scheme("bearer")
+                            .bearerFormat("JWT")))
+            .info(new Info().title("방구석연합 Swagger API 명세서").version("1.0").description("RoomUnion Swagger API"));
+    }
 
-  @Bean
-  public GroupedOpenApi customGroupedOpenApi() {
-    return GroupedOpenApi.builder().group("api").pathsToMatch("/**").build();
-  }
+    @Bean
+    public GroupedOpenApi customGroupedOpenApi() {
+        return GroupedOpenApi.builder().group("api").pathsToMatch("/**").build();
+    }
 
 }

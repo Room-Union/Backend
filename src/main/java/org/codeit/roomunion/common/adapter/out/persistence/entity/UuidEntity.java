@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.codeit.roomunion.common.domain.model.Uuid;
 
 @Entity
 @Builder
@@ -19,4 +20,16 @@ public class UuidEntity {
 
     @Column(unique = true)
     private String uuid;
+
+    public static UuidEntity from(Uuid uuid) {
+        return UuidEntity.builder()
+            .uuid(uuid.getValue())
+            .build();
+    }
+
+    public Uuid toDomain() {
+        return Uuid.of(this.uuid);
+    }
+
+
 }

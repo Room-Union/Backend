@@ -1,13 +1,11 @@
 package org.codeit.roomunion.auth.config;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 //CorsConfig 설정
 @Configuration

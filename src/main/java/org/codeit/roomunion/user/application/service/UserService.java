@@ -1,5 +1,6 @@
 package org.codeit.roomunion.user.application.service;
 
+import org.codeit.roomunion.auth.application.port.out.CustomPasswordEncoder;
 import org.codeit.roomunion.common.exception.UserNotFoundException;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
@@ -7,7 +8,6 @@ import org.codeit.roomunion.user.application.port.out.UserRepository;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.model.User;
 import org.codeit.roomunion.user.domain.policy.UserPolicy;
-import org.codeit.roomunion.auth.application.port.out.CustomPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

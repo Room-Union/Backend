@@ -18,11 +18,11 @@ public class S3Properties {
     @Getter
     public static class Path {
         private final String profile;
-        private final String crew;
+        private final String meeting;
 
-        public Path(String profile, String crew) {
+        public Path(String profile, String meeting) {
             this.profile = profile;
-            this.crew = crew;
+            this.meeting = meeting;
         }
 
     }

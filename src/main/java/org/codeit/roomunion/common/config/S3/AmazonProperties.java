@@ -16,7 +16,7 @@ public class AmazonProperties {
     }
 
     @Getter
-    public static class Credentials{
+    public static class Credentials {
         private final String accessKey;
         private final String secretKey;
 
