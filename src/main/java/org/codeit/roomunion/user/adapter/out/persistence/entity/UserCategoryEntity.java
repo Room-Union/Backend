@@ -2,7 +2,7 @@ package org.codeit.roomunion.user.adapter.out.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import org.codeit.roomunion.moim.domain.model.enums.MoimCategory;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 
 @Getter
 @Entity
@@ -23,17 +23,17 @@ public class UserCategoryEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
-    private MoimCategory moimCategory;
+    private MeetingCategory meetingCategory;
 
     protected UserCategoryEntity() {
     }
 
-    UserCategoryEntity(UserEntity user, MoimCategory moimCategory) {
+    UserCategoryEntity(UserEntity user, MeetingCategory meetingCategory) {
         this.user = user;
-        this.moimCategory = moimCategory;
+        this.meetingCategory = meetingCategory;
     }
 
-    static UserCategoryEntity of(UserEntity user, MoimCategory moimCategory) {
-        return new UserCategoryEntity(user, moimCategory);
+    static UserCategoryEntity of(UserEntity user, MeetingCategory meetingCategory) {
+        return new UserCategoryEntity(user, meetingCategory);
     }
 }

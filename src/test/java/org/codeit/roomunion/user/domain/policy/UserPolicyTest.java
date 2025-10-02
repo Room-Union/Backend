@@ -1,6 +1,6 @@
 package org.codeit.roomunion.user.domain.policy;
 
-import org.codeit.roomunion.moim.domain.model.enums.MoimCategory;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.command.UserCreateCommandFixture;
 import org.codeit.roomunion.user.domain.model.Gender;
@@ -29,7 +29,7 @@ class UserPolicyTest {
             "Password123!",
             "nickname",
             Gender.MALE,
-            Set.of(MoimCategory.GAME, MoimCategory.INFO_ECONOMY)
+            Set.of(MeetingCategory.GAME, MeetingCategory.INFO_ECONOMY)
         );
 
         // when & then
@@ -56,7 +56,7 @@ class UserPolicyTest {
                 "Password123!",
                 "nickname",
                 Gender.MALE,
-                Set.of(MoimCategory.GAME, MoimCategory.INFO_ECONOMY)
+                Set.of(MeetingCategory.GAME, MeetingCategory.INFO_ECONOMY)
             );
 
             // when & then
@@ -81,7 +81,7 @@ class UserPolicyTest {
                 "Password123!",
                 "nickname",
                 Gender.MALE,
-                Set.of(MoimCategory.GAME, MoimCategory.INFO_ECONOMY)
+                Set.of(MeetingCategory.GAME, MeetingCategory.INFO_ECONOMY)
             );
 
             // when & then
@@ -109,7 +109,7 @@ class UserPolicyTest {
                 validPassword,
                 "nickname",
                 Gender.MALE,
-                Set.of(MoimCategory.GAME, MoimCategory.INFO_ECONOMY)
+                Set.of(MeetingCategory.GAME, MeetingCategory.INFO_ECONOMY)
             );
 
             // when & then
@@ -134,7 +134,7 @@ class UserPolicyTest {
                 invalidPassword,
                 "nickname",
                 Gender.MALE,
-                Set.of(MoimCategory.GAME, MoimCategory.INFO_ECONOMY)
+                Set.of(MeetingCategory.GAME, MeetingCategory.INFO_ECONOMY)
             );
 
             // when & then
@@ -146,7 +146,7 @@ class UserPolicyTest {
 
     @Nested
     @DisplayName("카테고리 검증")
-    class MoimCategoryValidationTest {
+    class MeetingCategoryValidationTest {
 
         @Test
         @DisplayName("카테고리가 정확히 2개인 경우 예외가 발생하지 않아야 한다")
@@ -157,7 +157,7 @@ class UserPolicyTest {
                 "Password123!",
                 "nickname",
                 Gender.MALE,
-                Set.of(MoimCategory.GAME, MoimCategory.INFO_ECONOMY)
+                Set.of(MeetingCategory.GAME, MeetingCategory.INFO_ECONOMY)
             );
 
             // when & then
@@ -168,7 +168,7 @@ class UserPolicyTest {
         @ParameterizedTest
         @MethodSource("provideInvalidCategories")
         @DisplayName("카테고리가 유효하지 않은 경우 예외가 발생해야 한다")
-        void validate_ShouldThrowException_WhenCategoriesAreInvalid(Set<MoimCategory> invalidCategories) {
+        void validate_ShouldThrowException_WhenCategoriesAreInvalid(Set<MeetingCategory> invalidCategories) {
             // given
             UserCreateCommand command = UserCreateCommandFixture.create(
                 "test@example.com",
@@ -188,8 +188,8 @@ class UserPolicyTest {
             return Stream.of(
                 Arguments.of((Object) null),                    // null
                 Arguments.of(Set.of()),                        // 빈 리스트
-                Arguments.of(Set.of(MoimCategory.GAME)),           // 1개
-                Arguments.of(Set.of(MoimCategory.GAME, MoimCategory.INFO_ECONOMY, MoimCategory.HOBBY)) // 3개 이상
+                Arguments.of(Set.of(MeetingCategory.GAME)),           // 1개
+                Arguments.of(Set.of(MeetingCategory.GAME, MeetingCategory.INFO_ECONOMY, MeetingCategory.HOBBY)) // 3개 이상
             );
         }
     }

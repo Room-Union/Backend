@@ -1,6 +1,6 @@
 package org.codeit.roomunion.user.adapter.in.web.request;
 
-import org.codeit.roomunion.moim.domain.model.enums.MoimCategory;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.model.Gender;
 
@@ -14,9 +14,9 @@ public record JoinUserRequest(String email, String password, String nickname, Ge
         return UserCreateCommand.of(email, password, nickname, gender, parseCategories(categories));
     }
 
-    private Set<MoimCategory> parseCategories(String categories) {
+    private Set<MeetingCategory> parseCategories(String categories) {
         return Arrays.stream(categories.split(","))
-            .map(MoimCategory::valueOf)
+            .map(MeetingCategory::valueOf)
             .collect(Collectors.toUnmodifiableSet());
     }
 }
