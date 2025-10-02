@@ -41,8 +41,8 @@ public class AmazonS3Manager {
         return s3Properties.getPath().getProfile() + "/" + uuidEntity.getUuid();
     }
 
-    public String crewImageKey(UuidEntity uuidEntity) {
-        return s3Properties.getPath().getCrew() + '/' + uuidEntity.getUuid();
+    public String moimImageKey(UuidEntity uuidEntity) {
+        return s3Properties.getPath().getMoim() + '/' + uuidEntity.getUuid();
     }
 
 

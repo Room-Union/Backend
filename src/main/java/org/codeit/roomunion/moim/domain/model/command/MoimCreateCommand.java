@@ -3,7 +3,7 @@ package org.codeit.roomunion.moim.domain.model.command;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.codeit.roomunion.moim.domain.model.enums.CrewCategory;
+import org.codeit.roomunion.moim.domain.model.enums.MoimCategory;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,13 +11,13 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class CrewCreateCommand {
+public class MoimCreateCommand {
 
     private final String name;
 
     private final String description;
 
-    private final CrewCategory category;
+    private final MoimCategory category;
 
     private final int maxMemberCount;
 

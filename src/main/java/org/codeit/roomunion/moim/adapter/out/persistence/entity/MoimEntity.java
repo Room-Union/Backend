@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.codeit.roomunion.moim.domain.model.Crew;
-import org.codeit.roomunion.moim.domain.model.enums.CrewCategory;
+import org.codeit.roomunion.moim.domain.model.Moim;
+import org.codeit.roomunion.moim.domain.model.enums.MoimCategory;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
@@ -14,12 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "crew")
+@Table(name = "moim")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CrewEntity {
+public class MoimEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,22 +31,22 @@ public class CrewEntity {
     @Column(nullable = false, length = 1000)
     private String description;
 
-    @Column(name = "crew_image")
-    private String crewImage;
+    @Column(name = "moim_image")
+    private String moimImage;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private CrewCategory category;
+    private MoimCategory category;
 
     @Column(nullable = false)
     @ColumnDefault("1")
     private int maxMemberCount;
 
-    @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CrewMemberEntity> crewMembers = new ArrayList<>();
+    @OneToMany(mappedBy = "moim", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MoimMemberEntity> moimMembers = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name = "crew_platform_urls", joinColumns = @JoinColumn(name = "crew_id"))
+    @CollectionTable(name = "moim_platform_urls", joinColumns = @JoinColumn(name = "moim_id"))
     @Column(name = "platform_url", length = 500)
     private List<String> platformUrls = new ArrayList<>();
 
@@ -54,12 +54,12 @@ public class CrewEntity {
     private LocalDateTime createdAt;
 
 
-    public Crew toDomain(Long hostUserId) {
-        return Crew.of(
+    public Moim toDomain(Long hostUserId) {
+        return Moim.of(
             this.getId(),
             this.getName(),
             this.getDescription(),
-            this.getCrewImage(),
+            this.getmoimImage(),
             this.getCategory(),
             this.getMaxMemberCount(),
             hostUserId,

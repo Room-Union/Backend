@@ -5,12 +5,12 @@ import org.codeit.roomunion.common.adapter.out.persistence.entity.UuidEntity;
 import org.codeit.roomunion.common.adapter.out.persistence.jpa.UuidJpaRepository;
 import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.exception.CustomException;
-import org.codeit.roomunion.moim.application.port.in.CrewCommandUseCase;
-import org.codeit.roomunion.moim.application.port.in.CrewQueryUseCase;
-import org.codeit.roomunion.moim.application.port.out.CrewRepository;
-import org.codeit.roomunion.moim.domain.model.Crew;
-import org.codeit.roomunion.moim.domain.model.command.CrewCreateCommand;
-import org.codeit.roomunion.moim.exception.CrewErrorCode;
+import org.codeit.roomunion.moim.application.port.in.MoimCommandUseCase;
+import org.codeit.roomunion.moim.application.port.in.MoimQueryUseCase;
+import org.codeit.roomunion.moim.application.port.out.MoimRepository;
+import org.codeit.roomunion.moim.domain.model.Moim;
+import org.codeit.roomunion.moim.domain.model.command.MoimCreateCommand;
+import org.codeit.roomunion.moim.exception.MoimErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,22 +21,22 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CrewService implements CrewCommandUseCase, CrewQueryUseCase {
+public class MoimService implements MoimCommandUseCase, MoimQueryUseCase {
 
-    private final CrewRepository crewRepository;
+    private final MoimRepository moimRepository;
     private final AmazonS3Manager s3Manager;
     private final UuidJpaRepository uuidJpaRepository;
 
     @Override
-    public Crew create(CrewCreateCommand command, MultipartFile image) {
+    public Moim create(MoimCreateCommand command, MultipartFile image) {
         // 추후 예외는 ErrorCode로 변경 예정
         if (command.getMaxMemberCount() < 1) {
-            throw new CustomException(CrewErrorCode.INVALID_MAX_MEMBER_COUNT);
+            throw new CustomException(MoimErrorCode.INVALID_MAX_MEMBER_COUNT);
         }
 
         String normalizedName = command.getName().trim();
-        if (crewRepository.existsCrewNameForHost(command.getUserId(), normalizedName)) {
-            throw new CustomException(CrewErrorCode.DUPLICATE_CREW_NAME);
+        if (moimRepository.existsMoimNameForHost(command.getUserId(), normalizedName)) {
+            throw new CustomException(MoimErrorCode.DUPLICATE_MOIM_NAME);
         }
 
         String imageUrl = null;
@@ -45,10 +45,10 @@ public class CrewService implements CrewCommandUseCase, CrewQueryUseCase {
             UuidEntity savedUuid = uuidJpaRepository.save(
                 UuidEntity.builder().uuid(uuid).build()
             );
-            imageUrl = s3Manager.uploadFile(s3Manager.crewImageKey(savedUuid), image);
+            imageUrl = s3Manager.uploadFile(s3Manager.moimImageKey(savedUuid), image);
         }
 
-        CrewCreateCommand finalCommand = CrewCreateCommand.builder()
+        MoimCreateCommand finalCommand = MoimCreateCommand.builder()
             .name(command.getName())
             .description(command.getDescription())
             .category(command.getCategory())
@@ -59,21 +59,21 @@ public class CrewService implements CrewCommandUseCase, CrewQueryUseCase {
             .createdAt(LocalDateTime.now())
             .build();
 
-        Crew saved = crewRepository.createCrew(finalCommand);
+        Moim saved = moimRepository.createMoim(finalCommand);
 
-        crewRepository.saveCrewMemberAsHost(saved.getId(), command.getUserId());
+        moimRepository.saveMoimMemberAsHost(saved.getId(), command.getUserId());
 
         return saved;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Crew getByCrewId(Long crewId) {
-        Crew crew = crewRepository.findById(crewId);
+    public Moim getBymoimId(Long moimId) {
+        Moim moim = moimRepository.findById(moimId);
         // 추후 예외는 ErrorCode로 변경 예정
-        if (crew == null) {
-            throw new CustomException(CrewErrorCode.CREW_NOT_FOUND);
+        if (moim == null) {
+            throw new CustomException(MoimErrorCode.getMoim_NOT_FOUND);
         }
-        return crew;
+        return moim;
     }
 }

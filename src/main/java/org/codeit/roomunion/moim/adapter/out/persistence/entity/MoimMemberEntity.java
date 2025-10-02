@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.codeit.roomunion.moim.domain.model.enums.CrewRole;
+import org.codeit.roomunion.moim.domain.model.enums.MoimRole;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 
 @Entity
@@ -13,16 +13,16 @@ import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "crew_member")
-public class CrewMemberEntity {
+@Table(name = "moim_member")
+public class MoimMemberEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "crew_id", nullable = false)
-    private CrewEntity crew;
+    @JoinColumn(name = "getMoim_id", nullable = false)
+    private MoimEntity moim;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -30,7 +30,7 @@ public class CrewMemberEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private CrewRole crewRole; // HOST / MEMBER
+    private MoimRole moimRole; // HOST / MEMBER
 
 
 }

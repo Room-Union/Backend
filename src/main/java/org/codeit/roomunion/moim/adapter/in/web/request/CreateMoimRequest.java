@@ -6,18 +6,18 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.codeit.roomunion.moim.domain.model.command.CrewCreateCommand;
-import org.codeit.roomunion.moim.domain.model.enums.CrewCategory;
+import org.codeit.roomunion.moim.domain.model.command.MoimCreateCommand;
+import org.codeit.roomunion.moim.domain.model.enums.MoimCategory;
 
 import java.util.List;
 
 @Getter
 @Setter
 @Builder
-@Schema(title = "CreateCrewRequest : Crew 생성 요청 DTO")
+@Schema(title = "CreateMoimRequest : Moim 생성 요청 DTO")
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateCrewRequest {
+public class CreateMoimRequest {
 
     @NotBlank(message = "모임명은 필수입니다.")
     @Size(max = 50)
@@ -31,7 +31,7 @@ public class CreateCrewRequest {
 
     @NotBlank(message = "모임 카테고리 선택은 필수입니다.")
     @Schema(example = "GAME")
-    private CrewCategory category;
+    private MoimCategory category;
 
     @Min(value = 1, message = "최대 참여자 수는 1 이상이어야 합니다.")
     @Schema(example = "10")
@@ -41,8 +41,8 @@ public class CreateCrewRequest {
     @Schema(example = "[\"https://zoom.us/12345\", \"https://discord.gg/abcde\"]")
     private List<String> platformURL;
 
-    public CrewCreateCommand toCommand(Long userId) {
-        return CrewCreateCommand.builder()
+    public MoimCreateCommand toCommand(Long userId) {
+        return MoimCreateCommand.builder()
             .name(this.name)
             .description(this.description)
             .category(this.category)

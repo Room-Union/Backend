@@ -1,7 +1,7 @@
 package org.codeit.roomunion.user.domain.command;
 
 import lombok.Getter;
-import org.codeit.roomunion.moim.domain.model.enums.CrewCategory;
+import org.codeit.roomunion.moim.domain.model.enums.MoimCategory;
 import org.codeit.roomunion.user.domain.model.Gender;
 
 import java.util.Set;
@@ -12,9 +12,9 @@ public class UserCreateCommand {
     private final String password;
     private final String nickname;
     private final Gender gender;
-    private final Set<CrewCategory> categories;
+    private final Set<MoimCategory> categories;
 
-    private UserCreateCommand(String email, String password, String nickname, Gender gender, Set<CrewCategory> categories) {
+    private UserCreateCommand(String email, String password, String nickname, Gender gender, Set<MoimCategory> categories) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
@@ -22,7 +22,7 @@ public class UserCreateCommand {
         this.categories = categories;
     }
 
-    public static UserCreateCommand of(String email, String password, String nickname, Gender gender, Set<CrewCategory> categories) {
+    public static UserCreateCommand of(String email, String password, String nickname, Gender gender, Set<MoimCategory> categories) {
         return new UserCreateCommand(email, password, nickname, gender, categories);
     }
 

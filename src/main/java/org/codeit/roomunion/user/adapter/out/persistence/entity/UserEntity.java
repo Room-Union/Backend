@@ -2,7 +2,7 @@ package org.codeit.roomunion.user.adapter.out.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import org.codeit.roomunion.moim.adapter.out.persistence.entity.CrewMemberEntity;
+import org.codeit.roomunion.moim.adapter.out.persistence.entity.MoimMemberEntity;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.model.Gender;
 import org.codeit.roomunion.user.domain.model.User;
@@ -33,7 +33,7 @@ public class UserEntity {
     private List<UserCategoryEntity> userCategories = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CrewMemberEntity> crewMembers = new ArrayList<>();
+    private List<MoimMemberEntity> moimMembers = new ArrayList<>();
 
     protected UserEntity() {
     }

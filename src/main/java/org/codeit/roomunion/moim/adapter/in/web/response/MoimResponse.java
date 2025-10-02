@@ -3,8 +3,8 @@ package org.codeit.roomunion.moim.adapter.in.web.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
-import org.codeit.roomunion.moim.domain.model.Crew;
-import org.codeit.roomunion.moim.domain.model.enums.CrewCategory;
+import org.codeit.roomunion.moim.domain.model.Moim;
+import org.codeit.roomunion.moim.domain.model.enums.MoimCategory;
 import org.codeit.roomunion.user.domain.model.User;
 
 import java.time.LocalDateTime;
@@ -12,11 +12,11 @@ import java.util.List;
 
 @Getter
 @Builder
-@Schema(title = "CrewResponse : 모임 응답 DTO")
-public class CrewResponse {
+@Schema(title = "MoimResponse : 모임 응답 DTO")
+public class MoimResponse {
 
     @Schema(description = "모임 ID", example = "1")
-    private Long crewId;
+    private Long moimId;
 
     @Schema(description = "모임명", example = "온라인 코딩 모임")
     private String name;
@@ -25,7 +25,7 @@ public class CrewResponse {
     private String description;
 
     @Schema(description = "모임 카테고리", example = "게임")
-    private CrewCategory category;
+    private MoimCategory category;
 
     @Schema(description = "최대 참여자 수", example = "10")
     private int maxMemberCount;
@@ -37,7 +37,7 @@ public class CrewResponse {
     private List<String> platformURL;
 
     @Schema(description = "모임 대표 이미지", example = "https://...")
-    private String crewImage;
+    private String moimImage;
 
     @Schema(description = "만든 사람 userId", example = "1")
     private Long userId;
@@ -51,20 +51,20 @@ public class CrewResponse {
     @Schema(description = "모임 생성 시각")
     private LocalDateTime createdAt;
 
-    public static CrewResponse from(Crew crew, User host, boolean isJoined) {
-        return CrewResponse.builder()
-            .crewId(crew.getId())
-            .name(crew.getName())
-            .description(crew.getDescription())
-            .category(crew.getCategory())
-            .maxMemberCount(crew.getMaxMemberCount())
+    public static MoimResponse from(Moim moim, User host, boolean isJoined) {
+        return MoimResponse.builder()
+            .moimId(moim.getId())
+            .name(moim.getName())
+            .description(moim.getDescription())
+            .category(moim.getCategory())
+            .maxMemberCount(moim.getMaxMemberCount())
             .isJoined(isJoined)
-            .platformURL(crew.getPlatformURL())
-            .crewImage(crew.getCrewImage())
+            .platformURL(moim.getPlatformURL())
+            .moimImage(moim.getmoimImage())
             .userId(host.getId())
 //            .profileImage(host.getProfileImage())
             .nickname(host.getNickname())
-            .createdAt(crew.getCreatedAt())
+            .createdAt(moim.getCreatedAt())
             .build();
     }
 
