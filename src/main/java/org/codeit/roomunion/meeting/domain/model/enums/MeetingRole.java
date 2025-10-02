@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public enum MeetingRole {
     HOST("모임장"),
-    MEMBER("크루원");
+    MEMBER("모임원");
 
     private final String description;
 
