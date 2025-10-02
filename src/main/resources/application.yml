@@ -42,7 +42,7 @@ cloud:
             bucket: ${CLOUD_AWS_S3_BUCKET}
             path:
                 profile: profile
-                moim: moim
+                meeting: meeting
         region:
             static-region: ${CLOUD_AWS_REGION_STATIC}
         stack:
