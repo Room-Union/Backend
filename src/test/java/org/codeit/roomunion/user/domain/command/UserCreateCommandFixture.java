@@ -1,6 +1,6 @@
 package org.codeit.roomunion.user.domain.command;
 
-import org.codeit.roomunion.crew.domain.model.enums.CrewCategory;
+import org.codeit.roomunion.moim.domain.model.enums.CrewCategory;
 import org.codeit.roomunion.user.domain.model.Gender;
 
 import java.util.Set;

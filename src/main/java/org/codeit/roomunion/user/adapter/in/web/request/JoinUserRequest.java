@@ -1,6 +1,6 @@
 package org.codeit.roomunion.user.adapter.in.web.request;
 
-import org.codeit.roomunion.crew.domain.model.enums.CrewCategory;
+import org.codeit.roomunion.moim.domain.model.enums.CrewCategory;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.model.Gender;
 

@@ -2,7 +2,6 @@ package org.codeit.roomunion.common.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.codeit.roomunion.common.exception.model.BaseErrorCode;
 import org.springframework.http.HttpStatus;
 
 @Getter

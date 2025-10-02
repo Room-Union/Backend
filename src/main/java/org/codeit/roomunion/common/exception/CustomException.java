@@ -1,7 +1,6 @@
 package org.codeit.roomunion.common.exception;
 
 import lombok.Getter;
-import org.codeit.roomunion.common.exception.model.BaseErrorCode;
 
 @Getter
 public class CustomException extends RuntimeException {

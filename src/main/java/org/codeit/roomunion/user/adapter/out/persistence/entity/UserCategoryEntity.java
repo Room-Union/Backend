@@ -2,7 +2,7 @@ package org.codeit.roomunion.user.adapter.out.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import org.codeit.roomunion.crew.domain.model.enums.CrewCategory;
+import org.codeit.roomunion.moim.domain.model.enums.CrewCategory;
 
 @Getter
 @Entity

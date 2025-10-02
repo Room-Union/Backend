@@ -2,9 +2,9 @@ package org.codeit.roomunion.common.advice;
 
 import lombok.extern.slf4j.Slf4j;
 import org.codeit.roomunion.common.advice.response.BaseResponse;
+import org.codeit.roomunion.common.exception.BaseErrorCode;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.common.exception.GlobalErrorCode;
-import org.codeit.roomunion.common.exception.model.BaseErrorCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
