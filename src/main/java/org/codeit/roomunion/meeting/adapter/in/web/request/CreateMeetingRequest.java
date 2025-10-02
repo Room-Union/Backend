@@ -2,18 +2,14 @@ package org.codeit.roomunion.meeting.adapter.in.web.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.Getter;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 
 import java.util.List;
 
 @Getter
-@Setter
-@Builder
 @Schema(title = "CreateMeetingRequest : Meeting 생성 요청 DTO")
-@NoArgsConstructor
-@AllArgsConstructor
 public class CreateMeetingRequest {
 
     @NotBlank(message = "모임명은 필수입니다.")
@@ -38,13 +34,14 @@ public class CreateMeetingRequest {
     @Schema(example = "[\"https://zoom.us/12345\", \"https://discord.gg/abcde\"]")
     private List<String> platformURL;
 
-    public MeetingCreateCommand toCommand(Long userId) {
+    public MeetingCreateCommand toCommand(Long userId, String hostEmail) {
         return MeetingCreateCommand.builder()
             .name(this.name)
             .description(this.description)
             .category(this.category)
             .maxMemberCount(this.maxMemberCount)
             .platformURL(this.platformURL)
+            .hostEmail(hostEmail)
             .userId(userId)
             .build();
     }

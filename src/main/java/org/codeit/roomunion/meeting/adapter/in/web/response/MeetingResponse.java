@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
-import org.codeit.roomunion.user.domain.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,7 +50,7 @@ public class MeetingResponse {
     @Schema(description = "모임 생성 시각")
     private LocalDateTime createdAt;
 
-    public static MeetingResponse from(Meeting meeting, User host, boolean isJoined) {
+    public static MeetingResponse from(Meeting meeting, boolean isJoined) {
         return MeetingResponse.builder()
             .meetingId(meeting.getId())
             .name(meeting.getName())
@@ -61,9 +60,9 @@ public class MeetingResponse {
             .isJoined(isJoined)
             .platformURL(meeting.getPlatformURL())
             .meetingImage(meeting.getMeetingImage())
-            .userId(host.getId())
+            .userId(meeting.getUserId())
 //            .profileImage(host.getProfileImage())
-            .nickname(host.getNickname())
+            .nickname(meeting.getHostNickname())
             .createdAt(meeting.getCreatedAt())
             .build();
     }

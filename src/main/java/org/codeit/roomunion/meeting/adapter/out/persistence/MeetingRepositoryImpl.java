@@ -50,7 +50,7 @@ public class MeetingRepositoryImpl implements MeetingRepository {
 
         MeetingEntity savedMeetingEntity = meetingJpaRepository.save(meetingEntity);
 
-        return savedMeetingEntity.toDomain(hostUser.getId());
+        return savedMeetingEntity.toDomain(hostUser.getId(), hostUser.getNickname());
     }
 
 
@@ -58,14 +58,16 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     public Meeting findById(Long meetingId) {
         return meetingJpaRepository.findById(meetingId)
             .map(entity -> {
-                // HOST 유저 찾기
-                Long hostUserId = meetingMemberJpaRepository
+                return meetingMemberJpaRepository
                     .findBymeetingIdAndMeetingRole(meetingId, MeetingRole.HOST)
-                    .map(meetingMemberEntity -> meetingMemberEntity.getUser().getId())
-                    .orElse(null);
-                return entity.toDomain(hostUserId);
+                    .map(mm -> {
+                        Long hostUserId = mm.getUser().getId();
+                        String hostNickname = mm.getUser().getNickname();
+                        return entity.toDomain(hostUserId, hostNickname);
+                    })
+                    .orElseGet(() -> entity.toDomain(null, null));  // host 멤버 없을 때
             })
-            .orElse(Meeting.getEmpty());
+            .orElse(Meeting.getEmpty()); // 엔티티가 없을 때
     }
 
     @Override

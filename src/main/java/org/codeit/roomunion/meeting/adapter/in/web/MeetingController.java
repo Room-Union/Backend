@@ -9,8 +9,6 @@ import org.codeit.roomunion.meeting.adapter.in.web.response.MeetingResponse;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
-import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
-import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class MeetingController {
 
     private final MeetingCommandUseCase meetingCommandUseCase;
-    private final UserQueryUseCase userQueryUseCase;
 
     @Operation(summary = "모임 생성", description = "모임 생성 버튼을 눌렀을때 요청되는 API")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -36,10 +33,8 @@ public class MeetingController {
         @RequestPart("request") @Valid CreateMeetingRequest request,
         @RequestPart(value = "image", required = false) MultipartFile image
     ) {
-        String email = userDetails.getUsername();
-        MeetingCreateCommand command = request.toCommand(userDetails.getId());
+        MeetingCreateCommand command = request.toCommand(userDetails.getId(), userDetails.getUsername());
         Meeting meeting = meetingCommandUseCase.create(command, image);
-        User host = userQueryUseCase.getByEmail(email);
-        return ResponseEntity.ok(MeetingResponse.from(meeting, host, true));
+        return ResponseEntity.ok(MeetingResponse.from(meeting, true));
     }
 }

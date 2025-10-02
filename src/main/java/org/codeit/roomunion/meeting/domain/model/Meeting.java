@@ -21,11 +21,15 @@ public class Meeting {
 
     private final int maxMemberCount;
 
-    private final Long userId;
-
     private final List<String> platformURL;
 
     private final LocalDateTime createdAt;
+
+    private final Long userId;
+
+    private final String hostNickname;
+
+//    private final String hostProfileImage;
 
     private static final Meeting EMPTY = new Meeting(
         0L, // 존재하지 않는 ID
@@ -36,8 +40,8 @@ public class Meeting {
         0,
         null,
         Collections.emptyList(),
-        null
-
+        null,
+        ""
     );
 
     public static Meeting getEmpty() {
@@ -48,7 +52,14 @@ public class Meeting {
         return this == EMPTY;
     }
 
-    private Meeting(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, Long userId, List<String> platformURL, LocalDateTime createdAt) {
+    public Meeting withHostInfo(String hostNickname) {
+        return new Meeting(
+            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.userId, this.platformURL,
+            this.createdAt, hostNickname
+        );
+    }
+
+    private Meeting(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, Long userId, List<String> platformURL, LocalDateTime createdAt, String hostNickname) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -58,10 +69,11 @@ public class Meeting {
         this.userId = userId;
         this.platformURL = platformURL;
         this.createdAt = createdAt;
+        this.hostNickname = hostNickname;
     }
 
-    public static Meeting of(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, Long userId, List<String> platformURL, LocalDateTime createdAt) {
-        return new Meeting(id, name, description, meetingImage, category, maxMemberCount, userId, platformURL, createdAt);
+    public static Meeting of(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, Long userId, List<String> platformURL, LocalDateTime createdAt, String hostNickname) {
+        return new Meeting(id, name, description, meetingImage, category, maxMemberCount, userId, platformURL, createdAt, hostNickname);
     }
 
 }

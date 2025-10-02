@@ -25,6 +25,8 @@ public class MeetingCreateCommand {
 
     private final Long userId;
 
+    private final String hostEmail;
+
     private final String imageUrl;
 
     private final LocalDateTime createdAt;

@@ -43,6 +43,7 @@ public class MeetingEntity {
     private int maxMemberCount;
 
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<MeetingMemberEntity> meetingMembers = new ArrayList<>();
 
     @ElementCollection
@@ -54,7 +55,7 @@ public class MeetingEntity {
     private LocalDateTime createdAt;
 
 
-    public Meeting toDomain(Long hostUserId) {
+    public Meeting toDomain(Long hostUserId, String hostNickname) {
         return Meeting.of(
             this.getId(),
             this.getName(),
@@ -64,7 +65,8 @@ public class MeetingEntity {
             this.getMaxMemberCount(),
             hostUserId,
             this.getPlatformUrls(),
-            this.getCreatedAt()
+            this.getCreatedAt(),
+            hostNickname
         );
     }
 

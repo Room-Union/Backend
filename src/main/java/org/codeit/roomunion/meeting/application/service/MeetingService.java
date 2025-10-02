@@ -5,12 +5,15 @@ import org.codeit.roomunion.common.adapter.out.persistence.entity.UuidEntity;
 import org.codeit.roomunion.common.adapter.out.persistence.jpa.UuidJpaRepository;
 import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.exception.CustomException;
+import org.codeit.roomunion.common.exception.UserNotFoundException;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
+import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
+import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +29,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     private final MeetingRepository meetingRepository;
     private final AmazonS3Manager s3Manager;
     private final UuidJpaRepository uuidJpaRepository;
+    private final UserQueryUseCase userQueryUseCase;
 
     @Override
     public Meeting create(MeetingCreateCommand command, MultipartFile image) {
@@ -47,6 +51,9 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
             );
             imageUrl = s3Manager.uploadFile(s3Manager.meetingImageKey(savedUuid), image);
         }
+        // TODO 현태님 예외처리 수정시 변경
+        User host = userQueryUseCase.findByEmail(command.getHostEmail())
+            .orElseThrow(UserNotFoundException::new);
 
         MeetingCreateCommand finalCommand = MeetingCreateCommand.builder()
             .name(command.getName())
@@ -62,7 +69,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         Meeting saved = meetingRepository.createMeeting(finalCommand);
 
 
-        return saved;
+        return saved.withHostInfo(host.getNickname());
     }
 
     @Override
