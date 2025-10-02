@@ -6,7 +6,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
+import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
+import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
@@ -53,6 +56,29 @@ public class MeetingEntity {
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    public static MeetingEntity from(MeetingCreateCommand command, UserEntity hostUser) {
+        MeetingEntity meeting = MeetingEntity.builder()
+            .name(command.getName())
+            .description(command.getDescription())
+            .category(command.getCategory())
+            .meetingImage(command.getImageUrl())
+            .maxMemberCount(command.getMaxMemberCount())
+            .platformUrls(command.getPlatformURL())
+            .createdAt(command.getCreatedAt())
+            .build();
+        meeting.addHost(hostUser);
+        return meeting;
+    }
+
+    public void addHost(UserEntity hostUser) {
+        MeetingMemberEntity hostMember = MeetingMemberEntity.builder()
+            .meeting(this)
+            .user(hostUser)
+            .meetingRole(MeetingRole.HOST)
+            .build();
+        this.addMember(hostMember);
+    }
 
 
     public Meeting toDomain(Long hostUserId, String hostNickname) {

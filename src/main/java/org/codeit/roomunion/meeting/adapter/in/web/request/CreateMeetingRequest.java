@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -43,6 +44,7 @@ public class CreateMeetingRequest {
             .platformURL(this.platformURL)
             .hostEmail(hostEmail)
             .userId(userId)
+            .createdAt(LocalDateTime.now())
             .build();
     }
 

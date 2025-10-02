@@ -3,7 +3,6 @@ package org.codeit.roomunion.meeting.adapter.out.persistence;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.common.exception.UserNotFoundException;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
-import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingJpaRepository;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingMemberJpaRepository;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
@@ -13,8 +12,6 @@ import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.codeit.roomunion.user.adapter.out.persistence.jpa.UserJpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.time.LocalDateTime;
 
 @Repository
 @RequiredArgsConstructor
@@ -30,23 +27,7 @@ public class MeetingRepositoryImpl implements MeetingRepository {
         UserEntity hostUser = userJpaRepository.findById(command.getUserId())
             .orElseThrow(UserNotFoundException::new);
 
-        MeetingEntity meetingEntity = MeetingEntity.builder()
-            .name(command.getName())
-            .description(command.getDescription())
-            .category(command.getCategory())
-            .meetingImage(command.getImageUrl())
-            .maxMemberCount(command.getMaxMemberCount())
-            .platformUrls(command.getPlatformURL())
-            .createdAt(LocalDateTime.now())
-            .build();
-
-        MeetingMemberEntity hostMember = MeetingMemberEntity.builder()
-            .meeting(meetingEntity)
-            .user(hostUser)
-            .meetingRole(MeetingRole.HOST)
-            .build();
-
-        meetingEntity.addMember(hostMember);
+        MeetingEntity meetingEntity = MeetingEntity.from(command, hostUser);
 
         MeetingEntity savedMeetingEntity = meetingJpaRepository.save(meetingEntity);
 
