@@ -10,4 +10,5 @@ public interface UserQueryUseCase {
 
     Optional<User> findByEmail(String email);
 
+    void validateEmailExists(String email);
 }

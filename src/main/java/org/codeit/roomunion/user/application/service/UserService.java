@@ -35,6 +35,13 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
     }
 
     @Override
+    public void validateEmailExists(String email) {
+        if (findByEmail(email).isPresent()) { // TODO 예외 처리 수정
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+        }
+    }
+
+    @Override
     public User join(UserCreateCommand userCreateCommand) {
         UserPolicy.validate(userCreateCommand);
         validateEmailAndNicknameExists(userCreateCommand);
@@ -46,20 +53,14 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
     }
 
     private void validateEmailAndNicknameExists(UserCreateCommand userCreateCommand) {
-        if (validateEmailExists(userCreateCommand.getEmail())) { // TODO 예외 처리 수정
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
-        }
-        if (validateNicknameExists(userCreateCommand.getNickname())) {
+        validateEmailExists(userCreateCommand.getEmail());
+        validateNicknameExists(userCreateCommand.getNickname());
+    }
+
+    private void validateNicknameExists(String nickname) {
+        if (userRepository.findByNickname(nickname).isPresent()) { // TODO 예외 처리 수정
             throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
         }
-    }
-
-    private boolean validateNicknameExists(String nickname) {
-        return userRepository.findByNickname(nickname).isPresent();
-    }
-
-    private boolean validateEmailExists(String email) {
-        return findByEmail(email).isPresent();
     }
 
 }
