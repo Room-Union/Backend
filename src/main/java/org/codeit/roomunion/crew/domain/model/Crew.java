@@ -1,7 +1,6 @@
 package org.codeit.roomunion.crew.domain.model;
 
 import lombok.Getter;
-import org.codeit.roomunion.common.adapter.out.persistence.entity.UuidEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,5 +36,5 @@ public class Crew {
         this.userId = userId;
         this.platformURL = platformURL;
         this.createdAt = createdAt;
-
+    }
 }
