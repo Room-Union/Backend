@@ -1,8 +1,9 @@
 package org.codeit.roomunion.auth.application.service;
 
 import org.codeit.roomunion.auth.application.port.in.AuthUseCase;
+import org.codeit.roomunion.auth.domain.event.EmailVerificationCodeEvent;
 import org.codeit.roomunion.auth.domain.policy.EmailVerificationPolicy;
-import org.codeit.roomunion.common.application.port.out.EmailSender;
+import org.codeit.roomunion.common.application.port.out.EventPublisher;
 import org.codeit.roomunion.common.application.port.out.RandomNumberGenerator;
 import org.codeit.roomunion.common.application.port.out.TimeHolder;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
@@ -22,16 +23,16 @@ public class AuthService implements AuthUseCase {
 
     private final UserQueryUseCase userQueryUseCase;
     private final UserRepository userRepository;
-    private final EmailSender emailSender;
     private final RandomNumberGenerator randomNumberGenerator;
     private final TimeHolder timeHolder;
+    private final EventPublisher eventPublisher;
 
-    public AuthService(UserQueryUseCase userQueryUseCase, UserRepository userRepository, EmailSender emailSender, RandomNumberGenerator randomNumberGenerator, TimeHolder timeHolder) {
+    public AuthService(UserQueryUseCase userQueryUseCase, UserRepository userRepository, RandomNumberGenerator randomNumberGenerator, TimeHolder timeHolder, EventPublisher eventPublisher) {
         this.userQueryUseCase = userQueryUseCase;
         this.userRepository = userRepository;
-        this.emailSender = emailSender;
         this.randomNumberGenerator = randomNumberGenerator;
         this.timeHolder = timeHolder;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -44,7 +45,9 @@ public class AuthService implements AuthUseCase {
         String code = generateVerifyCode();
 
         userRepository.saveEmailVerificationCode(email, code, currentAt, expirationAt);
-        emailSender.send(email, ROOM_UNION_EMAIL_VARIFICATION_SUBJECT, ROOM_UNION_EMAIL_VARIFICATION_BODY.formatted(code));
+
+        EmailVerificationCodeEvent emailVerificationCodeEvent = EmailVerificationCodeEvent.of(email, code, ROOM_UNION_EMAIL_VARIFICATION_SUBJECT, ROOM_UNION_EMAIL_VARIFICATION_BODY.formatted(code));
+        eventPublisher.publish(emailVerificationCodeEvent);
     }
 
     private String generateVerifyCode() {
