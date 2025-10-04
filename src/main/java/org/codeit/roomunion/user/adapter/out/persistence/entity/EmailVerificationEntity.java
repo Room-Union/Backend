@@ -42,4 +42,12 @@ public class EmailVerificationEntity {
         entity.verified = false;
         return entity;
     }
+
+    public void verify() {
+        verified = true;
+    }
+
+    public boolean isCodeNotValid(String code) {
+        return !this.code.equals(code);
+    }
 }

@@ -16,4 +16,5 @@ public interface UserRepository {
 
     void saveEmailVerificationCode(String email, String code, LocalDateTime currentAt, LocalDateTime expirationAt);
 
+    void verifyCode(String email, String code, LocalDateTime currentAt);
 }

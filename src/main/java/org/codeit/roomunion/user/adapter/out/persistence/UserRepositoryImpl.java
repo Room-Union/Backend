@@ -47,4 +47,15 @@ public class UserRepositoryImpl implements UserRepository {
         EmailVerificationEntity emailVerificationEntity = EmailVerificationEntity.of(email, code, currentAt, expirationAt);
         emailVarificationJpaRepository.save(emailVerificationEntity);
     }
+
+    @Override
+    public void verifyCode(String email, String code, LocalDateTime currentAt) {
+        EmailVerificationEntity emailVerificationEntity = emailVarificationJpaRepository.findValidVerificationBy(email, currentAt)
+            .orElseThrow(() -> new IllegalArgumentException("코드 시간 만료")); //TODO 예외 수정
+        if (emailVerificationEntity.isCodeNotValid(code)) {
+            throw new IllegalArgumentException("코드 불일치"); //TODO 예외 수정
+        }
+        emailVerificationEntity.verify();
+    }
+
 }

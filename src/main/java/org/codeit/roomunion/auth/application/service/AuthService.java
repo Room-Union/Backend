@@ -50,6 +50,13 @@ public class AuthService implements AuthUseCase {
         eventPublisher.publish(emailVerificationCodeEvent);
     }
 
+    @Override
+    @Transactional
+    public void verifyCode(String email, String code) {
+        LocalDateTime currentAt = timeHolder.localDateTime();
+        userRepository.verifyCode(email, code, currentAt);
+    }
+
     private String generateVerifyCode() {
         int randomNumber = randomNumberGenerator.generate(VERIFICATION_CODE_BOUND);
         return String.format("%06d", randomNumber);
