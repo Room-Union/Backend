@@ -16,7 +16,7 @@ import java.util.Optional;
 public class UserService implements UserQueryUseCase, UserCommandUseCase {
 
     private final UserRepository userRepository;
-    private final CustomPasswordEncoder passwordEncoder;
+    private final CustomPasswordEncoder passwordEncoder; // FIXME CustomPasswordEncoder 제거 후 PasswordEncoder로 변경
 
     public UserService(UserRepository userRepository, CustomPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;

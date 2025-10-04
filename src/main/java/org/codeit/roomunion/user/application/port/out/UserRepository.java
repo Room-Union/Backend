@@ -3,6 +3,7 @@ package org.codeit.roomunion.user.application.port.out;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.model.User;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface UserRepository {
@@ -12,4 +13,7 @@ public interface UserRepository {
     Optional<User> findByEmail(String email);
 
     Optional<User> findByNickname(String nickname);
+
+    void saveEmailVerificationCode(String email, String code, LocalDateTime currentAt, LocalDateTime expirationAt);
+
 }
