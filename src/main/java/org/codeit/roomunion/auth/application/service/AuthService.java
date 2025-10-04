@@ -8,10 +8,12 @@ import org.codeit.roomunion.common.application.port.out.TimeHolder;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
 import org.codeit.roomunion.user.application.port.out.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
+@Transactional(readOnly = true)
 public class AuthService implements AuthUseCase {
 
     private static final int VERIFICATION_CODE_BOUND = 1000000;
@@ -33,6 +35,7 @@ public class AuthService implements AuthUseCase {
     }
 
     @Override
+    @Transactional
     public void sendVerificationCode(String email) {
         userQueryUseCase.validateEmailExists(email);
 
