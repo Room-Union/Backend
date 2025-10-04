@@ -35,6 +35,18 @@ spring:
     jwt:
         secret: e253645a97f98c5ac9d94c7cb6fe47adef76834f1ebf312d9617564096f443ad
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_APP_ADDRESS}
+    password: ${GMAIL_APP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 # S3
 cloud:
     aws:
