@@ -5,10 +5,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.common.exception.ErrorCode;
 import org.codeit.roomunion.common.jwt.JwtUtil;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -21,9 +21,10 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 
+@Slf4j
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final long EXPIRATION;
+    private final long EXPIRATION = Duration.ofHours(24).toMillis() * 7; // 7 days
 
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
@@ -31,8 +32,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     public LoginFilter(
         JwtUtil jwtUtil,
-        AuthenticationManager authenticationManager,
-        @Value("${spring.jwt.access-token-expire-time}") long expiration
+        AuthenticationManager authenticationManager
     ) {
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
@@ -73,8 +73,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private Map<String, Object> createErrorResponse(ErrorCode errorCode) {
         return Map.of(
-                "code", errorCode.getCode(),
-                "message", errorCode.getMessage()
+            "code", errorCode.getCode(),
+            "message", errorCode.getMessage()
         );
     }
 
