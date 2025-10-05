@@ -22,17 +22,17 @@ public class AuthService implements AuthUseCase {
     private static final String ROOM_UNION_EMAIL_VARIFICATION_BODY = "인증 코드: %s";
 
     private final UserQueryUseCase userQueryUseCase;
+    private final UserCommandUseCase userCommandUseCase;
     private final RandomNumberGenerator randomNumberGenerator;
     private final TimeHolder timeHolder;
     private final EventPublisher eventPublisher;
-    private final UserCommandUseCase userCommandUseCase;
 
-    public AuthService(UserQueryUseCase userQueryUseCase, RandomNumberGenerator randomNumberGenerator, TimeHolder timeHolder, EventPublisher eventPublisher, UserCommandUseCase userCommandUseCase) {
+    public AuthService(UserQueryUseCase userQueryUseCase, UserCommandUseCase userCommandUseCase, RandomNumberGenerator randomNumberGenerator, TimeHolder timeHolder, EventPublisher eventPublisher) {
         this.userQueryUseCase = userQueryUseCase;
+        this.userCommandUseCase = userCommandUseCase;
         this.randomNumberGenerator = randomNumberGenerator;
         this.timeHolder = timeHolder;
         this.eventPublisher = eventPublisher;
-        this.userCommandUseCase = userCommandUseCase;
     }
 
     @Override
