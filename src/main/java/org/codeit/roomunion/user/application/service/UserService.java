@@ -10,6 +10,7 @@ import org.codeit.roomunion.user.domain.model.User;
 import org.codeit.roomunion.user.domain.policy.UserPolicy;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -36,6 +37,11 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
     }
 
     @Override
+    public void verifyCode(String email, String code, LocalDateTime currentAt) {
+        userRepository.verifyCode(email, code, currentAt);
+    }
+
+    @Override
     public User join(UserCreateCommand userCreateCommand) {
         UserPolicy.validate(userCreateCommand);
         validateEmailAndNicknameExists(userCreateCommand);
@@ -44,6 +50,16 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
 
         String encodedPassword = passwordEncoder.encode(userCreateCommand.getPassword());
         return userRepository.create(userCreateCommand.replaceEncodePassword(encodedPassword));
+    }
+
+    @Override
+    public void saveEmailVerificationCode(String email, String code, LocalDateTime currentAt, LocalDateTime expirationAt) {
+        userRepository.saveEmailVerificationCode(email, code, currentAt, expirationAt);
+    }
+
+    @Override
+    public void validateEmailNotVerified(String email, LocalDateTime expirationAt) {
+        userRepository.validateEmailNotVerified(email, expirationAt);
     }
 
     private void validateEmailAndNicknameExists(UserCreateCommand userCreateCommand) {

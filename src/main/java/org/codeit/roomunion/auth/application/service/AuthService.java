@@ -6,8 +6,8 @@ import org.codeit.roomunion.auth.domain.policy.EmailVerificationPolicy;
 import org.codeit.roomunion.common.application.port.out.EventPublisher;
 import org.codeit.roomunion.common.application.port.out.RandomNumberGenerator;
 import org.codeit.roomunion.common.application.port.out.TimeHolder;
+import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
-import org.codeit.roomunion.user.application.port.out.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,17 +22,17 @@ public class AuthService implements AuthUseCase {
     private static final String ROOM_UNION_EMAIL_VARIFICATION_BODY = "인증 코드: %s";
 
     private final UserQueryUseCase userQueryUseCase;
-    private final UserRepository userRepository;
     private final RandomNumberGenerator randomNumberGenerator;
     private final TimeHolder timeHolder;
     private final EventPublisher eventPublisher;
+    private final UserCommandUseCase userCommandUseCase;
 
-    public AuthService(UserQueryUseCase userQueryUseCase, UserRepository userRepository, RandomNumberGenerator randomNumberGenerator, TimeHolder timeHolder, EventPublisher eventPublisher) {
+    public AuthService(UserQueryUseCase userQueryUseCase, RandomNumberGenerator randomNumberGenerator, TimeHolder timeHolder, EventPublisher eventPublisher, UserCommandUseCase userCommandUseCase) {
         this.userQueryUseCase = userQueryUseCase;
-        this.userRepository = userRepository;
         this.randomNumberGenerator = randomNumberGenerator;
         this.timeHolder = timeHolder;
         this.eventPublisher = eventPublisher;
+        this.userCommandUseCase = userCommandUseCase;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class AuthService implements AuthUseCase {
         LocalDateTime expirationAt = EmailVerificationPolicy.calculateExpirationAt(currentAt);
         String code = generateVerifyCode();
 
-        userRepository.saveEmailVerificationCode(email, code, currentAt, expirationAt);
+        userCommandUseCase.saveEmailVerificationCode(email, code, currentAt, expirationAt);
 
         EmailVerificationCodeEvent emailVerificationCodeEvent = EmailVerificationCodeEvent.of(email, code, ROOM_UNION_EMAIL_VARIFICATION_SUBJECT, ROOM_UNION_EMAIL_VARIFICATION_BODY.formatted(code));
         eventPublisher.publish(emailVerificationCodeEvent);
@@ -54,7 +54,7 @@ public class AuthService implements AuthUseCase {
     @Transactional
     public void verifyCode(String email, String code) {
         LocalDateTime currentAt = timeHolder.localDateTime();
-        userRepository.verifyCode(email, code, currentAt);
+        userQueryUseCase.verifyCode(email, code, currentAt);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class AuthService implements AuthUseCase {
     public void extendExpiration(String email) {
         LocalDateTime currentAt = timeHolder.localDateTime();
         LocalDateTime expirationAt = EmailVerificationPolicy.calculateExpirationAt(currentAt);
-        userRepository.validateEmailNotVerified(email, expirationAt);
+        userCommandUseCase.validateEmailNotVerified(email, expirationAt);
     }
 
     private String generateVerifyCode() {
