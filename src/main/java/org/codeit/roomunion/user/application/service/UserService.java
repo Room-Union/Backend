@@ -1,13 +1,12 @@
 package org.codeit.roomunion.user.application.service;
 
-import org.codeit.roomunion.auth.application.port.out.CustomPasswordEncoder;
-import org.codeit.roomunion.common.exception.UserNotFoundException;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
 import org.codeit.roomunion.user.application.port.out.UserRepository;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.model.User;
 import org.codeit.roomunion.user.domain.policy.UserPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,9 +16,9 @@ import java.util.Optional;
 public class UserService implements UserQueryUseCase, UserCommandUseCase {
 
     private final UserRepository userRepository;
-    private final CustomPasswordEncoder passwordEncoder; // FIXME CustomPasswordEncoder 제거 후 PasswordEncoder로 변경
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, CustomPasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
