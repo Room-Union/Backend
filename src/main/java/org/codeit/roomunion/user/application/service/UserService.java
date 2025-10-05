@@ -41,7 +41,6 @@ import org.codeit.roomunion.auth.application.port.out.CustomPasswordEncoder;
 =======
 >>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -116,12 +115,12 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
     }
 
     @Override
-    public User join(UserCreateCommand userCreateCommand, MultipartFile profileImage) {
+    public User join(UserCreateCommand userCreateCommand) {
         UserPolicy.validate(userCreateCommand);
         validateEmailAndNicknameExists(userCreateCommand);
 
-        // TODO 이미지 업로드 로직 추가 필요
         // TODO 등록 전 이메일 검증 완료되었는지 확인 필요
+
         String encodedPassword = passwordEncoder.encode(userCreateCommand.getPassword());
         return userRepository.create(userCreateCommand.replaceEncodePassword(encodedPassword));
     }
