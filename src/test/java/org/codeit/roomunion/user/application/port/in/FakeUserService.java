@@ -1,6 +1,8 @@
 package org.codeit.roomunion.user.application.port.in;
 
+import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
+import org.codeit.roomunion.user.domain.exception.UserErrorCode;
 import org.codeit.roomunion.user.domain.model.User;
 import org.codeit.roomunion.user.domain.model.UserFixture;
 
@@ -43,7 +45,9 @@ public class FakeUserService implements UserQueryUseCase, UserCommandUseCase{
 
     @Override
     public void validateEmailExists(String email) {
-
+        if (findByEmail(email).isPresent()) {
+            throw new CustomException(UserErrorCode.ALREADY_REGISTERED_EMAIL);
+        }
     }
 
     @Override

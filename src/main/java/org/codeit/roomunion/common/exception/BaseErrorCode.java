@@ -8,6 +8,10 @@ public interface BaseErrorCode {
 
     HttpStatus getStatus();
 
+    default int getStatusValue() {
+        return getStatus().value();
+    }
+
     default String getCode() {
         return ((Enum<?>) this).name();
     }

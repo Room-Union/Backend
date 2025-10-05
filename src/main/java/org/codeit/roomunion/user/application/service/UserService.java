@@ -1,9 +1,11 @@
 package org.codeit.roomunion.user.application.service;
 
+import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
 import org.codeit.roomunion.user.application.port.out.UserRepository;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
+import org.codeit.roomunion.user.domain.exception.UserErrorCode;
 import org.codeit.roomunion.user.domain.model.User;
 import org.codeit.roomunion.user.domain.policy.UserPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,8 +32,8 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
 
     @Override
     public void validateEmailExists(String email) {
-        if (findByEmail(email).isPresent()) { // TODO 예외 처리 수정
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+        if (findByEmail(email).isPresent()) {
+            throw new CustomException(UserErrorCode.ALREADY_REGISTERED_EMAIL);
         }
     }
 
@@ -67,8 +69,8 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
     }
 
     private void validateNicknameExists(String nickname) {
-        if (userRepository.findByNickname(nickname).isPresent()) { // TODO 예외 처리 수정
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+        if (userRepository.findByNickname(nickname).isPresent()) {
+            throw new CustomException(UserErrorCode.ALREADY_REGISTERED_NICKNAME);
         }
     }
 

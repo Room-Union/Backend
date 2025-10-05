@@ -6,8 +6,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.codeit.roomunion.auth.domain.exception.AuthErrorCode;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
-import org.codeit.roomunion.common.exception.ErrorCode;
+import org.codeit.roomunion.common.exception.BaseErrorCode;
 import org.codeit.roomunion.common.jwt.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -62,27 +63,27 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
-        ErrorCode errorCode = getErrorCode(failed);
+        BaseErrorCode errorCode = getErrorCode(failed);
 
         String errorResponse = objectMapper.writeValueAsString(createErrorResponse(errorCode));
-        response.setStatus(errorCode.getStatusCode());
+        response.setStatus(errorCode.getStatusValue());
         response.setContentType("application/json; charset=UTF-8");
 
         response.getWriter().write(errorResponse);
     }
 
-    private Map<String, Object> createErrorResponse(ErrorCode errorCode) {
+    private Map<String, Object> createErrorResponse(BaseErrorCode errorCode) {
         return Map.of(
             "code", errorCode.getCode(),
             "message", errorCode.getMessage()
         );
     }
 
-    private ErrorCode getErrorCode(AuthenticationException failed) {
+    private BaseErrorCode getErrorCode(AuthenticationException failed) {
         return switch (failed) {
-            case BadCredentialsException ignore -> ErrorCode.INVALID_INPUT_VALUE;
-            case DisabledException ignore -> ErrorCode.LOGIN_FAIL;
-            default -> ErrorCode.INTERNAL_SERVER_ERROR;
+            case BadCredentialsException ignore -> AuthErrorCode.INVALID_INPUT_VALUE;
+            case DisabledException ignore -> AuthErrorCode.LOGIN_FAIL;
+            default -> AuthErrorCode.INTERNAL_SERVER_ERROR;
         };
     }
 }

@@ -1,5 +1,6 @@
 package org.codeit.roomunion.user.adapter.out.persistence;
 
+import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.EmailVerificationEntity;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.codeit.roomunion.user.adapter.out.persistence.jpa.EmailVarificationJpaRepository;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import static org.codeit.roomunion.user.domain.exception.UserErrorCode.*;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
@@ -51,9 +54,9 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void verifyCode(String email, String code, LocalDateTime currentAt) {
         EmailVerificationEntity emailVerificationEntity = emailVarificationJpaRepository.findValidVerificationBy(email, currentAt)
-            .orElseThrow(() -> new IllegalArgumentException("코드 시간 만료")); //TODO 예외 수정
+            .orElseThrow(() -> new CustomException(EXPIRED_CODE));
         if (emailVerificationEntity.isCodeNotValid(code)) {
-            throw new IllegalArgumentException("코드 불일치"); //TODO 예외 수정
+            throw new CustomException(INVALID_CODE);
         }
         emailVerificationEntity.verify();
     }
@@ -61,9 +64,9 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void validateEmailNotVerified(String email, LocalDateTime expirationAt) {
         EmailVerificationEntity emailVerificationEntity = emailVarificationJpaRepository.findLatestVerificationByEmail(email)
-            .orElseThrow(() -> new IllegalArgumentException("이메일 인증 내역 없음"));// TODO 예외 수정
+            .orElseThrow(() -> new CustomException(EMAIL_VALIDATION_NOT_FOUND));
         if (emailVerificationEntity.isVerified()) {
-            throw new IllegalArgumentException("이미 인증된 이메일"); // TODO 예외 수정
+            throw new CustomException(ALREADY_VERIFIED_EMAIL);
         }
         emailVerificationEntity.renewExpirationAt(expirationAt);
     }

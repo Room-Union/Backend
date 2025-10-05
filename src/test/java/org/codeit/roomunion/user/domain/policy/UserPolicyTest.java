@@ -1,5 +1,6 @@
 package org.codeit.roomunion.user.domain.policy;
 
+import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.command.UserCreateCommandFixture;
@@ -86,8 +87,8 @@ class UserPolicyTest {
 
             // when & then
             assertThatThrownBy(() -> UserPolicy.validate(command))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Invalid email format");
+                .isInstanceOf(CustomException.class)
+                .hasMessage("유효하지 않은 입력입니다.");
         }
     }
 
@@ -148,8 +149,8 @@ class UserPolicyTest {
 
             // when & then
             assertThatThrownBy(() -> UserPolicy.validate(command))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Password must be 8-13 characters long and contain letters, numbers, and special characters (!, @, #, $, %, ^, *, (, ), _, +, =, -, ~)");
+                .isInstanceOf(CustomException.class)
+                .hasMessage("유효하지 않은 입력입니다.");
         }
     }
 
@@ -189,8 +190,8 @@ class UserPolicyTest {
 
             // when & then
             assertThatThrownBy(() -> UserPolicy.validate(command))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("At least two categories must be selected");
+                .isInstanceOf(CustomException.class)
+                .hasMessage("유효하지 않은 입력입니다.");
         }
 
         private static Stream<Arguments> provideInvalidCategories() {

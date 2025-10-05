@@ -2,6 +2,7 @@ package org.codeit.roomunion.auth.application.port.in;
 
 import org.codeit.roomunion.auth.application.service.AuthService;
 import org.codeit.roomunion.common.application.port.out.*;
+import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.user.application.port.in.FakeUserService;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
@@ -72,7 +73,8 @@ class AuthUseCaseTest {
 
             // When & Then
             assertThatThrownBy(() -> authService.sendVerificationCode(email))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(CustomException.class)
+                .hasMessage("이미 가입된 이메일");
         }
 
     }
