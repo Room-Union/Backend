@@ -48,6 +48,10 @@ public class EmailVerificationEntity {
     }
 
     public boolean isCodeNotValid(String code) {
-        return !this.code.equals(code);
+        return verified || !this.code.equals(code);
+    }
+
+    public void renewExpirationAt(LocalDateTime expirationAt) {
+        this.expirationAt = expirationAt;
     }
 }

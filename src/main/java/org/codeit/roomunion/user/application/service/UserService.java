@@ -24,12 +24,6 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
     }
 
     @Override
-    public User getByEmail(String email) {
-        return findByEmail(email)
-            .orElseThrow(UserNotFoundException::new);
-    }
-
-    @Override
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }

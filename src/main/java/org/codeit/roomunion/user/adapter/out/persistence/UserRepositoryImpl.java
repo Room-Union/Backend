@@ -58,4 +58,11 @@ public class UserRepositoryImpl implements UserRepository {
         emailVerificationEntity.verify();
     }
 
+    @Override
+    public void validateEmailNotVerified(String email, LocalDateTime expirationAt) {
+        EmailVerificationEntity emailVerificationEntity = emailVarificationJpaRepository.findLatestVerificationByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("이메일 인증 내역 없음"));// TODO 예외 수정
+        emailVerificationEntity.renewExpirationAt(expirationAt);
+    }
+
 }

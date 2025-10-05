@@ -5,4 +5,6 @@ public interface AuthUseCase {
     void sendVerificationCode(String email);
 
     void verifyCode(String email, String code);
+
+    void extendExpiration(String email);
 }

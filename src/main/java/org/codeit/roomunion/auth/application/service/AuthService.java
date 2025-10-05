@@ -57,6 +57,14 @@ public class AuthService implements AuthUseCase {
         userRepository.verifyCode(email, code, currentAt);
     }
 
+    @Override
+    @Transactional
+    public void extendExpiration(String email) {
+        LocalDateTime currentAt = timeHolder.localDateTime();
+        LocalDateTime expirationAt = EmailVerificationPolicy.calculateExpirationAt(currentAt);
+        userRepository.validateEmailNotVerified(email, expirationAt);
+    }
+
     private String generateVerifyCode() {
         int randomNumber = randomNumberGenerator.generate(VERIFICATION_CODE_BOUND);
         return String.format("%06d", randomNumber);

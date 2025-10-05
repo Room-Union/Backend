@@ -6,8 +6,6 @@ import java.util.Optional;
 
 public interface UserQueryUseCase {
 
-    User getByEmail(String email);
-
     Optional<User> findByEmail(String email);
 
     void validateEmailExists(String email);

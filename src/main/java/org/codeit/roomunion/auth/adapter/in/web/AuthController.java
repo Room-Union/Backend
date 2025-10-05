@@ -33,4 +33,11 @@ public class AuthController {
             .build();
     }
 
+    @PostMapping("/email/extend")
+    public ResponseEntity<Void> extendVerificationCode(@RequestBody SendVarificationCodeRequest request) {
+        authUsecase.extendExpiration(request.email());
+        return ResponseEntity.noContent()
+            .build();
+    }
+
 }
