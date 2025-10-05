@@ -34,7 +34,6 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
     @Override
     public Meeting create(MeetingCreateCommand command, MultipartFile image) {
-        // 추후 예외는 ErrorCode로 변경 예정
         if (command.getMaxMemberCount() < 1) {
             throw new CustomException(MeetingErrorCode.INVALID_MAX_MEMBER_COUNT);
         }
@@ -66,10 +65,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     @Transactional(readOnly = true)
     public Meeting getByMeetingId(Long meetingId, Long currentUserId) {
         Meeting meeting = meetingRepository.findById(meetingId);
-        // 추후 예외는 ErrorCode로 변경 예정
-        if (meeting.isEmpty()) {
-            throw new CustomException(MeetingErrorCode.MEETING_NOT_FOUND);
-        }
+
         // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
         boolean isHost =  currentUserId != null && Objects.equals(meeting.getUserId(), currentUserId);
 
