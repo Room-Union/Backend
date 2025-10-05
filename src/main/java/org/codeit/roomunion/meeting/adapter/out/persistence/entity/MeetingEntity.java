@@ -52,6 +52,7 @@ public class MeetingEntity {
     @ElementCollection
     @CollectionTable(name = "meeting_platform_urls", joinColumns = @JoinColumn(name = "meeting_id"))
     @Column(name = "platform_url", length = 500)
+    @Builder.Default
     private List<String> platformUrls = new ArrayList<>();
 
     @Column(nullable = false)
@@ -92,7 +93,8 @@ public class MeetingEntity {
             hostUserId,
             this.getPlatformUrls(),
             this.getCreatedAt(),
-            hostNickname
+            hostNickname,
+            false
         );
     }
 
