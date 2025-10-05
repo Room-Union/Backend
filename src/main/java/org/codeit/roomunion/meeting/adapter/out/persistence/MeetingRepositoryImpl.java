@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.common.exception.UserNotFoundException;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
+import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingJpaRepository;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingMemberJpaRepository;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
@@ -39,18 +40,17 @@ public class MeetingRepositoryImpl implements MeetingRepository {
 
     @Override
     public Meeting findById(Long meetingId) {
-        return meetingJpaRepository.findById(meetingId)
-            .map(entity -> {
-                return meetingMemberJpaRepository
-                    .findBymeetingIdAndMeetingRole(meetingId, MeetingRole.HOST)
-                    .map(mm -> {
-                        Long hostUserId = mm.getUser().getId();
-                        String hostNickname = mm.getUser().getNickname();
-                        return entity.toDomain(hostUserId, hostNickname);
-                    })
-                    .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_HOST_NOT_FOUND));
-            })
-            .orElse(Meeting.getEmpty()); // 엔티티가 없을 때
+        MeetingEntity meeting = meetingJpaRepository.findById(meetingId)
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
+
+        MeetingMemberEntity host = meetingMemberJpaRepository
+            .findByMeetingIdAndMeetingRole(meetingId, MeetingRole.HOST)
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_HOST_NOT_FOUND));
+
+        Long hostUserId = host.getUser().getId();
+        String hostNickname = host.getUser().getNickname();
+
+        return meeting.toDomain(hostUserId, hostNickname);
     }
 
     @Override

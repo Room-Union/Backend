@@ -31,5 +31,18 @@ public class MeetingCreateCommand {
 
     private final LocalDateTime createdAt;
 
+    public static MeetingCreateCommand of(MeetingCreateCommand baseCommand, String imageUrl) {
+        return MeetingCreateCommand.builder()
+            .name(baseCommand.getName())
+            .description(baseCommand.getDescription())
+            .category(baseCommand.getCategory())
+            .maxMemberCount(baseCommand.getMaxMemberCount())
+            .userId(baseCommand.getUserId())
+            .platformURL(baseCommand.getPlatformURL())
+            .imageUrl(imageUrl)
+            .createdAt(LocalDateTime.now())
+            .build();
+    }
+
 
 }

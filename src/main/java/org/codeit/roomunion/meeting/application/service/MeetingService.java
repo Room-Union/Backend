@@ -1,5 +1,6 @@
 package org.codeit.roomunion.meeting.application.service;
 
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.application.port.out.UuidRepository;
@@ -53,16 +54,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         User host = userQueryUseCase.findByEmail(command.getHostEmail())
             .orElseThrow(UserNotFoundException::new);
 
-        MeetingCreateCommand finalCommand = MeetingCreateCommand.builder()
-            .name(command.getName())
-            .description(command.getDescription())
-            .category(command.getCategory())
-            .maxMemberCount(command.getMaxMemberCount())
-            .userId(command.getUserId())
-            .platformURL(command.getPlatformURL())
-            .imageUrl(imageUrl)
-            .createdAt(LocalDateTime.now())
-            .build();
+        MeetingCreateCommand finalCommand = MeetingCreateCommand.of(command, imageUrl);
 
         Meeting saved = meetingRepository.createMeeting(finalCommand);
 
@@ -72,12 +64,15 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
     @Override
     @Transactional(readOnly = true)
-    public Meeting getBymeetingId(Long meetingId) {
+    public Meeting getByMeetingId(Long meetingId, Long currentUserId) {
         Meeting meeting = meetingRepository.findById(meetingId);
         // 추후 예외는 ErrorCode로 변경 예정
         if (meeting.isEmpty()) {
             throw new CustomException(MeetingErrorCode.MEETING_NOT_FOUND);
         }
-        return meeting;
+        // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
+        boolean isHost =  currentUserId != null && Objects.equals(meeting.getUserId(), currentUserId);
+
+        return meeting.withJoined(isHost);
     }
 }

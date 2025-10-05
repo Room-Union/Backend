@@ -71,7 +71,7 @@ public class MeetingEntity {
         return meeting;
     }
 
-    public void addHost(UserEntity hostUser) {
+    private void addHost(UserEntity hostUser) {
         MeetingMemberEntity hostMember = MeetingMemberEntity.builder()
             .meeting(this)
             .user(hostUser)

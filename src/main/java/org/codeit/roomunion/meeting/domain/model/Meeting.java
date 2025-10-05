@@ -1,16 +1,17 @@
 package org.codeit.roomunion.meeting.domain.model;
 
-import lombok.Getter;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
-
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import lombok.Getter;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 
 @Getter
 public class Meeting {
 
     private static final String IMAGE_PATH_TEMPLATE = "meeting/%s";
+
+    private static final Meeting EMPTY = new Meeting(0L, "", "", null, null, 0, null, Collections.emptyList(), null, "", false);
 
     private final Long id;
 
@@ -34,18 +35,7 @@ public class Meeting {
 
 //    private final String hostProfileImage;
 
-    private static final Meeting EMPTY = new Meeting(
-        0L, // 존재하지 않는 ID
-        "",  // 기본값
-        "",
-        null,
-        null,
-        0,
-        null,
-        Collections.emptyList(),
-        null,
-        ""
-    );
+    private final boolean isJoined;
 
     public static String getImagePath(String uuid) {
         return String.format(IMAGE_PATH_TEMPLATE, uuid);
@@ -61,12 +51,12 @@ public class Meeting {
 
     public Meeting withHostInfo(String hostNickname) {
         return new Meeting(
-            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.userId, this.platformURL,
-            this.createdAt, hostNickname
+            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.userId, this.platformURL, this.createdAt, hostNickname, this.isJoined
         );
     }
 
-    private Meeting(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, Long userId, List<String> platformURL, LocalDateTime createdAt, String hostNickname) {
+    private Meeting(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, Long userId, List<String> platformURL, LocalDateTime createdAt,
+        String hostNickname, boolean isJoined) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -77,10 +67,19 @@ public class Meeting {
         this.platformURL = platformURL;
         this.createdAt = createdAt;
         this.hostNickname = hostNickname;
+        this.isJoined = isJoined;
     }
 
-    public static Meeting of(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, Long userId, List<String> platformURL, LocalDateTime createdAt, String hostNickname) {
-        return new Meeting(id, name, description, meetingImage, category, maxMemberCount, userId, platformURL, createdAt, hostNickname);
+    public static Meeting of(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, Long userId, List<String> platformURL,
+        LocalDateTime createdAt, String hostNickname, boolean isJoined) {
+        return new Meeting(id, name, description, meetingImage, category, maxMemberCount, userId, platformURL, createdAt, hostNickname, isJoined);
     }
+
+    public Meeting withJoined(boolean joined) {
+        return new Meeting(
+            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.userId, this.platformURL, this.createdAt, this.hostNickname, this.isJoined
+        );
+    }
+
 
 }

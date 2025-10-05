@@ -4,5 +4,5 @@ import org.codeit.roomunion.meeting.domain.model.Meeting;
 
 public interface MeetingQueryUseCase {
 
-    Meeting getBymeetingId(Long meetingId);
+    Meeting getByMeetingId(Long meetingId, Long currentUserId);
 }
