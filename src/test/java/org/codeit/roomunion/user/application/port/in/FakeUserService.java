@@ -4,15 +4,24 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.model.User;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class UserServiceFake implements UserQueryUseCase, UserCommandUseCase{
+public class FakeUserService implements UserQueryUseCase, UserCommandUseCase{
 
     @Override
     public User join(UserCreateCommand userCreateCommand) {
         throw new NotImplementedException();
+    }
+
+    @Override
+    public void saveEmailVerificationCode(String email, String code, LocalDateTime currentAt, LocalDateTime expirationAt) {
+
+    }
+
+    @Override
+    public void validateEmailNotVerified(String email, LocalDateTime expirationAt) {
+
     }
 
     @Override
@@ -22,6 +31,11 @@ class UserServiceFake implements UserQueryUseCase, UserCommandUseCase{
 
     @Override
     public void validateEmailExists(String email) {
+
+    }
+
+    @Override
+    public void verifyCode(String email, String code, LocalDateTime currentAt) {
 
     }
 
