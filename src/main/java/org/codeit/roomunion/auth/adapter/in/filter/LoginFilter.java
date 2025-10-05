@@ -6,13 +6,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import lombok.extern.slf4j.Slf4j;
 =======
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+import lombok.extern.slf4j.Slf4j;
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.common.exception.ErrorCode;
 import org.codeit.roomunion.common.jwt.JwtUtil;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -26,12 +29,16 @@ import java.time.Duration;
 import java.util.Map;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 @Slf4j
 =======
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+@Slf4j
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final long EXPIRATION;
+    private final long EXPIRATION = Duration.ofHours(24).toMillis() * 7; // 7 days
 
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
@@ -118,12 +125,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private Map<String, Object> createErrorResponse(ErrorCode errorCode) {
         return Map.of(
 <<<<<<< HEAD
+<<<<<<< HEAD
             "code", errorCode.getCode(),
             "message", errorCode.getMessage()
 =======
                 "code", errorCode.getCode(),
                 "message", errorCode.getMessage()
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+            "code", errorCode.getCode(),
+            "message", errorCode.getMessage()
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
         );
     }
 

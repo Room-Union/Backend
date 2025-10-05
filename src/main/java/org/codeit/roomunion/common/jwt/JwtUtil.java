@@ -28,11 +28,15 @@ public class JwtUtil {
     public String getEmail(String token) {
         return Jwts.parser()
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
             .verifyWith(secretKey)
             .build()
             .parseSignedClaims(token)
             .getPayload()
             .get("email", String.class);
+<<<<<<< HEAD
 =======
                 .verifyWith(secretKey)
                 .build()
@@ -40,17 +44,23 @@ public class JwtUtil {
                 .getPayload()
                 .get("email", String.class);
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
     }
 
     public Boolean isExpired(String token) {
         return Jwts.parser()
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
             .verifyWith(secretKey)
             .build()
             .parseSignedClaims(token)
             .getPayload()
             .getExpiration()
             .before(new Date());
+<<<<<<< HEAD
 =======
                 .verifyWith(secretKey)
                 .build()
@@ -59,17 +69,23 @@ public class JwtUtil {
                 .getExpiration()
                 .before(new Date());
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
     }
 
     public String createJwt(Long userId, String email, Long expiration) {
         return Jwts.builder()
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
             .claim("sub", userId.toString())
             .claim("email", email)
             .issuedAt(new Date(System.currentTimeMillis()))
             .expiration(new Date(System.currentTimeMillis() + expiration))
             .signWith(secretKey)
             .compact();
+<<<<<<< HEAD
 =======
                 .claim("sub", userId.toString())
                 .claim("email", email)
@@ -78,5 +94,7 @@ public class JwtUtil {
                 .signWith(secretKey)
                 .compact();
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
     }
 }

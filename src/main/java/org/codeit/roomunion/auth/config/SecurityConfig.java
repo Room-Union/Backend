@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.auth.adapter.in.filter.JwtAuthenticationFilter;
 import org.codeit.roomunion.auth.adapter.in.filter.LoginFilter;
 import org.codeit.roomunion.common.jwt.JwtUtil;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -42,14 +41,14 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
 
-    @Value("${spring.jwt.access-token-expire-time}")
-    private long accessTokenExpireTime;
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        LoginFilter loginFilter = new LoginFilter(jwtUtil, authenticationManager(authenticationConfiguration), accessTokenExpireTime);
+        LoginFilter loginFilter = new LoginFilter(jwtUtil, authenticationManager(authenticationConfiguration));
         http
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
             .httpBasic(AbstractHttpConfigurer::disable)
@@ -58,6 +57,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(SecurityConfig::authorizeHttpRequests)
             .addFilterAfter(loginFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+<<<<<<< HEAD
 =======
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
@@ -68,12 +68,17 @@ public class SecurityConfig {
                 .addFilterAfter(loginFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
         return http.build();
     }
 
     private static void authorizeHttpRequests(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry request) {
         request
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
             .requestMatchers(PUBLIC_ENDPOINTS).permitAll()

@@ -1,10 +1,14 @@
 package org.codeit.roomunion.user.domain.policy;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 =======
 import org.codeit.roomunion.moim.domain.model.Category;
 >>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
+=======
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 
 import java.util.Set;
@@ -48,10 +52,14 @@ public class UserPolicy {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     private static boolean isNotRequiredCategorySize(Set<MeetingCategory> categories) {
 =======
     private static boolean isNotRequiredCategorySize(Set<Category> categories) {
 >>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
+=======
+    private static boolean isNotRequiredCategorySize(Set<MeetingCategory> categories) {
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
         if (categories == null || categories.isEmpty()) {
             return true;
         }

@@ -2,6 +2,9 @@ package org.codeit.roomunion.user.application.service;
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
 import org.codeit.roomunion.auth.application.port.out.CustomPasswordEncoder;
 import org.codeit.roomunion.common.exception.UserNotFoundException;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
@@ -10,6 +13,7 @@ import org.codeit.roomunion.user.application.port.out.UserRepository;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.model.User;
 import org.codeit.roomunion.user.domain.policy.UserPolicy;
+<<<<<<< HEAD
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -34,6 +38,8 @@ import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.model.User;
 import org.codeit.roomunion.user.domain.policy.UserPolicy;
 import org.codeit.roomunion.auth.application.port.out.CustomPasswordEncoder;
+=======
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

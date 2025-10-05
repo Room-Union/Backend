@@ -48,8 +48,12 @@ public class UserRepositoryImpl implements UserRepository {
     public User create(UserCreateCommand userCreateCommand) {
         UserEntity userEntity = UserEntity.of(userCreateCommand);
         return userJpaRepository.save(userEntity)
+<<<<<<< HEAD
                 .toDomain();
 >>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
+=======
+            .toDomain();
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
     }
 
     @Override

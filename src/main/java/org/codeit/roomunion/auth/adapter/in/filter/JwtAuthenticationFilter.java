@@ -32,6 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(
 <<<<<<< HEAD
+<<<<<<< HEAD
         @NonNull HttpServletRequest request,
         @NonNull HttpServletResponse response,
         @NonNull FilterChain filterChain
@@ -40,6 +41,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+        @NonNull HttpServletRequest request,
+        @NonNull HttpServletResponse response,
+        @NonNull FilterChain filterChain
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
     ) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
 
@@ -58,6 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
 <<<<<<< HEAD
+<<<<<<< HEAD
                 userDetails,
                 null,
                 userDetails.getAuthorities()
@@ -66,6 +73,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     null,
                     userDetails.getAuthorities()
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
             );
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
@@ -108,12 +120,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private Map<String, Object> createErrorResponse(ErrorCode errorCode) {
         return Map.of(
 <<<<<<< HEAD
+<<<<<<< HEAD
             "code", errorCode.getCode(),
             "message", errorCode.getMessage()
 =======
                 "code", errorCode.getCode(),
                 "message", errorCode.getMessage()
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
+=======
+            "code", errorCode.getCode(),
+            "message", errorCode.getMessage()
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
         );
     }
 }

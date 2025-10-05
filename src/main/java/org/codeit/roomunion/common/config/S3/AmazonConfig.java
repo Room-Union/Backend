@@ -7,6 +7,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import lombok.RequiredArgsConstructor;
 =======
 import jakarta.annotation.PostConstruct;
@@ -14,6 +15,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 >>>>>>> 5f18479 (:sparkles: S3 설정 및 이미지 업로드 기능 구현 (#5))
+=======
+import lombok.RequiredArgsConstructor;
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

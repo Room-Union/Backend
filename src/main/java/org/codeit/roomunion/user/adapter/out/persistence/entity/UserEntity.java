@@ -5,6 +5,9 @@ package org.codeit.roomunion.user.adapter.out.persistence.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.model.Gender;
