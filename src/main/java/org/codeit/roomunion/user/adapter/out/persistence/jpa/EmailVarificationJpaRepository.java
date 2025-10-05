@@ -20,7 +20,6 @@ public interface EmailVarificationJpaRepository extends JpaRepository<EmailVerif
 
     @Query("SELECT e FROM email_verifications e " +
         "WHERE e.email = :email " +
-        "AND e.verified = false " +
         "ORDER BY e.createdAt DESC " +
         "LIMIT 1 ")
     Optional<EmailVerificationEntity> findLatestVerificationByEmail(String email);

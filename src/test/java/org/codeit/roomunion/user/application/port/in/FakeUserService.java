@@ -1,17 +1,27 @@
 package org.codeit.roomunion.user.application.port.in;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.model.User;
+import org.codeit.roomunion.user.domain.model.UserFixture;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class FakeUserService implements UserQueryUseCase, UserCommandUseCase{
 
+    private final List<User> users;
+
+    public FakeUserService() {
+        this.users = new ArrayList<>();
+    }
+
     @Override
     public User join(UserCreateCommand userCreateCommand) {
-        throw new NotImplementedException();
+        User user = UserFixture.create(1L, userCreateCommand.getEmail());
+        users.add(user);
+        return user;
     }
 
     @Override
@@ -26,7 +36,9 @@ public class FakeUserService implements UserQueryUseCase, UserCommandUseCase{
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return Optional.empty();
+        return users.stream()
+            .filter(user -> user.getEmail().equals(email))
+            .findFirst();
     }
 
     @Override
