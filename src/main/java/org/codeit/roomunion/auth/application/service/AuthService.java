@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
 public class AuthService implements AuthUseCase {
 
     private static final int VERIFICATION_CODE_BOUND = 1000000;
-    private static final String ROOM_UNION_EMAIL_VARIFICATION_SUBJECT = "RoomUnion 회원가입 인증 코드";
-    private static final String ROOM_UNION_EMAIL_VARIFICATION_BODY = "인증 코드: %s";
+    private static final String ROOM_UNION_EMAIL_VERIFICATION_SUBJECT = "RoomUnion 회원가입 인증 코드";
+    private static final String ROOM_UNION_EMAIL_VERIFICATION_BODY = "인증 코드: %s";
 
     private final UserQueryUseCase userQueryUseCase;
     private final UserCommandUseCase userCommandUseCase;
@@ -46,7 +46,7 @@ public class AuthService implements AuthUseCase {
 
         userCommandUseCase.saveEmailVerificationCode(email, code, currentAt, expirationAt);
 
-        EmailVerificationCodeEvent emailVerificationCodeEvent = EmailVerificationCodeEvent.of(email, code, ROOM_UNION_EMAIL_VARIFICATION_SUBJECT, ROOM_UNION_EMAIL_VARIFICATION_BODY.formatted(code));
+        EmailVerificationCodeEvent emailVerificationCodeEvent = EmailVerificationCodeEvent.of(email, code, ROOM_UNION_EMAIL_VERIFICATION_SUBJECT, ROOM_UNION_EMAIL_VERIFICATION_BODY.formatted(code));
         eventPublisher.publish(emailVerificationCodeEvent);
     }
 

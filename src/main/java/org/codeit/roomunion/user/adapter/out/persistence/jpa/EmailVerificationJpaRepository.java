@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-public interface EmailVarificationJpaRepository extends JpaRepository<EmailVerificationEntity, Long> {
+public interface EmailVerificationJpaRepository extends JpaRepository<EmailVerificationEntity, Long> {
 
     @Query("SELECT e FROM email_verifications e " +
         "WHERE e.email = :email " +

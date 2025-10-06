@@ -1,6 +1,6 @@
 package org.codeit.roomunion.auth.adapter.in.web;
 
-import org.codeit.roomunion.auth.adapter.in.web.request.SendVarificationCodeRequest;
+import org.codeit.roomunion.auth.adapter.in.web.request.SendVerificationCodeRequest;
 import org.codeit.roomunion.auth.adapter.in.web.request.VerifyEmailCodeRequest;
 import org.codeit.roomunion.auth.application.port.in.AuthUseCase;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class AuthController {
     }
 
     @PostMapping("/email/send")
-    public ResponseEntity<Void> sendVerificationEmail(@RequestBody SendVarificationCodeRequest request) {
+    public ResponseEntity<Void> sendVerificationEmail(@RequestBody SendVerificationCodeRequest request) {
         authUsecase.sendVerificationCode(request.email());
         return ResponseEntity.noContent()
             .build();
@@ -34,7 +34,7 @@ public class AuthController {
     }
 
     @PostMapping("/email/extend")
-    public ResponseEntity<Void> extendVerificationCode(@RequestBody SendVarificationCodeRequest request) {
+    public ResponseEntity<Void> extendVerificationCode(@RequestBody SendVerificationCodeRequest request) {
         authUsecase.extendExpiration(request.email());
         return ResponseEntity.noContent()
             .build();
