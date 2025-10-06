@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class FakeUserService implements UserQueryUseCase, UserCommandUseCase{
+public class FakeUserService implements UserQueryUseCase, UserCommandUseCase {
 
     private final List<User> users;
 

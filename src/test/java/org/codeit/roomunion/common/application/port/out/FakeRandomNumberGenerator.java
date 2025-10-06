@@ -1,7 +1,5 @@
 package org.codeit.roomunion.common.application.port.out;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class FakeRandomNumberGenerator implements RandomNumberGenerator {
 
     private final int randomNumber;
