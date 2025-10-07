@@ -1,37 +1,45 @@
 package org.codeit.roomunion.user.application.service;
 
-import org.codeit.roomunion.auth.application.port.out.CustomPasswordEncoder;
-import org.codeit.roomunion.common.exception.UserNotFoundException;
+import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
 import org.codeit.roomunion.user.application.port.out.UserRepository;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
+import org.codeit.roomunion.user.domain.exception.UserErrorCode;
 import org.codeit.roomunion.user.domain.model.User;
 import org.codeit.roomunion.user.domain.policy.UserPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
 public class UserService implements UserQueryUseCase, UserCommandUseCase {
 
     private final UserRepository userRepository;
-    private final CustomPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, CustomPasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public User getByEmail(String email) {
-        return findByEmail(email)
-            .orElseThrow(UserNotFoundException::new);
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public void validateEmailExists(String email) {
+        if (findByEmail(email).isPresent()) {
+            throw new CustomException(UserErrorCode.ALREADY_REGISTERED_EMAIL);
+        }
+    }
+
+    @Override
+    public void verifyCode(String email, String code, LocalDateTime currentAt) {
+        userRepository.verifyCode(email, code, currentAt);
     }
 
     @Override
@@ -45,21 +53,25 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
         return userRepository.create(userCreateCommand.replaceEncodePassword(encodedPassword));
     }
 
+    @Override
+    public void saveEmailVerificationCode(String email, String code, LocalDateTime currentAt, LocalDateTime expirationAt) {
+        userRepository.saveEmailVerificationCode(email, code, currentAt, expirationAt);
+    }
+
+    @Override
+    public void validateEmailNotVerified(String email, LocalDateTime expirationAt) {
+        userRepository.validateEmailNotVerified(email, expirationAt);
+    }
+
     private void validateEmailAndNicknameExists(UserCreateCommand userCreateCommand) {
-        if (validateEmailExists(userCreateCommand.getEmail())) { // TODO 예외 처리 수정
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
-        }
-        if (validateNicknameExists(userCreateCommand.getNickname())) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
-        }
+        validateEmailExists(userCreateCommand.getEmail());
+        validateNicknameExists(userCreateCommand.getNickname());
     }
 
-    private boolean validateNicknameExists(String nickname) {
-        return userRepository.findByNickname(nickname).isPresent();
-    }
-
-    private boolean validateEmailExists(String email) {
-        return findByEmail(email).isPresent();
+    private void validateNicknameExists(String nickname) {
+        if (userRepository.findByNickname(nickname).isPresent()) {
+            throw new CustomException(UserErrorCode.ALREADY_REGISTERED_NICKNAME);
+        }
     }
 
 }
