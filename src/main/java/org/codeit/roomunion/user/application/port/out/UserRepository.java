@@ -5,6 +5,7 @@ package org.codeit.roomunion.user.application.port.out;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.model.User;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface UserRepository {
@@ -14,6 +15,7 @@ public interface UserRepository {
     Optional<User> findByEmail(String email);
 
     Optional<User> findByNickname(String nickname);
+<<<<<<< HEAD
 =======
 =======
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
@@ -33,4 +35,12 @@ public interface UserRepository {
 
     Optional<User> findByNickname(String nickname);
 >>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
+=======
+
+    void saveEmailVerificationCode(String email, String code, LocalDateTime currentAt, LocalDateTime expirationAt);
+
+    void verifyCode(String email, String code, LocalDateTime currentAt);
+
+    void validateEmailNotVerified(String email, LocalDateTime expirationAt);
+>>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
 }

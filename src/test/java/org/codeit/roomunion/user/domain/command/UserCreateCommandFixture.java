@@ -27,4 +27,8 @@ public class UserCreateCommandFixture {
         return UserCreateCommand.of(email, password, nickname, gender, categories);
     }
 
+    public static UserCreateCommand create(String email) {
+        return create(email, "password", "nickname", Gender.MALE, Set.of());
+    }
+
 }

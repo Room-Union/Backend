@@ -2,15 +2,23 @@ package org.codeit.roomunion.user.adapter.out.persistence;
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+import org.codeit.roomunion.common.exception.CustomException;
+import org.codeit.roomunion.user.adapter.out.persistence.entity.EmailVerificationEntity;
+>>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
+import org.codeit.roomunion.user.adapter.out.persistence.jpa.EmailVerificationJpaRepository;
 import org.codeit.roomunion.user.adapter.out.persistence.jpa.UserJpaRepository;
 import org.codeit.roomunion.user.application.port.out.UserRepository;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
+<<<<<<< HEAD
 =======
 import org.codeit.roomunion.common.exception.UserNotFoundException;
 =======
@@ -28,13 +36,19 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 >>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
+=======
+import static org.codeit.roomunion.user.domain.exception.UserErrorCode.*;
+
+>>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
     private final UserJpaRepository userJpaRepository;
+    private final EmailVerificationJpaRepository emailVerificationJpaRepository;
 
-    public UserRepositoryImpl(UserJpaRepository userJpaRepository) {
+    public UserRepositoryImpl(UserJpaRepository userJpaRepository, EmailVerificationJpaRepository emailVerificationJpaRepository) {
         this.userJpaRepository = userJpaRepository;
+        this.emailVerificationJpaRepository = emailVerificationJpaRepository;
     }
 
     @Override
@@ -84,4 +98,31 @@ public class UserRepositoryImpl implements UserRepository {
             .map(UserEntity::toDomain);
 >>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
     }
+
+    @Override
+    public void saveEmailVerificationCode(String email, String code, LocalDateTime currentAt, LocalDateTime expirationAt) {
+        EmailVerificationEntity emailVerificationEntity = EmailVerificationEntity.of(email, code, currentAt, expirationAt);
+        emailVerificationJpaRepository.save(emailVerificationEntity);
+    }
+
+    @Override
+    public void verifyCode(String email, String code, LocalDateTime currentAt) {
+        EmailVerificationEntity emailVerificationEntity = emailVerificationJpaRepository.findValidVerificationBy(email, currentAt)
+            .orElseThrow(() -> new CustomException(EXPIRED_CODE));
+        if (emailVerificationEntity.isCodeNotValid(code)) {
+            throw new CustomException(INVALID_CODE);
+        }
+        emailVerificationEntity.verify();
+    }
+
+    @Override
+    public void validateEmailNotVerified(String email, LocalDateTime expirationAt) {
+        EmailVerificationEntity emailVerificationEntity = emailVerificationJpaRepository.findLatestVerificationByEmail(email)
+            .orElseThrow(() -> new CustomException(EMAIL_VALIDATION_NOT_FOUND));
+        if (emailVerificationEntity.isVerified()) {
+            throw new CustomException(ALREADY_VERIFIED_EMAIL);
+        }
+        emailVerificationEntity.renewExpirationAt(expirationAt);
+    }
+
 }

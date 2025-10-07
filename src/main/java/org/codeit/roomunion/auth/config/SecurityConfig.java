@@ -27,6 +27,7 @@ public class SecurityConfig {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     private static final String[] PUBLIC_ENDPOINTS = {"/v1/users/sign-up", "/v1/auth/login"};
 =======
     private static final String[] PUBLIC_ENDPOINTS = {"/users/sign-up", "/auth/login", "/users/nickname/check"};
@@ -34,6 +35,9 @@ public class SecurityConfig {
 =======
     private static final String[] PUBLIC_ENDPOINTS = {"/v1/users/sign-up", "/v1/auth/login"};
 >>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
+=======
+    private static final String[] PUBLIC_ENDPOINTS = {"/v1/users/sign-up", "/v1/auth/login", "/v1/auth/email/send", "/v1/auth/email/verify"};
+>>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
     private static final String[] SWAGGER_ENDPOINTS = {"/swagger-ui/**", "/v3/api-docs/**"};
 
     private final CorsConfig corsConfig;

@@ -1,37 +1,38 @@
 server:
-    servlet:
-        context-path: /api
-    tomcat:
-        max-swallow-size: -1
+  servlet:
+    context-path: /api
+  tomcat:
+    max-swallow-size: -1
 
 spring:
-    servlet:
-        multipart:
-            max-file-size: 30MB
-            max-request-size: 50MB
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 50MB
 
-    datasource:
-        url: ${DB_URL}
-        username: ${DB_USERNAME}
-        password: ${DB_PASSWORD}
-        driver-class-name: com.mysql.cj.jdbc.Driver
-    sql:
-        init:
-            mode: never
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: never
 
-    jpa:
-        hibernate:
-            ddl-auto: update
-            naming:
-                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-        properties:
-            hibernate:
-                dialect: org.hibernate.dialect.MySQL8Dialect
-                show_sql: true
-                format_sql: true
-                use_sql_comments: true
-                default_batch_fetch_size: 1000
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        default_batch_fetch_size: 1000
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     jwt:
@@ -63,18 +64,42 @@ cloud:
 
 # S3
 cloud:
+=======
+  jwt:
+    secret: e253645a97f98c5ac9d94c7cb6fe47adef76834f1ebf312d9617564096f443ad
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_APP_ADDRESS}
+    password: ${GMAIL_APP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# S3
+cloud:
+>>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
   aws:
     s3:
       bucket: ${CLOUD_AWS_S3_BUCKET}
       path:
         profile: profile
+<<<<<<< HEAD
         crew: crew
+=======
+        meeting: meeting
+>>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
     region:
       static-region: ${CLOUD_AWS_REGION_STATIC}
     stack:
       auto: false
     credentials:
       access-key: ${AWS_ACCESS_KEY_ID}
+<<<<<<< HEAD
       secret-key: ${AWS_SECRET_ACCESS_KEY}
 >>>>>>> 5f18479 (:sparkles: S3 설정 및 이미지 업로드 기능 구현 (#5))
 =======
@@ -97,3 +122,6 @@ cloud:
             access-key: ${AWS_ACCESS_KEY_ID}
             secret-key: ${AWS_SECRET_ACCESS_KEY}
 >>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
+=======
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
+>>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))

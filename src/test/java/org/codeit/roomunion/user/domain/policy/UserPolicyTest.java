@@ -2,6 +2,10 @@ package org.codeit.roomunion.user.domain.policy;
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+import org.codeit.roomunion.common.exception.CustomException;
+>>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 =======
 import org.codeit.roomunion.moim.domain.model.Category;
@@ -118,8 +122,8 @@ class UserPolicyTest {
 
             // when & then
             assertThatThrownBy(() -> UserPolicy.validate(command))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Invalid email format");
+                .isInstanceOf(CustomException.class)
+                .hasMessage("유효하지 않은 입력입니다.");
         }
     }
 
@@ -229,6 +233,7 @@ class UserPolicyTest {
 
             // when & then
             assertThatThrownBy(() -> UserPolicy.validate(command))
+<<<<<<< HEAD
                 .isInstanceOf(IllegalArgumentException.class)
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -239,6 +244,10 @@ class UserPolicyTest {
 =======
                 .hasMessage("Password must be 8-13 characters long and contain letters, numbers, and special characters (!, @, #, $, %, ^, *, (, ), _, +, =, -, ~)");
 >>>>>>> 521de11 (refactor: 회원가입시 프로필 이미지 제거, 비밀번호 유효성체크 수정, 기타 수정 (#8))
+=======
+                .isInstanceOf(CustomException.class)
+                .hasMessage("유효하지 않은 입력입니다.");
+>>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
         }
     }
 
@@ -302,8 +311,8 @@ class UserPolicyTest {
 
             // when & then
             assertThatThrownBy(() -> UserPolicy.validate(command))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("At least two categories must be selected");
+                .isInstanceOf(CustomException.class)
+                .hasMessage("유효하지 않은 입력입니다.");
         }
 
         private static Stream<Arguments> provideInvalidCategories() {

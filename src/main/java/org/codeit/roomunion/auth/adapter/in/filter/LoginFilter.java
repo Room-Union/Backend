@@ -8,13 +8,17 @@ import jakarta.servlet.http.HttpServletResponse;
 <<<<<<< HEAD
 <<<<<<< HEAD
 import lombok.extern.slf4j.Slf4j;
+<<<<<<< HEAD
 =======
 >>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
 =======
 import lombok.extern.slf4j.Slf4j;
 >>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
+=======
+import org.codeit.roomunion.auth.domain.exception.AuthErrorCode;
+>>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
-import org.codeit.roomunion.common.exception.ErrorCode;
+import org.codeit.roomunion.common.exception.BaseErrorCode;
 import org.codeit.roomunion.common.jwt.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -105,12 +109,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
-        ErrorCode errorCode = getErrorCode(failed);
+        BaseErrorCode errorCode = getErrorCode(failed);
 
         String errorResponse = objectMapper.writeValueAsString(createErrorResponse(errorCode));
+<<<<<<< HEAD
         response.setStatus(errorCode.getStatusCode());
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+        response.setStatus(errorCode.getStatusValue());
+>>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
         response.setContentType("application/json; charset=UTF-8");
 =======
         response.setContentType("application/json");
@@ -122,7 +130,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.getWriter().write(errorResponse);
     }
 
-    private Map<String, Object> createErrorResponse(ErrorCode errorCode) {
+    private Map<String, Object> createErrorResponse(BaseErrorCode errorCode) {
         return Map.of(
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -139,11 +147,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         );
     }
 
-    private ErrorCode getErrorCode(AuthenticationException failed) {
+    private BaseErrorCode getErrorCode(AuthenticationException failed) {
         return switch (failed) {
-            case BadCredentialsException ignore -> ErrorCode.INVALID_INPUT_VALUE;
-            case DisabledException ignore -> ErrorCode.LOGIN_FAIL;
-            default -> ErrorCode.INTERNAL_SERVER_ERROR;
+            case BadCredentialsException ignore -> AuthErrorCode.INVALID_INPUT_VALUE;
+            case DisabledException ignore -> AuthErrorCode.LOGIN_FAIL;
+            default -> AuthErrorCode.INTERNAL_SERVER_ERROR;
         };
     }
 }

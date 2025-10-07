@@ -8,8 +8,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.auth.application.service.JwtService;
+import org.codeit.roomunion.auth.domain.exception.AuthErrorCode;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
-import org.codeit.roomunion.common.exception.ErrorCode;
+import org.codeit.roomunion.common.exception.BaseErrorCode;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -88,11 +89,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void validateToken(HttpServletResponse response, String jwtToken, CustomUserDetails userDetails) throws IOException {
         if (jwtService.isTokenInvalid(jwtToken, userDetails)) {
-            setErrorResponse(response, ErrorCode.INVALID_JWT);
+            setErrorResponse(response, AuthErrorCode.INVALID_JWT);
             throw new JwtException("잘못된 토큰입니다.");
         }
         if (jwtService.isTokenExpired(jwtToken)) {
-            setErrorResponse(response, ErrorCode.EXPIRED_JWT);
+            setErrorResponse(response, AuthErrorCode.EXPIRED_JWT);
             throw new JwtException("만료된 토큰입니다.");
         }
     }
@@ -101,11 +102,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return authHeader == null || !authHeader.startsWith("Bearer ");
     }
 
-    private void setErrorResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
+    private void setErrorResponse(HttpServletResponse response, BaseErrorCode errorCode) throws IOException {
         String errorResponse = objectMapper.writeValueAsString(createErrorResponse(errorCode));
+<<<<<<< HEAD
         response.setStatus(errorCode.getStatusCode());
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+        response.setStatus(errorCode.getStatusValue());
+>>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
         response.setContentType("application/json; charset=UTF-8");
 =======
         response.setContentType("application/json");
@@ -117,7 +122,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.getWriter().write(errorResponse);
     }
 
-    private Map<String, Object> createErrorResponse(ErrorCode errorCode) {
+    private Map<String, Object> createErrorResponse(BaseErrorCode errorCode) {
         return Map.of(
 <<<<<<< HEAD
 <<<<<<< HEAD

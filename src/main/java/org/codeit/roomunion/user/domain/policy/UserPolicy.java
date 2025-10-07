@@ -2,6 +2,11 @@ package org.codeit.roomunion.user.domain.policy;
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+import org.codeit.roomunion.common.exception.CustomException;
+import org.codeit.roomunion.common.exception.GlobalErrorCode;
+>>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 =======
 import org.codeit.roomunion.moim.domain.model.Category;
@@ -31,11 +36,12 @@ public class UserPolicy {
     private UserPolicy() {
     }
 
-    public static void validate(UserCreateCommand userCreateCommand) { // TODO 현준님 예외 변경하면 여기도 바꾸기
+    public static void validate(UserCreateCommand userCreateCommand) {
         if (isNotValidateEmail(userCreateCommand)) {
-            throw new IllegalArgumentException("Invalid email format");
+            throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
         }
         if (isNotValidatePassword(userCreateCommand)) {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
             throw new IllegalArgumentException("Password must be 8-13 characters long and contain letters, numbers, and special characters (!, @, #, $, %, ^, *, (, ), _, +, =, -, ~)");
@@ -45,18 +51,23 @@ public class UserPolicy {
 =======
             throw new IllegalArgumentException("Password must be 8-13 characters long and contain letters, numbers, and special characters (!, @, #, $, %, ^, *, (, ), _, +, =, -, ~)");
 >>>>>>> 521de11 (refactor: 회원가입시 프로필 이미지 제거, 비밀번호 유효성체크 수정, 기타 수정 (#8))
+=======
+            throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
+>>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
         }
         if (isNotRequiredCategorySize(userCreateCommand.getCategories())) {
-            throw new IllegalArgumentException("At least two categories must be selected");
+            throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
         }
     }
 
     private static boolean isNotValidatePassword(UserCreateCommand userCreateCommand) {
-        return !PASSWORD_PATTERN.matcher(userCreateCommand.getPassword()).matches();
+        return !PASSWORD_PATTERN.matcher(userCreateCommand.getPassword())
+            .matches();
     }
 
     private static boolean isNotValidateEmail(UserCreateCommand userCreateCommand) {
-        return !EMAIL_PATTERN.matcher(userCreateCommand.getEmail()).matches();
+        return !EMAIL_PATTERN.matcher(userCreateCommand.getEmail())
+            .matches();
     }
 
 <<<<<<< HEAD

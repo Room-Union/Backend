@@ -5,6 +5,8 @@ import org.codeit.roomunion.user.domain.model.User;
 <<<<<<< HEAD
 <<<<<<< HEAD
 
+import java.time.LocalDateTime;
+
 public interface UserCommandUseCase {
 
     User join(UserCreateCommand userCreateCommand);
@@ -22,4 +24,7 @@ public interface UserCommandUseCase {
     User join(UserCreateCommand userCreateCommand);
 >>>>>>> 521de11 (refactor: 회원가입시 프로필 이미지 제거, 비밀번호 유효성체크 수정, 기타 수정 (#8))
 
+    void saveEmailVerificationCode(String email, String code, LocalDateTime currentAt, LocalDateTime expirationAt);
+
+    void validateEmailNotVerified(String email, LocalDateTime expirationAt);
 }
