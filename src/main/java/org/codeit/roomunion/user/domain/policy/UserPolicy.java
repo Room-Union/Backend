@@ -1,5 +1,7 @@
 package org.codeit.roomunion.user.domain.policy;
 
+import org.codeit.roomunion.common.exception.CustomException;
+import org.codeit.roomunion.common.exception.GlobalErrorCode;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 
@@ -15,24 +17,26 @@ public class UserPolicy {
     private UserPolicy() {
     }
 
-    public static void validate(UserCreateCommand userCreateCommand) { // TODO 현준님 예외 변경하면 여기도 바꾸기
+    public static void validate(UserCreateCommand userCreateCommand) {
         if (isNotValidateEmail(userCreateCommand)) {
-            throw new IllegalArgumentException("Invalid email format");
+            throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
         }
         if (isNotValidatePassword(userCreateCommand)) {
-            throw new IllegalArgumentException("Password must be 8-13 characters long and contain letters, numbers, and special characters (!, @, #, $, %, ^, *, (, ), _, +, =, -, ~)");
+            throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
         }
         if (isNotRequiredCategorySize(userCreateCommand.getCategories())) {
-            throw new IllegalArgumentException("At least two categories must be selected");
+            throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
         }
     }
 
     private static boolean isNotValidatePassword(UserCreateCommand userCreateCommand) {
-        return !PASSWORD_PATTERN.matcher(userCreateCommand.getPassword()).matches();
+        return !PASSWORD_PATTERN.matcher(userCreateCommand.getPassword())
+            .matches();
     }
 
     private static boolean isNotValidateEmail(UserCreateCommand userCreateCommand) {
-        return !EMAIL_PATTERN.matcher(userCreateCommand.getEmail()).matches();
+        return !EMAIL_PATTERN.matcher(userCreateCommand.getEmail())
+            .matches();
     }
 
     private static boolean isNotRequiredCategorySize(Set<MeetingCategory> categories) {

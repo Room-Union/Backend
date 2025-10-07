@@ -1,10 +1,10 @@
 package org.codeit.roomunion.meeting.domain.model;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
 import lombok.Getter;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 public class Meeting {

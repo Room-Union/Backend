@@ -2,7 +2,6 @@ package org.codeit.roomunion.meeting.adapter.out.persistence;
 
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.common.exception.CustomException;
-import org.codeit.roomunion.common.exception.UserNotFoundException;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingJpaRepository;
@@ -14,6 +13,7 @@ import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.codeit.roomunion.user.adapter.out.persistence.jpa.UserJpaRepository;
+import org.codeit.roomunion.user.domain.exception.UserErrorCode;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -26,9 +26,8 @@ public class MeetingRepositoryImpl implements MeetingRepository {
 
     @Override
     public Meeting createMeeting(MeetingCreateCommand command) {
-        // TODO 현태님 UserErrorCode로 변경하시면 예외처리 적용
         UserEntity hostUser = userJpaRepository.findById(command.getUserId())
-            .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
         MeetingEntity meetingEntity = MeetingEntity.from(command, hostUser);
 
