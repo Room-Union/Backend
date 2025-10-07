@@ -94,6 +94,11 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
         userRepository.validateEmailNotVerified(email, expirationAt);
     }
 
+    @Override
+    public User getUserInfo(String email) {
+        return userRepository.findByEmailWithCategory(email);
+    }
+
     private void validateEmailAndNicknameExists(UserCreateCommand userCreateCommand) {
         validateEmailExists(userCreateCommand.getEmail());
         validateNicknameExists(userCreateCommand.getNickname());

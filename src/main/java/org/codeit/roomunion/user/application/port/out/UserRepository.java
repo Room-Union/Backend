@@ -22,4 +22,6 @@ public interface UserRepository {
     void validateEmailNotVerified(String email, LocalDateTime expirationAt);
 
     User modify(User user, UserModifyCommand userModifyCommand, boolean isUpdateImage);
+
+    User findByEmailWithCategory(String email);
 }

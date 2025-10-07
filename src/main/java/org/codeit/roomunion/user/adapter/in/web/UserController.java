@@ -4,12 +4,14 @@ import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.user.adapter.in.web.request.JoinUserRequest;
 import org.codeit.roomunion.user.adapter.in.web.request.UserModifyRequest;
 import org.codeit.roomunion.user.adapter.in.web.response.JoinUserResponse;
+import org.codeit.roomunion.user.adapter.in.web.response.UserInfoResponse;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
 import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/users")
@@ -36,6 +38,13 @@ public class UserController {
         userCommandUseCase.modify(userDetails.getUser(), request.toCommand(), profileImage);
         return ResponseEntity.noContent()
             .build();
+    }
+
+
+    @GetMapping
+    public ResponseEntity<UserInfoResponse> getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userCommandUseCase.getUserInfo(userDetails.getUsername());
+        return ResponseEntity.ok(UserInfoResponse.from(user));
     }
 
 }
