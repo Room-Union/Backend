@@ -21,7 +21,7 @@ public class UserController {
         this.userCommandUseCase = userCommandUseCase;
     }
 
-    @PostMapping(value = "/sign-up")
+    @PostMapping("/sign-up")
     public ResponseEntity<JoinUserResponse> createUser(@RequestBody JoinUserRequest request) {
         User user = userCommandUseCase.join(request.toCommand());
         return ResponseEntity.ok(JoinUserResponse.from(user));
