@@ -1,6 +1,6 @@
 package org.codeit.roomunion.user.application.service;
 
-import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
+import org.codeit.roomunion.common.application.port.out.EventPublisher;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
@@ -8,6 +8,7 @@ import org.codeit.roomunion.user.application.port.out.UserRepository;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.command.UserModifyCommand;
 import org.codeit.roomunion.user.domain.exception.UserErrorCode;
+import org.codeit.roomunion.user.domain.event.ProfileImageUploadEvent;
 import org.codeit.roomunion.user.domain.model.User;
 import org.codeit.roomunion.user.domain.policy.UserPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,12 +26,12 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AmazonS3Manager amazonS3Manager;
+    private final EventPublisher eventPublisher;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AmazonS3Manager amazonS3Manager) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EventPublisher eventPublisher) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.amazonS3Manager = amazonS3Manager;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -79,7 +80,8 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
         if (!hasImage(profileImage)) {
             return;
         }
-        amazonS3Manager.uploadFile(user.getProfileImagePath(), profileImage);
+        ProfileImageUploadEvent profileImageUploadEvent = ProfileImageUploadEvent.of(user.getProfileImagePath(), profileImage);
+        eventPublisher.publish(profileImageUploadEvent);
     }
 
     @Override
