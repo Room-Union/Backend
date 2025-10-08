@@ -71,9 +71,13 @@ public class UserEntity {
     public void modify(UserModifyCommand userModifyCommand, boolean isUpdateImage) {
         this.nickname = userModifyCommand.getNickname();
         this.gender = userModifyCommand.getGender();
-        this.userCategories = createUserCategoryEntities(userModifyCommand.getCategories(), this);
+        this.userCategories.addAll(createUserCategoryEntities(userModifyCommand.getCategories(), this));
         if (isUpdateImage) {
             this.hasImage = true;
         }
+    }
+
+    public void clearCategories() {
+        userCategories.clear();
     }
 }

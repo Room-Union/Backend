@@ -10,6 +10,7 @@ import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.command.UserModifyCommand;
 import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -73,9 +74,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    @Transactional
     public User modify(User user, UserModifyCommand userModifyCommand, boolean isUpdateImage) {
-        UserEntity userEntity = userJpaRepository.findById(user.getId())
+        UserEntity userEntity = userJpaRepository.findByIdWithCategories(user.getId())
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        userEntity.clearCategories();
+        userJpaRepository.flush();
         userEntity.modify(userModifyCommand, isUpdateImage);
         return userEntity.toDomain();
     }
