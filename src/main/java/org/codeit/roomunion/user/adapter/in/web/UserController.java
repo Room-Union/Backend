@@ -8,10 +8,9 @@ import org.codeit.roomunion.user.adapter.in.web.response.UserInfoResponse;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
 import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/v1/users")
@@ -42,8 +41,8 @@ public class UserController {
 
 
     @GetMapping
-    public ResponseEntity<UserInfoResponse> getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
-        User user = userCommandUseCase.getUserInfo(userDetails.getUsername());
+    public ResponseEntity<UserInfoResponse> getUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userCommandUseCase.getUserInfo(userDetails.getUser());
         return ResponseEntity.ok(UserInfoResponse.from(user));
     }
 

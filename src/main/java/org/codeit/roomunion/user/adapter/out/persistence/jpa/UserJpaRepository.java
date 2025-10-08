@@ -14,6 +14,6 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByNickname(String nickname);
 
     @Query("SELECT u FROM UserEntity u LEFT JOIN FETCH u.userCategories WHERE u.id = :id")
-    Optional<UserEntity> findByIdWithCategories(@Param Long id);
+    Optional<UserEntity> findByIdWithCategories(@Param("id") Long id);
 
 }

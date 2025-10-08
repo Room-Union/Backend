@@ -14,6 +14,7 @@ import org.hibernate.annotations.NaturalId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @Entity
@@ -68,12 +69,19 @@ public class UserEntity {
         return User.of(id, email, password, nickname, gender);
     }
 
+    public User toDomainWithCategories() {
+        Set<MeetingCategory> categories = userCategories.stream()
+            .map(UserCategoryEntity::toDomain)
+            .collect(Collectors.toUnmodifiableSet());
+        return User.of(id, email, password, nickname, gender, categories, hasImage);
+    }
+
     public void modify(UserModifyCommand userModifyCommand, boolean isUpdateImage) {
-        this.nickname = userModifyCommand.getNickname();
-        this.gender = userModifyCommand.getGender();
-        this.userCategories.addAll(createUserCategoryEntities(userModifyCommand.getCategories(), this));
+        nickname = userModifyCommand.getNickname();
+        gender = userModifyCommand.getGender();
+        userCategories.addAll(createUserCategoryEntities(userModifyCommand.getCategories(), this));
         if (isUpdateImage) {
-            this.hasImage = true;
+            hasImage = true;
         }
     }
 

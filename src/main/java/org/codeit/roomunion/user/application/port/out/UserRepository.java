@@ -23,5 +23,5 @@ public interface UserRepository {
 
     User modify(User user, UserModifyCommand userModifyCommand, boolean isUpdateImage);
 
-    User findByEmailWithCategory(String email);
+    User getByWithCategories(User user);
 }

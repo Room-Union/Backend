@@ -76,12 +76,23 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     @Transactional
     public User modify(User user, UserModifyCommand userModifyCommand, boolean isUpdateImage) {
-        UserEntity userEntity = userJpaRepository.findByIdWithCategories(user.getId())
+        UserEntity userEntity = findByWithCategories(user)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         userEntity.clearCategories();
         userJpaRepository.flush();
         userEntity.modify(userModifyCommand, isUpdateImage);
-        return userEntity.toDomain();
+        return userEntity.toDomainWithCategories();
+    }
+
+    @Override
+    public User getByWithCategories(User user) {
+        return findByWithCategories(user)
+            .orElseThrow(() -> new CustomException(USER_NOT_FOUND))
+            .toDomainWithCategories();
+    }
+
+    private Optional<UserEntity> findByWithCategories(User user) {
+        return userJpaRepository.findByIdWithCategories(user.getId());
     }
 
 }

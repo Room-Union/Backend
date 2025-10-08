@@ -17,5 +17,5 @@ public interface UserCommandUseCase {
 
     void validateEmailNotVerified(String email, LocalDateTime expirationAt);
 
-    User getUserInfo(String email);
+    User getUserInfo(User user);
 }

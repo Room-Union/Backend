@@ -95,8 +95,8 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
     }
 
     @Override
-    public User getUserInfo(String email) {
-        return userRepository.findByEmailWithCategory(email);
+    public User getUserInfo(User user) {
+        return userRepository.getByWithCategories(user);
     }
 
     private void validateEmailAndNicknameExists(UserCreateCommand userCreateCommand) {

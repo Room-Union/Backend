@@ -36,4 +36,8 @@ public class UserCategoryEntity {
     static UserCategoryEntity of(UserEntity user, MeetingCategory category) {
         return new UserCategoryEntity(user, category);
     }
+
+    public MeetingCategory toDomain() {
+        return this.category;
+    }
 }
