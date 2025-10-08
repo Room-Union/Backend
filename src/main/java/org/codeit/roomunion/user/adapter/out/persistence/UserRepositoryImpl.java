@@ -7,6 +7,7 @@ import org.codeit.roomunion.user.adapter.out.persistence.jpa.EmailVerificationJp
 import org.codeit.roomunion.user.adapter.out.persistence.jpa.UserJpaRepository;
 import org.codeit.roomunion.user.application.port.out.UserRepository;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
+import org.codeit.roomunion.user.domain.command.UserModifyCommand;
 import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.stereotype.Repository;
 
@@ -69,6 +70,14 @@ public class UserRepositoryImpl implements UserRepository {
             throw new CustomException(ALREADY_VERIFIED_EMAIL);
         }
         emailVerificationEntity.renewExpirationAt(expirationAt);
+    }
+
+    @Override
+    public User modify(User user, UserModifyCommand userModifyCommand, boolean isUpdateImage) {
+        UserEntity userEntity = userJpaRepository.findById(user.getId())
+            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        userEntity.modify(userModifyCommand, isUpdateImage);
+        return userEntity.toDomain();
     }
 
 }

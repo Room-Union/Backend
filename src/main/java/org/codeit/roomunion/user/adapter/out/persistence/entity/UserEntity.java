@@ -3,13 +3,17 @@ package org.codeit.roomunion.user.adapter.out.persistence.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
+import org.codeit.roomunion.user.domain.command.UserModifyCommand;
 import org.codeit.roomunion.user.domain.model.Gender;
 import org.codeit.roomunion.user.domain.model.User;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.NaturalId;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Entity
@@ -35,6 +39,9 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MeetingMemberEntity> meetingMembers = new ArrayList<>();
 
+    @ColumnDefault("false")
+    private boolean hasImage;
+
     protected UserEntity() {
     }
 
@@ -47,18 +54,26 @@ public class UserEntity {
 
     public static UserEntity of(UserCreateCommand userCreateCommand) {
         UserEntity userEntity = new UserEntity(userCreateCommand.getEmail(), userCreateCommand.getPassword(), userCreateCommand.getNickname(), userCreateCommand.getGender());
-        userEntity.userCategories = createUserCategoryEntities(userCreateCommand, userEntity);
+        userEntity.userCategories = createUserCategoryEntities(userCreateCommand.getCategories(), userEntity);
         return userEntity;
     }
 
-    private static List<UserCategoryEntity> createUserCategoryEntities(UserCreateCommand userCreateCommand, UserEntity userEntity) {
-        return userCreateCommand.getCategories()
-            .stream()
+    private static List<UserCategoryEntity> createUserCategoryEntities(Set<MeetingCategory> userCreateCommand, UserEntity userEntity) {
+        return userCreateCommand.stream()
             .map(category -> UserCategoryEntity.of(userEntity, category))
             .toList();
     }
 
     public User toDomain() {
         return User.of(id, email, password, nickname, gender);
+    }
+
+    public void modify(UserModifyCommand userModifyCommand, boolean isUpdateImage) {
+        this.nickname = userModifyCommand.getNickname();
+        this.gender = userModifyCommand.getGender();
+        this.userCategories = createUserCategoryEntities(userModifyCommand.getCategories(), this);
+        if (isUpdateImage) {
+            this.hasImage = true;
+        }
     }
 }

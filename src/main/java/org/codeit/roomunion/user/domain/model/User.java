@@ -4,6 +4,9 @@ import lombok.Getter;
 
 @Getter
 public class User {
+
+    private static final String PROFILE_IMAGE_PATH = "user/%s/profile";
+
     private final Long id;
     private final String email;
     private final String password;
@@ -20,5 +23,9 @@ public class User {
 
     public static User of(Long id, String email, String password, String nickname, Gender gender) {
         return new User(id, email, password, nickname, gender);
+    }
+
+    public String getProfileImagePath() {
+        return PROFILE_IMAGE_PATH.formatted(id);
     }
 }

@@ -23,17 +23,17 @@ public class UserCategoryEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
-    private MeetingCategory meetingCategory;
+    private MeetingCategory category;
 
     protected UserCategoryEntity() {
     }
 
-    UserCategoryEntity(UserEntity user, MeetingCategory meetingCategory) {
+    UserCategoryEntity(UserEntity user, MeetingCategory category) {
         this.user = user;
-        this.meetingCategory = meetingCategory;
+        this.category = category;
     }
 
-    static UserCategoryEntity of(UserEntity user, MeetingCategory meetingCategory) {
-        return new UserCategoryEntity(user, meetingCategory);
+    static UserCategoryEntity of(UserEntity user, MeetingCategory category) {
+        return new UserCategoryEntity(user, category);
     }
 }
