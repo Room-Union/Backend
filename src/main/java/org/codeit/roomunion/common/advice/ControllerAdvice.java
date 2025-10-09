@@ -32,7 +32,7 @@ public class ControllerAdvice {
         String errorMessages = getValidationErrorMessage(e);
         log.error("Validation 오류 발생: {}", errorMessages);
         return ResponseEntity.status(errorCode.getStatus())
-                .body(ErrorResponse.error(errorCode.getCode(), errorMessages));
+            .body(ErrorResponse.error(errorCode.getCode(), errorMessages));
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -41,7 +41,7 @@ public class ControllerAdvice {
         String detail = "필수 파라미터 누락: " + e.getParameterName();
         log.error("필수 요청 파라미터 누락: {}", detail);
         return ResponseEntity.status(errorCode.getStatus())
-                .body(ErrorResponse.error(errorCode.getCode(), detail));
+            .body(ErrorResponse.error(errorCode.getCode(), detail));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

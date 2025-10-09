@@ -67,7 +67,7 @@ public class Meeting {
 
     public Meeting withJoined(boolean joined) {
         return new Meeting(
-            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.userId, this.platformURL, this.createdAt, this.hostNickname, this.isJoined
+            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.userId, this.platformURL, this.createdAt, this.hostNickname, joined
         );
     }
 
