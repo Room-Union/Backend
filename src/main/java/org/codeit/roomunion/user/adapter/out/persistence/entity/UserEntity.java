@@ -77,7 +77,7 @@ public class UserEntity {
         return User.of(id, email, password, nickname, gender, categories, imageUrl);
     }
 
-    public void modify(UserModifyCommand userModifyCommand, boolean isUpdateImage) {
+    public void update(UserModifyCommand userModifyCommand, boolean isUpdateImage) {
         modifyNickname(userModifyCommand.getNickname());
         gender = userModifyCommand.getGender();
         userCategories.addAll(createUserCategoryEntities(userModifyCommand.getCategories(), this));
@@ -94,5 +94,9 @@ public class UserEntity {
 
     public void clearCategories() {
         userCategories.clear();
+    }
+
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
     }
 }

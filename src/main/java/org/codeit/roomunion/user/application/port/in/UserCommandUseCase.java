@@ -13,6 +13,8 @@ public interface UserCommandUseCase {
 
     void modify(User user, UserModifyCommand userModifyCommand, MultipartFile profileImage);
 
+    void updatePassword(User user, String password, String newPassword);
+
     void saveEmailVerificationCode(String email, String code, LocalDateTime currentAt, LocalDateTime expirationAt);
 
     void validateEmailNotVerified(String email, LocalDateTime expirationAt);

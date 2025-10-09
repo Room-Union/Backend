@@ -3,6 +3,7 @@ package org.codeit.roomunion.user.adapter.in.web;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.user.adapter.in.web.request.JoinUserRequest;
 import org.codeit.roomunion.user.adapter.in.web.request.UserModifyRequest;
+import org.codeit.roomunion.user.adapter.in.web.request.UserUpdatePasswordRequest;
 import org.codeit.roomunion.user.adapter.in.web.response.JoinUserResponse;
 import org.codeit.roomunion.user.adapter.in.web.response.UserInfoResponse;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
@@ -43,6 +44,16 @@ public class UserController {
     public ResponseEntity<UserInfoResponse> getUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
         User user = userCommandUseCase.getUserInfo(userDetails.getUser());
         return ResponseEntity.ok(UserInfoResponse.from(user));
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<Void> updatePassword(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestBody UserUpdatePasswordRequest request
+    ) {
+        userCommandUseCase.updatePassword(userDetails.getUser(), request.password(), request.newPassword());
+        return ResponseEntity.noContent()
+            .build();
     }
 
 }

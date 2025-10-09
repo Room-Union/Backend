@@ -68,8 +68,23 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
     public void modify(User user, UserModifyCommand userModifyCommand, MultipartFile profileImage) {
         UserPolicy.validate(userModifyCommand);
         validateNicknameExists(userModifyCommand.getNickname());
-        userRepository.modify(user, userModifyCommand, hasImage(profileImage));
+        userRepository.update(user, userModifyCommand, hasImage(profileImage));
         updateProfileImage(user, profileImage);
+    }
+
+    @Override
+    @Transactional
+    public void updatePassword(User user, String password, String newPassword) {
+        validatePassword(user, password);
+        UserPolicy.validateNewPassword(password, newPassword);
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        userRepository.updatePassword(user, encodedPassword);
+    }
+
+    private void validatePassword(User user, String password) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new CustomException(UserErrorCode.INVALID_PASSWORD);
+        }
     }
 
     private boolean hasImage(MultipartFile profileImage) {

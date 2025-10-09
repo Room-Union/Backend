@@ -76,12 +76,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void modify(User user, UserModifyCommand userModifyCommand, boolean isUpdateImage) {
+    public void update(User user, UserModifyCommand userModifyCommand, boolean isUpdateImage) {
         UserEntity userEntity = findByWithCategories(user)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         userEntity.clearCategories();
         userJpaRepository.flush();
-        userEntity.modify(userModifyCommand, isUpdateImage);
+        userEntity.update(userModifyCommand, isUpdateImage);
     }
 
     @Override
@@ -90,6 +90,13 @@ public class UserRepositoryImpl implements UserRepository {
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         String imageUrl = imageFactory.createProfileImagePath(userEntity);
         return userEntity.toDomainWithCategories(imageUrl);
+    }
+
+    @Override
+    public void updatePassword(User user, String encodedPassword) {
+        UserEntity userEntity = userJpaRepository.findById(user.getId())
+            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        userEntity.updatePassword(encodedPassword);
     }
 
     private Optional<UserEntity> findByWithCategories(User user) {

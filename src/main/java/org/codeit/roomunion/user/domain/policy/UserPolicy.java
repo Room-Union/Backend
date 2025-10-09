@@ -5,7 +5,9 @@ import org.codeit.roomunion.common.exception.GlobalErrorCode;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.command.UserModifyCommand;
+import org.codeit.roomunion.user.domain.exception.UserErrorCode;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -43,6 +45,16 @@ public class UserPolicy {
             throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
         }
         if (isNotRequiredCategorySize(userModifyCommand.getCategories())) {
+            throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
+        }
+    }
+
+    public static void validateNewPassword(String password, String newPassword) {
+        validateNonNull(password, newPassword);
+        if (Objects.equals(password, newPassword)) {
+            throw new CustomException(UserErrorCode.SAME_PASSWORD);
+        }
+        if (isNotValidatePassword(newPassword)) {
             throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
         }
     }
