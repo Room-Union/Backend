@@ -1,7 +1,10 @@
 package org.codeit.roomunion.meeting.adapter.in.web;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.meeting.adapter.in.web.request.CreateMeetingRequest;
@@ -10,6 +13,10 @@ import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingBadge;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingSort;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/meeting")
+@Tag(name = "모임 API", description = "모임 전용 API")
 public class MeetingController {
 
     private final MeetingCommandUseCase meetingCommandUseCase;
@@ -34,7 +42,8 @@ public class MeetingController {
     ) {
         MeetingCreateCommand command = request.toCommand(userDetails.getId(), userDetails.getUsername());
         Meeting meeting = meetingCommandUseCase.create(command, image);
-        return ResponseEntity.ok(MeetingResponse.from(meeting, true));
+        List<MeetingBadge> badges = meetingQueryUseCase.getBadges(meeting);
+        return ResponseEntity.ok(MeetingResponse.from(meeting, badges));
     }
 
     @Operation(summary = "특정 모임 조회", description = "meetingId로 모임 상세 정보를 조회. isJoined 필드로 인해 토큰 필수")
@@ -44,7 +53,26 @@ public class MeetingController {
         @PathVariable Long meetingId
     ) {
         Meeting meeting = meetingQueryUseCase.getByMeetingId(meetingId, userDetails.getId());
-        return ResponseEntity.ok(MeetingResponse.from(meeting, meeting.isJoined()));
+        List<MeetingBadge> badges = meetingQueryUseCase.getBadges(meeting);
+        return ResponseEntity.ok(MeetingResponse.from(meeting, badges));
     }
+
+    @Operation(summary = "전체/카테고리 모임 리스트 조회", description = "전체/카테고리별 조회 + 정렬(최신순/사람많은 순) + 페이징처리")
+    @GetMapping("/list")
+    public ResponseEntity<Page<MeetingResponse>> getMeetingList(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestParam(required = false) MeetingCategory category,
+        @RequestParam(defaultValue = "LATEST") MeetingSort sort,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<Meeting> meetings = meetingQueryUseCase.search(category, sort, page, size, userDetails.getId());
+        Page<MeetingResponse> response = meetings.map(
+            meeting -> MeetingResponse.from(meeting, meetingQueryUseCase.getBadges(meeting))
+        );
+        return ResponseEntity.ok(response);
+    }
+
+
 
 }

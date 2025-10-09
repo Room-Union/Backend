@@ -22,4 +22,6 @@ public interface MeetingMemberJpaRepository extends JpaRepository<MeetingMemberE
     boolean existsMeetingByHostAndName(@Param("userId") Long userId,
                                        @Param("name") String name,
                                        @Param("role") MeetingRole role);
+
+    int countByMeetingId(Long meetingId);
 }

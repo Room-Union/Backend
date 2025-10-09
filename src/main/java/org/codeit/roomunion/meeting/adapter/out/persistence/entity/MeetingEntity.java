@@ -5,10 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
+import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -82,7 +84,15 @@ public class MeetingEntity {
     }
 
 
-    public Meeting toDomain(Long hostUserId, String hostNickname) {
+    public Meeting toDomain() {
+
+        MeetingMemberEntity hostMember = this.meetingMembers.stream()
+            .filter(member -> member.getMeetingRole() == MeetingRole.HOST)
+            .findFirst()
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_HOST_NOT_FOUND));
+
+        UserEntity host = hostMember.getUser();
+
         return Meeting.of(
             this.getId(),
             this.getName(),
@@ -90,10 +100,10 @@ public class MeetingEntity {
             this.getMeetingImage(),
             this.getCategory(),
             this.getMaxMemberCount(),
-            hostUserId,
+            host.getId(),
             this.getPlatformUrls(),
             this.getCreatedAt(),
-            hostNickname,
+            host.getNickname(),
             false
         );
     }
