@@ -39,7 +39,6 @@ public class UserController {
             .build();
     }
 
-
     @GetMapping
     public ResponseEntity<UserInfoResponse> getUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
         User user = userCommandUseCase.getUserInfo(userDetails.getUser());

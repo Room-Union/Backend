@@ -67,9 +67,9 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
     @Transactional
     public void modify(User user, UserModifyCommand userModifyCommand, MultipartFile profileImage) {
         UserPolicy.validate(userModifyCommand);
-
-        User modifiedUser = userRepository.modify(user, userModifyCommand, hasImage(profileImage));
-        updateProfileImage(modifiedUser, profileImage);
+        validateNicknameExists(userModifyCommand.getNickname());
+        userRepository.modify(user, userModifyCommand, hasImage(profileImage));
+        updateProfileImage(user, profileImage);
     }
 
     private boolean hasImage(MultipartFile profileImage) {
@@ -77,8 +77,8 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
     }
 
     private void updateProfileImage(User user, MultipartFile profileImage) {
-        if (!hasImage(profileImage)) {
-            return;
+        if (hasImage(profileImage)) {
+            amazonS3Manager.uploadFile(user.getProfileImagePath(), profileImage);
         }
         ProfileImageUploadEvent profileImageUploadEvent = ProfileImageUploadEvent.of(user.getProfileImagePath(), profileImage);
         eventPublisher.publish(profileImageUploadEvent);

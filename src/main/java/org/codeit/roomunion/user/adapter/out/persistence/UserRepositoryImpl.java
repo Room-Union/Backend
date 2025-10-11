@@ -3,6 +3,7 @@ package org.codeit.roomunion.user.adapter.out.persistence;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.EmailVerificationEntity;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
+import org.codeit.roomunion.user.adapter.out.persistence.factory.ImageFactory;
 import org.codeit.roomunion.user.adapter.out.persistence.jpa.EmailVerificationJpaRepository;
 import org.codeit.roomunion.user.adapter.out.persistence.jpa.UserJpaRepository;
 import org.codeit.roomunion.user.application.port.out.UserRepository;
@@ -10,7 +11,6 @@ import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.command.UserModifyCommand;
 import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -22,10 +22,12 @@ public class UserRepositoryImpl implements UserRepository {
 
     private final UserJpaRepository userJpaRepository;
     private final EmailVerificationJpaRepository emailVerificationJpaRepository;
+    private final ImageFactory imageFactory;
 
-    public UserRepositoryImpl(UserJpaRepository userJpaRepository, EmailVerificationJpaRepository emailVerificationJpaRepository) {
+    public UserRepositoryImpl(UserJpaRepository userJpaRepository, EmailVerificationJpaRepository emailVerificationJpaRepository, ImageFactory imageFactory) {
         this.userJpaRepository = userJpaRepository;
         this.emailVerificationJpaRepository = emailVerificationJpaRepository;
+        this.imageFactory = imageFactory;
     }
 
     @Override
@@ -74,21 +76,20 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    @Transactional
-    public User modify(User user, UserModifyCommand userModifyCommand, boolean isUpdateImage) {
+    public void modify(User user, UserModifyCommand userModifyCommand, boolean isUpdateImage) {
         UserEntity userEntity = findByWithCategories(user)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
         userEntity.clearCategories();
         userJpaRepository.flush();
         userEntity.modify(userModifyCommand, isUpdateImage);
-        return userEntity.toDomainWithCategories();
     }
 
     @Override
     public User getByWithCategories(User user) {
-        return findByWithCategories(user)
-            .orElseThrow(() -> new CustomException(USER_NOT_FOUND))
-            .toDomainWithCategories();
+        UserEntity userEntity = findByWithCategories(user)
+            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+        String imageUrl = imageFactory.createProfileImagePath(userEntity);
+        return userEntity.toDomainWithCategories(imageUrl);
     }
 
     private Optional<UserEntity> findByWithCategories(User user) {

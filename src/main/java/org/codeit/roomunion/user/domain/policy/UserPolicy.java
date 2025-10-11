@@ -20,6 +20,8 @@ public class UserPolicy {
     }
 
     public static void validate(UserCreateCommand userCreateCommand) {
+        validateNonNull(userCreateCommand.getEmail(), userCreateCommand.getNickname(), userCreateCommand.getPassword(), userCreateCommand.getGender(), userCreateCommand.getCategories());
+
         if (isNotValidateEmail(userCreateCommand.getEmail())) {
             throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
         }
@@ -34,15 +36,9 @@ public class UserPolicy {
         }
     }
 
-    private static boolean isNotValidateNickname(String nickname) {
-        if (nickname == null) {
-            return true;
-        }
-        return !NICKNAME_PATTERN.matcher(nickname)
-            .matches();
-    }
-
     public static void validate(UserModifyCommand userModifyCommand) {
+        validateNonNull(userModifyCommand.getGender(), userModifyCommand.getCategories());
+
         if (isNotValidateNickname(userModifyCommand.getNickname())) {
             throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
         }
@@ -51,26 +47,34 @@ public class UserPolicy {
         }
     }
 
-    private static boolean isNotValidatePassword(String password) {
-        if (password == null) {
-            return true;
+    private static void validateNonNull(Object... objects) {
+        for (Object o : objects) {
+            validateIsNull(o);
         }
+    }
+
+    private static void validateIsNull(Object object) {
+        if (object == null) {
+            throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
+        }
+    }
+
+    private static boolean isNotValidateNickname(String nickname) {
+        return !NICKNAME_PATTERN.matcher(nickname)
+            .matches();
+    }
+
+    private static boolean isNotValidatePassword(String password) {
         return !PASSWORD_PATTERN.matcher(password)
             .matches();
     }
 
     private static boolean isNotValidateEmail(String email) {
-        if (email == null) {
-            return true;
-        }
         return !EMAIL_PATTERN.matcher(email)
             .matches();
     }
 
     private static boolean isNotRequiredCategorySize(Set<MeetingCategory> categories) {
-        if (categories == null || categories.isEmpty()) {
-            return true;
-        }
         return categories.size() != REQUIRED_CATEGORY_COUNT;
     }
 }

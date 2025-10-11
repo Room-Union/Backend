@@ -30,6 +30,7 @@ public class UserEntity {
 
     private String password;
 
+    @Column(unique = true)
     private String nickname;
 
     private Gender gender;
@@ -69,19 +70,25 @@ public class UserEntity {
         return User.of(id, email, password, nickname, gender);
     }
 
-    public User toDomainWithCategories() {
+    public User toDomainWithCategories(String imageUrl) {
         Set<MeetingCategory> categories = userCategories.stream()
             .map(UserCategoryEntity::toDomain)
             .collect(Collectors.toUnmodifiableSet());
-        return User.of(id, email, password, nickname, gender, categories, hasImage);
+        return User.of(id, email, password, nickname, gender, categories, imageUrl);
     }
 
     public void modify(UserModifyCommand userModifyCommand, boolean isUpdateImage) {
-        nickname = userModifyCommand.getNickname();
+        modifyNickname(userModifyCommand.getNickname());
         gender = userModifyCommand.getGender();
         userCategories.addAll(createUserCategoryEntities(userModifyCommand.getCategories(), this));
         if (isUpdateImage) {
             hasImage = true;
+        }
+    }
+
+    private void modifyNickname(String nickname) {
+        if (nickname != null) {
+            this.nickname = nickname;
         }
     }
 

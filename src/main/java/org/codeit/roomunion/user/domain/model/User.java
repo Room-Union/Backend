@@ -10,7 +10,7 @@ import java.util.Set;
 @Getter
 public class User {
 
-    private static final String PROFILE_IMAGE_PATH = "user/%s/profile";
+    public static final String PROFILE_IMAGE_PATH = "user/%s/profile";
 
     private final Long id;
     private final String email;
@@ -18,21 +18,21 @@ public class User {
     private final String nickname;
     private final Gender gender;
     private final Set<MeetingCategory> categories;
-    private final boolean hasImage;
+    private final String profileImageUrl;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private User(Long id, String email, String password, String nickname, Gender gender, Set<MeetingCategory> categories, boolean hasImage) {
+    private User(Long id, String email, String password, String nickname, Gender gender, Set<MeetingCategory> categories, String profileImageUrl) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.gender = gender;
         this.categories = categories;
-        this.hasImage = hasImage;
+        this.profileImageUrl = profileImageUrl;
     }
 
-    public static User of(Long id, String email, String password, String nickname, Gender gender, Set<MeetingCategory> categories, boolean hasImage) {
-        return new User(id, email, password, nickname, gender, categories, hasImage);
+    public static User of(Long id, String email, String password, String nickname, Gender gender, Set<MeetingCategory> categories, String profileImageUrl) {
+        return new User(id, email, password, nickname, gender, categories, profileImageUrl);
     }
 
     public static User of(Long id, String email, String password, String nickname, Gender gender) {
