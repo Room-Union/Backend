@@ -93,10 +93,9 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
 
     private void updateProfileImage(User user, MultipartFile profileImage) {
         if (hasImage(profileImage)) {
-            amazonS3Manager.uploadFile(user.getProfileImagePath(), profileImage);
+            ProfileImageUploadEvent profileImageUploadEvent = ProfileImageUploadEvent.of(user.getProfileImagePath(), profileImage);
+            eventPublisher.publish(profileImageUploadEvent);
         }
-        ProfileImageUploadEvent profileImageUploadEvent = ProfileImageUploadEvent.of(user.getProfileImagePath(), profileImage);
-        eventPublisher.publish(profileImageUploadEvent);
     }
 
     @Override
