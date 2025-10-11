@@ -1,6 +1,7 @@
 package org.codeit.roomunion.user.application.port.out;
 
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
+import org.codeit.roomunion.user.domain.command.UserModifyCommand;
 import org.codeit.roomunion.user.domain.model.User;
 
 import java.time.LocalDateTime;
@@ -19,4 +20,10 @@ public interface UserRepository {
     void verifyCode(String email, String code, LocalDateTime currentAt);
 
     void validateEmailNotVerified(String email, LocalDateTime expirationAt);
+
+    void update(User user, UserModifyCommand userModifyCommand, boolean isUpdateImage);
+
+    User getByWithCategories(User user);
+
+    void updatePassword(User user, String encodedPassword);
 }
