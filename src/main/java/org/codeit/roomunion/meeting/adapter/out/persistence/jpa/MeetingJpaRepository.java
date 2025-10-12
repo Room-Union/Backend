@@ -4,6 +4,7 @@ import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long> {
 
+    @EntityGraph(attributePaths = {"meetingMembers", "meetingMembers.user"})
     @Query("""
       SELECT m
       FROM MeetingEntity m
@@ -22,6 +24,7 @@ public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long>
         Pageable pageable
     );
 
+    @EntityGraph(attributePaths = {"meetingMembers", "meetingMembers.user"})
     @Query("""
       SELECT m
       FROM MeetingEntity m

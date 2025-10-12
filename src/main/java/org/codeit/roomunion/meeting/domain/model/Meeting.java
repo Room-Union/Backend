@@ -1,6 +1,7 @@
 package org.codeit.roomunion.meeting.domain.model;
 
 import lombok.Getter;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingBadge;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 
 import java.time.LocalDateTime;
@@ -35,18 +36,26 @@ public class Meeting {
 
     private final boolean isJoined;
 
+    private final List<MeetingBadge> badges;
+
     public static String getImagePath(String uuid) {
         return String.format(IMAGE_PATH_TEMPLATE, uuid);
     }
 
     public Meeting withHostInfo(String hostNickname) {
         return new Meeting(
-            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.userId, this.platformURL, this.createdAt, hostNickname, this.isJoined
+            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.userId, this.platformURL, this.createdAt, hostNickname, this.isJoined, this.badges
+        );
+    }
+
+    public Meeting withBadges(List<MeetingBadge> badges) {
+        return new Meeting(
+            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.userId, this.platformURL, this.createdAt, this.hostNickname, this.isJoined, badges
         );
     }
 
     private Meeting(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, Long userId, List<String> platformURL, LocalDateTime createdAt,
-        String hostNickname, boolean isJoined) {
+        String hostNickname, boolean isJoined, List<MeetingBadge> badges) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -58,16 +67,17 @@ public class Meeting {
         this.createdAt = createdAt;
         this.hostNickname = hostNickname;
         this.isJoined = isJoined;
+        this.badges = badges;
     }
 
     public static Meeting of(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, Long userId, List<String> platformURL,
         LocalDateTime createdAt, String hostNickname, boolean isJoined) {
-        return new Meeting(id, name, description, meetingImage, category, maxMemberCount, userId, platformURL, createdAt, hostNickname, isJoined);
+        return new Meeting(id, name, description, meetingImage, category, maxMemberCount, userId, platformURL, createdAt, hostNickname, isJoined, List.of());
     }
 
     public Meeting withJoined(boolean joined) {
         return new Meeting(
-            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.userId, this.platformURL, this.createdAt, this.hostNickname, joined
+            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.userId, this.platformURL, this.createdAt, this.hostNickname, joined,this.badges
         );
     }
 

@@ -17,7 +17,7 @@ public enum MeetingSort {
     @JsonCreator
     public static MeetingSort from(String value) {
         for (MeetingSort sort: values()) {
-            if (sort.name().equalsIgnoreCase(value) || sort.getDescription().equals(value)) {
+            if (sort.name().equalsIgnoreCase(value)) {
                 return sort;
             }
         }

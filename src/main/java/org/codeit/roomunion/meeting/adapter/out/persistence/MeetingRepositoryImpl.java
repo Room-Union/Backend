@@ -64,9 +64,10 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<MeetingEntity> resultPage = (sort == MeetingSort.MEMBER_DESC)
-            ? meetingJpaRepository.findByCategoryOrderByMemberCountDesc(category, pageable)
-            : meetingJpaRepository.findByCategoryOrderByCreatedAtDesc(category, pageable);
+        Page<MeetingEntity> resultPage = switch (sort) {
+            case LATEST -> meetingJpaRepository.findByCategoryOrderByCreatedAtDesc(category, pageable);
+            case MEMBER_DESC -> meetingJpaRepository.findByCategoryOrderByMemberCountDesc(category, pageable);
+        };
 
         return resultPage.map(MeetingEntity::toDomain);
     }

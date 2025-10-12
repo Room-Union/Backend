@@ -19,7 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "meeting")
+@Table(
+    name = "meeting",
+    indexes = {
+        @Index(name = "idx_meeting_created_at", columnList = "createdAt"),
+        @Index(name = "idx_meeting_category_created_at", columnList = "category, createdAt")
+    }
+)
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -87,7 +93,7 @@ public class MeetingEntity {
     public Meeting toDomain() {
 
         MeetingMemberEntity hostMember = this.meetingMembers.stream()
-            .filter(member -> member.getMeetingRole() == MeetingRole.HOST)
+            .filter(MeetingMemberEntity::isHost)
             .findFirst()
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_HOST_NOT_FOUND));
 

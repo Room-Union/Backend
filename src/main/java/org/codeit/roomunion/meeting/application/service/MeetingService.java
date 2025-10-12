@@ -8,7 +8,6 @@ import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.application.port.out.UuidRepository;
 import org.codeit.roomunion.common.domain.model.Uuid;
 import org.codeit.roomunion.common.exception.CustomException;
-import org.codeit.roomunion.meeting.adapter.in.web.response.MeetingResponse;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
@@ -62,9 +61,11 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
         MeetingCreateCommand finalCommand = MeetingCreateCommand.of(command, imageUrl);
 
-        return meetingRepository.createMeeting(finalCommand)
+        Meeting meeting = meetingRepository.createMeeting(finalCommand)
             .withHostInfo(host.getNickname())
             .withJoined(true);
+
+        return getMeetingWithBadges(meeting);
     }
 
     @Override
@@ -74,15 +75,9 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
         // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
         boolean isHost =  currentUserId != null && Objects.equals(meeting.getUserId(), currentUserId);
-        return meeting.withJoined(isHost);
-    }
+        meeting = meeting.withJoined(isHost);
 
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<MeetingBadge> getBadges(Meeting meeting) {
-        int currentCount = meetingRepository.countJoinedMembers(meeting.getId());
-        return calculateBadges(meeting, currentCount, LocalDateTime.now());
+        return getMeetingWithBadges(meeting);
     }
 
 
@@ -94,8 +89,16 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
             // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
             .map(meeting -> {
                 boolean isHost = currentUserId != null && Objects.equals(meeting.getUserId(), currentUserId);
-                return meeting.withJoined(isHost);
+                Meeting joinedMeeting = meeting.withJoined(isHost);
+
+                return getMeetingWithBadges(joinedMeeting);
             });
+    }
+
+    private Meeting getMeetingWithBadges(Meeting meeting) {
+        int currentCount = meetingRepository.countJoinedMembers(meeting.getId());
+        List<MeetingBadge> badges = calculateBadges(meeting, currentCount, LocalDateTime.now());
+        return meeting.withBadges(badges);
     }
 
 
@@ -103,8 +106,16 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         List<MeetingBadge> badges = new ArrayList<>();
         LocalDateTime createdAt = meeting.getCreatedAt();
 
+        int max = meeting.getMaxMemberCount();
+
+        // 마감 여부 확인
+        if (currentCount >= max) {
+            badges.add(MeetingBadge.CLOSED);
+            return badges;
+        }
+
         // 모집중
-        if (currentCount < meeting.getMaxMemberCount()) {
+        if (currentCount < max) {
             badges.add(MeetingBadge.RECRUITING);
         }
 
@@ -115,7 +126,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
         // 마감임박: 최대인원 5명당 마감임박기준을 1명
         // ex) 최대 12명 중 3명 이하 남음(5명당 1명 기준) → 마감임박
-        int remaining = meeting.getMaxMemberCount() - currentCount; // 12 - 10 = 2
+        int remaining = max - currentCount; // 12 - 10 = 2
         int closingLimit = (int) Math.ceil(meeting.getMaxMemberCount() / 5.0); // ceil(12 / 5.0) = 3
 
         if (remaining > 0 && remaining <= closingLimit) { // 2 <= 3 → true

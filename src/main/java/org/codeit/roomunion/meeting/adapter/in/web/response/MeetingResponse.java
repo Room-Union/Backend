@@ -54,7 +54,7 @@ public class MeetingResponse {
     @Schema(description = "뱃지 목록", example = "[\"RECRUITING\",\"NEW\"]")
     private List<MeetingBadge> badges;
 
-    public static MeetingResponse from(Meeting meeting, List<MeetingBadge> badges) {
+    public static MeetingResponse from(Meeting meeting) {
         return MeetingResponse.builder()
             .meetingId(meeting.getId())
             .name(meeting.getName())
@@ -68,7 +68,7 @@ public class MeetingResponse {
 //            .profileImage(host.getProfileImage())
             .nickname(meeting.getHostNickname())
             .createdAt(meeting.getCreatedAt())
-            .badges(badges)
+            .badges(meeting.getBadges())
             .build();
     }
 
