@@ -64,9 +64,9 @@ public class MeetingResponse {
             .isJoined(meeting.isJoined())
             .platformURL(meeting.getPlatformURL())
             .meetingImage(meeting.getMeetingImage())
-            .userId(meeting.getUserId())
+            .userId(meeting.getHost().getId())
 //            .profileImage(host.getProfileImage())
-            .nickname(meeting.getHostNickname())
+            .nickname(meeting.getHost().getNickname())
             .createdAt(meeting.getCreatedAt())
             .badges(meeting.getBadges())
             .build();
