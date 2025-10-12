@@ -33,6 +33,7 @@ public class UserCategoryEntity {
     @Column(nullable = false, length = 10)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     private MeetingCategory meetingCategory;
 =======
     private Category category;
@@ -40,17 +41,25 @@ public class UserCategoryEntity {
 =======
     private MeetingCategory meetingCategory;
 >>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
+=======
+    private MeetingCategory category;
+>>>>>>> 16456c7 (feat: 유저 수정 API, 유저 정보 조회 API, 비밀번호 변경 API 개발 (#12))
 
     protected UserCategoryEntity() {
     }
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     UserCategoryEntity(UserEntity user, MeetingCategory meetingCategory) {
+=======
+    UserCategoryEntity(UserEntity user, MeetingCategory category) {
+>>>>>>> 16456c7 (feat: 유저 수정 API, 유저 정보 조회 API, 비밀번호 변경 API 개발 (#12))
         this.user = user;
-        this.meetingCategory = meetingCategory;
+        this.category = category;
     }
 
+<<<<<<< HEAD
     static UserCategoryEntity of(UserEntity user, MeetingCategory meetingCategory) {
         return new UserCategoryEntity(user, meetingCategory);
 =======
@@ -70,5 +79,13 @@ public class UserCategoryEntity {
     static UserCategoryEntity of(UserEntity user, MeetingCategory meetingCategory) {
         return new UserCategoryEntity(user, meetingCategory);
 >>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
+=======
+    static UserCategoryEntity of(UserEntity user, MeetingCategory category) {
+        return new UserCategoryEntity(user, category);
+    }
+
+    public MeetingCategory toDomain() {
+        return this.category;
+>>>>>>> 16456c7 (feat: 유저 수정 API, 유저 정보 조회 API, 비밀번호 변경 API 개발 (#12))
     }
 }

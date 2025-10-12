@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Set;
@@ -99,8 +100,8 @@ class UserPolicyTest {
             "test@",
             "test.domain.com",
             "test@domain",
-            ""
         })
+        @NullAndEmptySource
         @DisplayName("유효하지 않은 이메일 형식인 경우 예외가 발생해야 한다")
         void validate_ShouldThrowException_WhenEmailIsInvalid(String invalidEmail) {
             // given

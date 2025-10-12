@@ -39,7 +39,7 @@ public class UuidEntity {
     }
 
     public Uuid toDomain() {
-        return Uuid.of(this.uuid);
+        return Uuid.from(this.uuid);
     }
 
 
