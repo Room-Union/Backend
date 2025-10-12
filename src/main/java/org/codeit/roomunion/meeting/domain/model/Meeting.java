@@ -3,10 +3,10 @@ package org.codeit.roomunion.meeting.domain.model;
 import lombok.Getter;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingBadge;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.user.domain.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import org.codeit.roomunion.user.domain.model.User;
 
 @Getter
 public class Meeting {
@@ -43,7 +43,7 @@ public class Meeting {
 
     public Meeting withHost(User host) {
         return new Meeting(
-            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.platformURL, this.createdAt, this.isJoined, this.badges, this.host
+            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.platformURL, this.createdAt, this.isJoined, this.badges, host
         );
     }
 
@@ -54,7 +54,7 @@ public class Meeting {
     }
 
     private Meeting(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, List<String> platformURL, LocalDateTime createdAt,
-        boolean isJoined, List<MeetingBadge> badges, User host) {
+                    boolean isJoined, List<MeetingBadge> badges, User host) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -69,7 +69,7 @@ public class Meeting {
     }
 
     public static Meeting of(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, List<String> platformURL,
-        LocalDateTime createdAt, boolean isJoined, User host) {
+                             LocalDateTime createdAt, boolean isJoined, User host) {
         return new Meeting(id, name, description, meetingImage, category, maxMemberCount, platformURL, createdAt, isJoined, List.of(), host);
     }
 
