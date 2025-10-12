@@ -1,8 +1,6 @@
 package org.codeit.roomunion.common.adapter.out.s3;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.codeit.roomunion.common.config.S3.S3Properties;
@@ -10,26 +8,43 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetUrlRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class AmazonS3Manager {
 
-    private final AmazonS3 amazonS3;
+    private final S3Client s3Client;
 
     private final S3Properties s3Properties;
-    
-    public String uploadFile(String keyName, MultipartFile file) {
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(file.getContentType());
-        metadata.setContentLength(file.getSize());
-        try {
-            amazonS3.putObject(new PutObjectRequest(s3Properties.getBucket(), keyName, file.getInputStream(), metadata));
-        } catch (IOException e) {
-            log.error("error at AmazonS3Manager uploadFile : {}", (Object) e.getStackTrace());
-        }
 
-        return amazonS3.getUrl(s3Properties.getBucket(), keyName).toString();
+    public String uploadFile(String keyName, MultipartFile file) {
+        try {
+            PutObjectRequest putRequest = PutObjectRequest.builder()
+                .bucket(s3Properties.getBucket())
+                .key(keyName)
+                .contentType(file.getContentType())
+                .build();
+
+            // 파일을 S3에 업로드
+            s3Client.putObject(putRequest,
+                RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+
+            String url = s3Client.utilities()
+                .getUrl(GetUrlRequest.builder()
+                    .bucket(s3Properties.getBucket())
+                    .key(keyName)
+                    .build())
+                .toExternalForm();
+
+            return url;
+        } catch (IOException e) {
+            log.error("error at AmazonS3Manager uploadFile", e);
+            throw new RuntimeException("S3 업로드 중 오류 발생", e);
+        }
     }
 }
