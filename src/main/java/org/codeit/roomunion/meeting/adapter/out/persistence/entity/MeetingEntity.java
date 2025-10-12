@@ -106,11 +106,10 @@ public class MeetingEntity {
             this.getMeetingImage(),
             this.getCategory(),
             this.getMaxMemberCount(),
-            host.getId(),
             this.getPlatformUrls(),
             this.getCreatedAt(),
-            host.getNickname(),
-            false
+            false,
+            host.toDomain()
         );
     }
 

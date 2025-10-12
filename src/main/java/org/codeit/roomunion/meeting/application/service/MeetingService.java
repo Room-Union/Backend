@@ -62,7 +62,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         MeetingCreateCommand finalCommand = MeetingCreateCommand.of(command, imageUrl);
 
         Meeting meeting = meetingRepository.createMeeting(finalCommand)
-            .withHostInfo(host.getNickname())
+            .withHost(host)
             .withJoined(true);
 
         return getMeetingWithBadges(meeting);
@@ -74,7 +74,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         Meeting meeting = meetingRepository.findById(meetingId);
 
         // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
-        boolean isHost =  currentUserId != null && Objects.equals(meeting.getUserId(), currentUserId);
+        boolean isHost =  currentUserId != null && Objects.equals(meeting.getHost().getId(), currentUserId);
         meeting = meeting.withJoined(isHost);
 
         return getMeetingWithBadges(meeting);
@@ -88,7 +88,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         return meetingRepository.search(category, sort, page, size)
             // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
             .map(meeting -> {
-                boolean isHost = currentUserId != null && Objects.equals(meeting.getUserId(), currentUserId);
+                boolean isHost = currentUserId != null && Objects.equals(meeting.getHost().getId(), currentUserId);
                 Meeting joinedMeeting = meeting.withJoined(isHost);
 
                 return getMeetingWithBadges(joinedMeeting);
