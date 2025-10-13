@@ -28,6 +28,9 @@ dependencies {
     // web
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // email
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
     // security
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
@@ -46,6 +49,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'com.h2database:h2'
 
     //jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
@@ -53,10 +57,11 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.13.0'
 
     //Swagger 세팅
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13"
 
     //S3 설정
-    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.4.0'
+
 }
 
 tasks.named('test') {

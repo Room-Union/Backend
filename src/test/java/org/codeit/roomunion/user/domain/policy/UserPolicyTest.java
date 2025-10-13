@@ -1,5 +1,6 @@
 package org.codeit.roomunion.user.domain.policy;
 
+import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.command.UserCreateCommandFixture;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Set;
@@ -71,8 +73,8 @@ class UserPolicyTest {
             "test@",
             "test.domain.com",
             "test@domain",
-            ""
         })
+        @NullAndEmptySource
         @DisplayName("유효하지 않은 이메일 형식인 경우 예외가 발생해야 한다")
         void validate_ShouldThrowException_WhenEmailIsInvalid(String invalidEmail) {
             // given
@@ -86,8 +88,8 @@ class UserPolicyTest {
 
             // when & then
             assertThatThrownBy(() -> UserPolicy.validate(command))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Invalid email format");
+                .isInstanceOf(CustomException.class)
+                .hasMessage("유효하지 않은 입력입니다.");
         }
     }
 
@@ -148,8 +150,8 @@ class UserPolicyTest {
 
             // when & then
             assertThatThrownBy(() -> UserPolicy.validate(command))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Password must be 8-13 characters long and contain letters, numbers, and special characters (!, @, #, $, %, ^, *, (, ), _, +, =, -, ~)");
+                .isInstanceOf(CustomException.class)
+                .hasMessage("유효하지 않은 입력입니다.");
         }
     }
 
@@ -189,8 +191,8 @@ class UserPolicyTest {
 
             // when & then
             assertThatThrownBy(() -> UserPolicy.validate(command))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("At least two categories must be selected");
+                .isInstanceOf(CustomException.class)
+                .hasMessage("유효하지 않은 입력입니다.");
         }
 
         private static Stream<Arguments> provideInvalidCategories() {

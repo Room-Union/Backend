@@ -13,7 +13,13 @@ import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "meeting_member")
+@Table(
+    name = "meeting_member",
+    indexes = {
+        @Index(name = "idx_meeting_member_meeting_id", columnList = "meeting_id")
+    }
+
+)
 public class MeetingMemberEntity {
 
     @Id
@@ -31,6 +37,10 @@ public class MeetingMemberEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private MeetingRole meetingRole; // HOST / MEMBER
+
+    public boolean isHost() {
+        return this.meetingRole == MeetingRole.HOST;
+    }
 
 
 }

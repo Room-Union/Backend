@@ -17,7 +17,7 @@ public enum MeetingRole {
     @JsonCreator
     public static MeetingRole from(String value) {
         for (MeetingRole role : MeetingRole.values()) {
-            if (role.name().equalsIgnoreCase(value) || role.getDescription().equals(value)) {
+            if (role.name().equalsIgnoreCase(value)) {
                 return role;
             }
         }
