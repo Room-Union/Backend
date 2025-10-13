@@ -5,10 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
+import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -17,7 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "meeting")
+@Table(
+    name = "meeting",
+    indexes = {
+        @Index(name = "idx_meeting_created_at", columnList = "createdAt"),
+        @Index(name = "idx_meeting_category_created_at", columnList = "category, createdAt")
+    }
+)
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -82,7 +90,15 @@ public class MeetingEntity {
     }
 
 
-    public Meeting toDomain(Long hostUserId, String hostNickname) {
+    public Meeting toDomain() {
+
+        MeetingMemberEntity hostMember = this.meetingMembers.stream()
+            .filter(MeetingMemberEntity::isHost)
+            .findFirst()
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_HOST_NOT_FOUND));
+
+        UserEntity host = hostMember.getUser();
+
         return Meeting.of(
             this.getId(),
             this.getName(),
@@ -90,11 +106,10 @@ public class MeetingEntity {
             this.getMeetingImage(),
             this.getCategory(),
             this.getMaxMemberCount(),
-            hostUserId,
             this.getPlatformUrls(),
             this.getCreatedAt(),
-            hostNickname,
-            false
+            false,
+            host.toDomain()
         );
     }
 

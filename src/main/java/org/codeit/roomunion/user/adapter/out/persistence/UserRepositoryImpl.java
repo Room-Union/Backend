@@ -1,12 +1,7 @@
 package org.codeit.roomunion.user.adapter.out.persistence;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.EmailVerificationEntity;
->>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.codeit.roomunion.user.adapter.out.persistence.factory.ImageFactory;
 import org.codeit.roomunion.user.adapter.out.persistence.jpa.EmailVerificationJpaRepository;
@@ -20,28 +15,8 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-<<<<<<< HEAD
-=======
-import org.codeit.roomunion.common.exception.UserNotFoundException;
-=======
->>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
-import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
-import org.codeit.roomunion.user.adapter.out.persistence.jpa.UserJpaRepository;
-import org.codeit.roomunion.user.application.port.out.UserRepository;
-import org.codeit.roomunion.user.domain.command.UserCreateCommand;
-import org.codeit.roomunion.user.domain.model.User;
-import org.springframework.stereotype.Repository;
-
-<<<<<<< HEAD
->>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
-=======
-import java.util.Optional;
-
->>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
-=======
 import static org.codeit.roomunion.user.domain.exception.UserErrorCode.*;
 
->>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
@@ -56,27 +31,14 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-<<<<<<< HEAD
-<<<<<<< HEAD
     public User create(UserCreateCommand userCreateCommand) {
         UserEntity userEntity = UserEntity.of(userCreateCommand);
         return userJpaRepository.save(userEntity)
             .toDomain();
-=======
-    public User create(UserCreateCommand userCreateCommand) {
-        UserEntity userEntity = UserEntity.of(userCreateCommand);
-        return userJpaRepository.save(userEntity)
-<<<<<<< HEAD
-                .toDomain();
->>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
-=======
-            .toDomain();
->>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-<<<<<<< HEAD
         return userJpaRepository.findByEmail(email)
             .map(UserEntity::toDomain);
     }
@@ -85,22 +47,6 @@ public class UserRepositoryImpl implements UserRepository {
     public Optional<User> findByNickname(String nickname) {
         return userJpaRepository.findByNickname(nickname)
             .map(UserEntity::toDomain);
-=======
-    public User getByEmail(String email) {
-        return userJpaRepository.findByEmail(email)
-                .map(UserEntity::toDomain)
-                .orElseThrow(UserNotFoundException::new);
->>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
-=======
-        return userJpaRepository.findByEmail(email)
-            .map(UserEntity::toDomain);
-    }
-
-    @Override
-    public Optional<User> findByNickname(String nickname) {
-        return userJpaRepository.findByNickname(nickname)
-            .map(UserEntity::toDomain);
->>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
     }
 
     @Override

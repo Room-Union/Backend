@@ -15,8 +15,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     @Value("${server.servlet.context-path:}")
     private String contextPath;
 
@@ -44,45 +42,5 @@ public class SwaggerConfig {
     public GroupedOpenApi customGroupedOpenApi() {
         return GroupedOpenApi.builder().group("api").pathsToMatch("/**").build();
     }
-=======
-  @Value("${server.servlet.context-path:}")
-  private String contextPath;
-=======
-    @Value("${server.servlet.context-path:}")
-    private String contextPath;
->>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
-
-    @Bean
-    public OpenAPI customOpenAPI() {
-        Server localServer = new Server();
-        localServer.setUrl(contextPath);
-        localServer.setDescription("Local Server");
-
-        return new OpenAPI()
-            .addServersItem(localServer)
-            .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
-            .components(
-                new Components()
-                    .addSecuritySchemes(
-                        "bearerAuth",
-                        new SecurityScheme()
-                            .type(SecurityScheme.Type.HTTP)
-                            .scheme("bearer")
-                            .bearerFormat("JWT")))
-            .info(new Info().title("방구석연합 Swagger API 명세서").version("1.0").description("RoomUnion Swagger API"));
-    }
-
-<<<<<<< HEAD
-  @Bean
-  public GroupedOpenApi customGroupedOpenApi() {
-    return GroupedOpenApi.builder().group("api").pathsToMatch("/**").build();
-  }
->>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
-=======
-    @Bean
-    public GroupedOpenApi customGroupedOpenApi() {
-        return GroupedOpenApi.builder().group("api").pathsToMatch("/**").build();
-    }
->>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
 
 }

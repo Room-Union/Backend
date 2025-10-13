@@ -32,21 +32,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-<<<<<<< HEAD
-<<<<<<< HEAD
         @NonNull HttpServletRequest request,
         @NonNull HttpServletResponse response,
         @NonNull FilterChain filterChain
-=======
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
->>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
-=======
-        @NonNull HttpServletRequest request,
-        @NonNull HttpServletResponse response,
-        @NonNull FilterChain filterChain
->>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
     ) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
 
@@ -64,21 +52,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             validateToken(response, jwtToken, userDetails);
 
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-<<<<<<< HEAD
-<<<<<<< HEAD
                 userDetails,
                 null,
                 userDetails.getAuthorities()
-=======
-                    userDetails,
-                    null,
-                    userDetails.getAuthorities()
->>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
-=======
-                userDetails,
-                null,
-                userDetails.getAuthorities()
->>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
             );
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
@@ -104,38 +80,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void setErrorResponse(HttpServletResponse response, BaseErrorCode errorCode) throws IOException {
         String errorResponse = objectMapper.writeValueAsString(createErrorResponse(errorCode));
-<<<<<<< HEAD
-        response.setStatus(errorCode.getStatusCode());
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
         response.setStatus(errorCode.getStatusValue());
->>>>>>> 351834c (feat: 회원가입 이메일 검증 로직 개발 (이메일 코드 발송, 이메일 코드 연장, 이메일 코드 검증) (#11))
         response.setContentType("application/json; charset=UTF-8");
-=======
-        response.setContentType("application/json");
->>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
-=======
-        response.setContentType("application/json; charset=UTF-8");
->>>>>>> 98b72bc (feat: 회원가입, 로그인 구현 (#6))
 
         response.getWriter().write(errorResponse);
     }
 
     private Map<String, Object> createErrorResponse(BaseErrorCode errorCode) {
         return Map.of(
-<<<<<<< HEAD
-<<<<<<< HEAD
             "code", errorCode.getCode(),
             "message", errorCode.getMessage()
-=======
-                "code", errorCode.getCode(),
-                "message", errorCode.getMessage()
->>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
-=======
-            "code", errorCode.getCode(),
-            "message", errorCode.getMessage()
->>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
         );
     }
 }

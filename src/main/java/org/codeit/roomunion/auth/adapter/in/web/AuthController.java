@@ -1,5 +1,6 @@
 package org.codeit.roomunion.auth.adapter.in.web;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.codeit.roomunion.auth.adapter.in.web.request.SendVerificationCodeRequest;
 import org.codeit.roomunion.auth.adapter.in.web.request.VerifyEmailCodeRequest;
 import org.codeit.roomunion.auth.application.port.in.AuthUseCase;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/auth")
+@Tag(name = "Auth API", description = "이메일 인증 API")
 public class AuthController {
 
     private final AuthUseCase authUsecase;

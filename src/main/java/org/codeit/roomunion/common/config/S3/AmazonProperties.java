@@ -16,15 +16,7 @@ public class AmazonProperties {
     }
 
     @Getter
-<<<<<<< HEAD
-<<<<<<< HEAD
     public static class Credentials {
-=======
-    public static class Credentials{
->>>>>>> 5f18479 (:sparkles: S3 설정 및 이미지 업로드 기능 구현 (#5))
-=======
-    public static class Credentials {
->>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
         private final String accessKey;
         private final String secretKey;
 

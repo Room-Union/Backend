@@ -1,15 +1,5 @@
 package org.codeit.roomunion.auth.config;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Value;
->>>>>>> 8abfdd5 (feat: 스프링 시큐리티 개발 (#3))
-=======
->>>>>>> f2440ea (:sparkles: 전역 예외 처리 및 모임 생성 기능, 특정 모임 조회 기능 구현 (#9))
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
