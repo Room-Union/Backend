@@ -15,5 +15,4 @@ public interface BaseErrorCode {
     default String getCode() {
         return ((Enum<?>) this).name();
     }
-
 }

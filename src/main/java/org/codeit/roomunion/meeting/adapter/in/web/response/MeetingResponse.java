@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingBadge;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 
 import java.time.LocalDateTime;
@@ -50,20 +51,24 @@ public class MeetingResponse {
     @Schema(description = "모임 생성 시각")
     private LocalDateTime createdAt;
 
-    public static MeetingResponse from(Meeting meeting, boolean isJoined) {
+    @Schema(description = "뱃지 목록", example = "[\"RECRUITING\",\"NEW\"]")
+    private List<MeetingBadge> badges;
+
+    public static MeetingResponse from(Meeting meeting) {
         return MeetingResponse.builder()
             .meetingId(meeting.getId())
             .name(meeting.getName())
             .description(meeting.getDescription())
             .category(meeting.getCategory())
             .maxMemberCount(meeting.getMaxMemberCount())
-            .isJoined(isJoined)
+            .isJoined(meeting.isJoined())
             .platformURL(meeting.getPlatformURL())
             .meetingImage(meeting.getMeetingImage())
-            .userId(meeting.getUserId())
+            .userId(meeting.getHost().getId())
 //            .profileImage(host.getProfileImage())
-            .nickname(meeting.getHostNickname())
+            .nickname(meeting.getHost().getNickname())
             .createdAt(meeting.getCreatedAt())
+            .badges(meeting.getBadges())
             .build();
     }
 

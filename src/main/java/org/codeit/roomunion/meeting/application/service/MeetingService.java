@@ -1,5 +1,8 @@
 package org.codeit.roomunion.meeting.application.service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.application.port.out.UuidRepository;
@@ -10,10 +13,14 @@ import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingBadge;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingSort;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
 import org.codeit.roomunion.user.domain.exception.UserErrorCode;
 import org.codeit.roomunion.user.domain.model.User;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,10 +61,11 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
         MeetingCreateCommand finalCommand = MeetingCreateCommand.of(command, imageUrl);
 
-        Meeting saved = meetingRepository.createMeeting(finalCommand);
+        Meeting meeting = meetingRepository.createMeeting(finalCommand)
+            .withHost(host)
+            .withJoined(true);
 
-
-        return saved.withHostInfo(host.getNickname());
+        return getMeetingWithBadges(meeting);
     }
 
     @Override
@@ -66,8 +74,66 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         Meeting meeting = meetingRepository.findById(meetingId);
 
         // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
-        boolean isHost =  currentUserId != null && Objects.equals(meeting.getUserId(), currentUserId);
+        boolean isHost =  currentUserId != null && Objects.equals(meeting.getHost().getId(), currentUserId);
+        meeting = meeting.withJoined(isHost);
 
-        return meeting.withJoined(isHost);
+        return getMeetingWithBadges(meeting);
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size,
+        Long currentUserId) {
+        return meetingRepository.search(category, sort, page, size)
+            // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
+            .map(meeting -> {
+                boolean isHost = currentUserId != null && Objects.equals(meeting.getHost().getId(), currentUserId);
+                Meeting joinedMeeting = meeting.withJoined(isHost);
+
+                return getMeetingWithBadges(joinedMeeting);
+            });
+    }
+
+    private Meeting getMeetingWithBadges(Meeting meeting) {
+        int currentCount = meetingRepository.countJoinedMembers(meeting.getId());
+        List<MeetingBadge> badges = calculateBadges(meeting, currentCount, LocalDateTime.now());
+        return meeting.withBadges(badges);
+    }
+
+
+    private List<MeetingBadge> calculateBadges(Meeting meeting, int currentCount, LocalDateTime now) {
+        List<MeetingBadge> badges = new ArrayList<>();
+        LocalDateTime createdAt = meeting.getCreatedAt();
+
+        int max = meeting.getMaxMemberCount();
+
+        // 마감 여부 확인
+        if (currentCount >= max) {
+            badges.add(MeetingBadge.CLOSED);
+            return badges;
+        }
+
+        // 모집중
+        if (currentCount < max) {
+            badges.add(MeetingBadge.RECRUITING);
+        }
+
+        // 신규 (7일)
+        if (createdAt != null && !createdAt.isBefore(now.minusDays(7))) {
+            badges.add(MeetingBadge.NEW);
+        }
+
+        // 마감임박: 최대인원 5명당 마감임박기준을 1명
+        // ex) 최대 12명 중 3명 이하 남음(5명당 1명 기준) → 마감임박
+        int remaining = max - currentCount; // 12 - 10 = 2
+        int closingLimit = (int) Math.ceil(meeting.getMaxMemberCount() / 5.0); // ceil(12 / 5.0) = 3
+
+        if (remaining > 0 && remaining <= closingLimit) { // 2 <= 3 → true
+            badges.add(MeetingBadge.CLOSING_SOON);
+        }
+
+        return badges;
+
     }
 }
