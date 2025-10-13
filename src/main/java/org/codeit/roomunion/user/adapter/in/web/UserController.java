@@ -1,5 +1,6 @@
 package org.codeit.roomunion.user.adapter.in.web;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.user.adapter.in.web.request.JoinUserRequest;
 import org.codeit.roomunion.user.adapter.in.web.request.UserModifyRequest;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/v1/users")
+@Tag(name = "User API", description = "회원 API")
 public class UserController {
 
     private final UserCommandUseCase userCommandUseCase;
