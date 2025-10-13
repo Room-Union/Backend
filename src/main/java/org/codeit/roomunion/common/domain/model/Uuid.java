@@ -11,7 +11,7 @@ public class Uuid {
         this.value = value;
     }
 
-    public static Uuid of(String value) {
+    public static Uuid from(String value) {
         return new Uuid(value);
     }
 }

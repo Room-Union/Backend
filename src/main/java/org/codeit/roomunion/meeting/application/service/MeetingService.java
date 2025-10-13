@@ -51,7 +51,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
         String imageUrl = null;
         if (image != null && !image.isEmpty()) {
-            Uuid uuid = uuidRepository.save(Uuid.of(UUID.randomUUID().toString()));
+            Uuid uuid = uuidRepository.save(Uuid.from(UUID.randomUUID().toString()));
             String key = Meeting.getImagePath(uuid.getValue()); // 도메인에서 경로 생성
             imageUrl = s3Manager.uploadFile(key, image);
         }

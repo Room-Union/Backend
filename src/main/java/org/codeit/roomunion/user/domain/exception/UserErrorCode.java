@@ -17,6 +17,8 @@ public enum UserErrorCode implements BaseErrorCode {
     ALREADY_VERIFIED_EMAIL("이미 인증된 이메일", HttpStatus.BAD_REQUEST),
     EXPIRED_CODE("만료된 코드", HttpStatus.BAD_REQUEST),
     INVALID_CODE("유효하지 않은 코드", HttpStatus.BAD_REQUEST),
+    INVALID_PASSWORD("일치하지 않는 비밀번호", HttpStatus.FORBIDDEN),
+    SAME_PASSWORD("같은 비밀번호 입력", HttpStatus.BAD_REQUEST),
     ;
 
     private final String message;
