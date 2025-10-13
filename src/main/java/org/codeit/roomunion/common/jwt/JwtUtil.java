@@ -15,6 +15,7 @@ import java.util.Date;
 @Component
 @RequiredArgsConstructor
 public class JwtUtil {
+
     private SecretKey secretKey;
 
     @Value("${spring.jwt.secret}")
@@ -23,25 +24,6 @@ public class JwtUtil {
     @PostConstruct
     public void init() {
         secretKey = new SecretKeySpec(secret.getBytes(), Jwts.SIG.HS256.key().build().getAlgorithm());
-    }
-
-    public String getEmail(String token) {
-        return Jwts.parser()
-            .verifyWith(secretKey)
-            .build()
-            .parseSignedClaims(token)
-            .getPayload()
-            .get("email", String.class);
-    }
-
-    public Boolean isExpired(String token) {
-        return Jwts.parser()
-            .verifyWith(secretKey)
-            .build()
-            .parseSignedClaims(token)
-            .getPayload()
-            .getExpiration()
-            .before(new Date());
     }
 
     public String createJwt(Long userId, String email, Long expiration) {
