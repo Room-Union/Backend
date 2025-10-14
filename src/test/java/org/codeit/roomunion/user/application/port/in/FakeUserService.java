@@ -34,6 +34,11 @@ public class FakeUserService implements UserQueryUseCase, UserCommandUseCase {
     }
 
     @Override
+    public void updatePassword(User user, String password, String newPassword) {
+
+    }
+
+    @Override
     public void saveEmailVerificationCode(String email, String code, LocalDateTime currentAt, LocalDateTime expirationAt) {
 
     }
@@ -41,6 +46,11 @@ public class FakeUserService implements UserQueryUseCase, UserCommandUseCase {
     @Override
     public void validateEmailNotVerified(String email, LocalDateTime expirationAt) {
 
+    }
+
+    @Override
+    public User getUserInfo(User user) {
+        return null;
     }
 
     @Override

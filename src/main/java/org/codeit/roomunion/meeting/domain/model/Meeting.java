@@ -25,6 +25,8 @@ public class Meeting {
 
     private final int maxMemberCount;
 
+    private final int currentMemberCount;
+
     private final List<String> platformURL;
 
     private final LocalDateTime createdAt;
@@ -43,17 +45,17 @@ public class Meeting {
 
     public Meeting withHost(User host) {
         return new Meeting(
-            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.platformURL, this.createdAt, this.isJoined, this.badges, host
+            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.currentMemberCount, this.platformURL, this.createdAt, this.isJoined, this.badges, host
         );
     }
 
     public Meeting withBadges(List<MeetingBadge> badges) {
         return new Meeting(
-            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.platformURL, this.createdAt, this.isJoined, badges, this.host
+            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.currentMemberCount, this.platformURL, this.createdAt, this.isJoined, badges, this.host
         );
     }
 
-    private Meeting(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, List<String> platformURL, LocalDateTime createdAt,
+    private Meeting(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, int currentMemberCount, List<String> platformURL, LocalDateTime createdAt,
                     boolean isJoined, List<MeetingBadge> badges, User host) {
         this.id = id;
         this.name = name;
@@ -61,6 +63,7 @@ public class Meeting {
         this.meetingImage = meetingImage;
         this.category = category;
         this.maxMemberCount = maxMemberCount;
+        this.currentMemberCount = currentMemberCount;
         this.platformURL = platformURL;
         this.createdAt = createdAt;
         this.isJoined = isJoined;
@@ -68,14 +71,14 @@ public class Meeting {
         this.host = host;
     }
 
-    public static Meeting of(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, List<String> platformURL,
+    public static Meeting of(Long id, String name, String description, String meetingImage, MeetingCategory category, int maxMemberCount, int currentMemberCount, List<String> platformURL,
                              LocalDateTime createdAt, boolean isJoined, User host) {
-        return new Meeting(id, name, description, meetingImage, category, maxMemberCount, platformURL, createdAt, isJoined, List.of(), host);
+        return new Meeting(id, name, description, meetingImage, category, maxMemberCount, currentMemberCount, platformURL, createdAt, isJoined, List.of(), host);
     }
 
     public Meeting withJoined(boolean joined) {
         return new Meeting(
-            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.platformURL, this.createdAt, joined, this.badges, this.host
+            this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.currentMemberCount, this.platformURL, this.createdAt, joined, this.badges, this.host
         );
     }
 

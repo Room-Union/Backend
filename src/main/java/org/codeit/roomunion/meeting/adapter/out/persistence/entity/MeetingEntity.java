@@ -106,6 +106,7 @@ public class MeetingEntity {
             this.getMeetingImage(),
             this.getCategory(),
             this.getMaxMemberCount(),
+            this.meetingMembers.size(),
             this.getPlatformUrls(),
             this.getCreatedAt(),
             false,

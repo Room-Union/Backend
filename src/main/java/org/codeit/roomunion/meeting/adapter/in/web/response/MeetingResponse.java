@@ -30,6 +30,9 @@ public class MeetingResponse {
     @Schema(description = "최대 참여자 수", example = "10")
     private int maxMemberCount;
 
+    @Schema(description = "현재 참여자 수", example = "5")
+    private int currentMemberCount;
+
     @Schema(description = "현재 사용자의 해당 모임 참여 여부", example = "true")
     private boolean isJoined;
 
@@ -61,6 +64,7 @@ public class MeetingResponse {
             .description(meeting.getDescription())
             .category(meeting.getCategory())
             .maxMemberCount(meeting.getMaxMemberCount())
+            .currentMemberCount(meeting.getCurrentMemberCount())
             .isJoined(meeting.isJoined())
             .platformURL(meeting.getPlatformURL())
             .meetingImage(meeting.getMeetingImage())
