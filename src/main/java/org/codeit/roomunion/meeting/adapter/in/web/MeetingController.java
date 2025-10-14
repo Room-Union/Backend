@@ -45,7 +45,7 @@ public class MeetingController {
     @Operation(summary = "특정 모임 조회(토큰 없이도 가능)", description = "meetingId로 모임 상세 정보를 조회. 로그인 시 isJoined 계산, 비로그인은 false")
     @GetMapping("/{meetingId}")
     public ResponseEntity<MeetingResponse> getMeeting(
-        @AuthenticationPrincipal CustomUserDetails userDetails, // null 허용
+        @AuthenticationPrincipal CustomUserDetails userDetails,
         @PathVariable Long meetingId
     ) {
         Long userId = (userDetails != null) ? userDetails.getId() : null;
@@ -56,7 +56,7 @@ public class MeetingController {
     @Operation(summary = "전체/카테고리 모임 리스트 조회(토큰 없이도 가능)", description = "전체/카테고리별 조회 + 정렬(최신순/사람많은 순) + 페이징처리. 로그인 시 isJoined 계산, 비로그인은 false")
     @GetMapping
     public ResponseEntity<Page<MeetingResponse>> getMeetingList(
-        @AuthenticationPrincipal CustomUserDetails userDetails, // null 허용
+        @AuthenticationPrincipal CustomUserDetails userDetails,
         @RequestParam(required = false) MeetingCategory category,
         @RequestParam(defaultValue = "LATEST") MeetingSort sort,
         @RequestParam(defaultValue = "0") int page,

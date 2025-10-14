@@ -96,7 +96,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     }
 
     private boolean isUserJoined(Long currentUserId, Meeting meeting) {
-        if (currentUserId == null) return false; // 비로그인: 항상 false
+        if (currentUserId == null) return false;
         Long hostId = (meeting.getHost() != null) ? meeting.getHost().getId() : null;
         // 가입 API 구현 이후 : return meetingMemberJpaRepository.existsByMeetingIdAndUserId(meeting.getId(), currentUserId);
         return hostId != null && Objects.equals(currentUserId, hostId);

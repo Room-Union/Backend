@@ -98,7 +98,7 @@ public class MeetingEntity {
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_HOST_NOT_FOUND));
 
         UserEntity host = hostMember.getUser();
-        int currentCount = (this.meetingMembers != null) ? this.meetingMembers.size() : 0;
+        int currentCount = this.meetingMembers.size();
 
         return Meeting.of(
             this.getId(),
