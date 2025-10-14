@@ -52,7 +52,7 @@ class AuthUseCaseTest {
         @Test
         void sendVerificationCodeSuccess() {
             // Given
-            AuthService authService = new AuthService(userQueryUseCase, userCommandUseCase, randomNumberGenerator, timeHolder, eventPublisher);
+            AuthService authService = getAuthService();
 
             // When & Then
             assertThatCode(() -> authService.sendVerificationCode("bht9011@gmail.com"))
@@ -68,7 +68,7 @@ class AuthUseCaseTest {
         @ValueSource(strings = {"bht9011@gmail.com", "test@test.com"})
         void sendVerificationCodeFailAlreadyExistsEmail(String email) {
             // Given
-            AuthService authService = new AuthService(userQueryUseCase, userCommandUseCase, randomNumberGenerator, timeHolder, eventPublisher);
+            AuthService authService = getAuthService();
             userCommandUseCase.join(UserCreateCommandFixture.create(email));
 
             // When & Then
@@ -76,7 +76,10 @@ class AuthUseCaseTest {
                 .isInstanceOf(CustomException.class)
                 .hasMessage("이미 가입된 이메일");
         }
+    }
 
+    private AuthService getAuthService() {
+        return new AuthService(userQueryUseCase, userCommandUseCase, randomNumberGenerator, timeHolder, eventPublisher, null, null);
     }
 
     @DisplayName("Extend Expiration")
@@ -87,7 +90,7 @@ class AuthUseCaseTest {
         @Test
         void extendExpirationSuccess() {
             // Given
-            AuthService authService = new AuthService(userQueryUseCase, userCommandUseCase, randomNumberGenerator, timeHolder, eventPublisher);
+            AuthService authService = getAuthService();
 
             // When & Then
             assertThatCode(() -> authService.extendExpiration("bht9011@gmail.com"))
