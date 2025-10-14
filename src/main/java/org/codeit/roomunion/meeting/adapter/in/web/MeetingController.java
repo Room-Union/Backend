@@ -42,30 +42,31 @@ public class MeetingController {
         return ResponseEntity.ok(MeetingResponse.from(meeting));
     }
 
-    @Operation(summary = "특정 모임 조회", description = "meetingId로 모임 상세 정보를 조회. isJoined 필드로 인해 토큰 필수")
+    @Operation(summary = "특정 모임 조회(토큰 없이도 가능)", description = "meetingId로 모임 상세 정보를 조회. 로그인 시 isJoined 계산, 비로그인은 false")
     @GetMapping("/{meetingId}")
     public ResponseEntity<MeetingResponse> getMeeting(
-        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @AuthenticationPrincipal CustomUserDetails userDetails, // null 허용
         @PathVariable Long meetingId
     ) {
-        Meeting meeting = meetingQueryUseCase.getByMeetingId(meetingId, userDetails.getId());
+        Long userId = (userDetails != null) ? userDetails.getId() : null;
+        Meeting meeting = meetingQueryUseCase.getByMeetingId(meetingId, userId);
         return ResponseEntity.ok(MeetingResponse.from(meeting));
     }
 
-    @Operation(summary = "전체/카테고리 모임 리스트 조회", description = "전체/카테고리별 조회 + 정렬(최신순/사람많은 순) + 페이징처리")
+    @Operation(summary = "전체/카테고리 모임 리스트 조회(토큰 없이도 가능)", description = "전체/카테고리별 조회 + 정렬(최신순/사람많은 순) + 페이징처리. 로그인 시 isJoined 계산, 비로그인은 false")
     @GetMapping
     public ResponseEntity<Page<MeetingResponse>> getMeetingList(
-        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @AuthenticationPrincipal CustomUserDetails userDetails, // null 허용
         @RequestParam(required = false) MeetingCategory category,
         @RequestParam(defaultValue = "LATEST") MeetingSort sort,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
-        Page<Meeting> meetings = meetingQueryUseCase.search(category, sort, page, size, userDetails.getId());
+        Long userId = (userDetails != null) ? userDetails.getId() : null;
+        Page<Meeting> meetings = meetingQueryUseCase.search(category, sort, page, size, userId);
         Page<MeetingResponse> response = meetings.map(MeetingResponse::from);
         return ResponseEntity.ok(response);
     }
-
 
 
 }
