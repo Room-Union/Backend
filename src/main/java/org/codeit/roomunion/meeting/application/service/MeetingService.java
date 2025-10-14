@@ -99,6 +99,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         if (currentUserId == null) {
             return false;
         }
+
         Long hostId = (meeting.getHost() != null) ? meeting.getHost().getId() : null;
         // 가입 API 구현 이후 : return meetingMemberJpaRepository.existsByMeetingIdAndUserId(meeting.getId(), currentUserId);
         return hostId != null && Objects.equals(currentUserId, hostId);
