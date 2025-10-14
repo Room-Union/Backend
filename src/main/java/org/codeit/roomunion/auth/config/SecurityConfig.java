@@ -26,7 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {"/v1/users/sign-up", "/v1/auth/login", "/v1/auth/email/send", "/v1/auth/email/verify", "/v1/auth/email/extend"};
-    private static final String[] PUBLIC_GET_ENDPOINTS = {"/v1/meetings/**"};
+    private static final String[] PUBLIC_GET_ENDPOINTS = {"/v1/meetings", "/v1/meetings/**"};
     private static final String[] SWAGGER_ENDPOINTS = {"/swagger-ui/**", "/v3/api-docs/**"};
 
     private final CorsConfig corsConfig;
