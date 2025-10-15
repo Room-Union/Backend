@@ -71,4 +71,34 @@ public class MeetingRepositoryImpl implements MeetingRepository {
 
         return resultPage.map(MeetingEntity::toDomain);
     }
+
+    @Override
+    public Meeting findByIdWithJoined(Long meetingId, Long currentUserId) {
+        MeetingEntity entity = meetingJpaRepository.findByIdWithUserJoinStatus(meetingId, currentUserId)
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
+
+        boolean joined = !entity.getMeetingMembers().isEmpty();
+
+        return entity.toDomain().withJoined(joined);
+    }
+
+    @Override
+    public boolean isMeetingMember(Long meetingId, Long userId) {
+        return meetingMemberJpaRepository.existsByMeetingIdAndUserId(meetingId, userId);
+    }
+
+    @Override
+    public void insertMember(Long meetingId, Long userId, MeetingRole role) {
+        MeetingEntity meeting = meetingJpaRepository.findById(meetingId)
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
+        UserEntity user = userJpaRepository.findById(userId)
+            .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+
+        if (meetingMemberJpaRepository.existsByMeetingIdAndUserId(meetingId, userId)) {
+            throw new CustomException(MeetingErrorCode.MEETING_MEMBER_NOT_FOUND);
+        }
+
+        MeetingMemberEntity mm = MeetingMemberEntity.of(meeting, user, role);
+        meetingMemberJpaRepository.save(mm);
+    }
 }

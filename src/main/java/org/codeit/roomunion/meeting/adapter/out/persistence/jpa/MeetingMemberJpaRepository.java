@@ -24,4 +24,7 @@ public interface MeetingMemberJpaRepository extends JpaRepository<MeetingMemberE
                                        @Param("role") MeetingRole role);
 
     int countByMeetingId(Long meetingId);
+
+    //특정 유저가 이미 해당 모임의 멤버인지 확인
+    boolean existsByMeetingIdAndUserId(Long meetingId, Long userId);
 }

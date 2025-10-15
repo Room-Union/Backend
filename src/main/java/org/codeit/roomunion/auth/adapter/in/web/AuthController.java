@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1/auth")
-@Tag(name = "Auth API", description = "이메일 인증 API")
+@Tag(name = "Auth API", description = "인증 API")
 public class AuthController {
 
     private final AuthUseCase authUsecase;
