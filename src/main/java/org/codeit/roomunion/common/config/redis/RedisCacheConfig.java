@@ -1,4 +1,4 @@
-package org.codeit.roomunion.common.config;
+package org.codeit.roomunion.common.config.redis;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;

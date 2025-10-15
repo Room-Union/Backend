@@ -12,6 +12,7 @@ import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.common.jwt.JwtUtil;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -51,6 +52,7 @@ public class AuthService implements AuthUseCase {
     }
 
     @Override
+    @Cacheable(value = "login", key = "#email")
     public String login(String email, String password) {
         try {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password);

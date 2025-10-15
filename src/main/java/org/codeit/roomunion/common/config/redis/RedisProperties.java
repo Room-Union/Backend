@@ -1,4 +1,4 @@
-package org.codeit.roomunion.common.config;
+package org.codeit.roomunion.common.config.redis;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
