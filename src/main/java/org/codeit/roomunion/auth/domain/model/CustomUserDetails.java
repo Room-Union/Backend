@@ -13,8 +13,12 @@ public class CustomUserDetails implements UserDetails {
 
     private final User user;
 
-    public CustomUserDetails(User user) {
+    private CustomUserDetails(User user) {
         this.user = user;
+    }
+
+    public static CustomUserDetails from(User user) {
+        return new CustomUserDetails(user);
     }
 
     @Override

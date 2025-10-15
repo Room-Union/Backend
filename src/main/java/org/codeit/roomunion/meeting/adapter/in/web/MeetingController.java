@@ -48,8 +48,7 @@ public class MeetingController {
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @PathVariable Long meetingId
     ) {
-        Long userId = (userDetails != null) ? userDetails.getId() : null;
-        Meeting meeting = meetingQueryUseCase.getByMeetingId(meetingId, userId);
+        Meeting meeting = meetingQueryUseCase.getByMeetingId(meetingId, userDetails.getUser());
         return ResponseEntity.ok(MeetingResponse.from(meeting));
     }
 
@@ -62,11 +61,9 @@ public class MeetingController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
-        Long userId = (userDetails != null) ? userDetails.getId() : null;
-        Page<Meeting> meetings = meetingQueryUseCase.search(category, sort, page, size, userId);
+        Page<Meeting> meetings = meetingQueryUseCase.search(category, sort, page, size, userDetails.getUser());
         Page<MeetingResponse> response = meetings.map(MeetingResponse::from);
         return ResponseEntity.ok(response);
     }
-
 
 }

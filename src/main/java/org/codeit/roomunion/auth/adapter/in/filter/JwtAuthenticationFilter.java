@@ -11,6 +11,7 @@ import org.codeit.roomunion.auth.application.service.JwtService;
 import org.codeit.roomunion.auth.domain.exception.AuthErrorCode;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.common.exception.BaseErrorCode;
+import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,6 +40,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
 
         if (isNotBearerToken(authHeader)) {
+            CustomUserDetails emptyCustomUserDetails = CustomUserDetails.from(User.empty());
+            UsernamePasswordAuthenticationToken authToken = createUserPasswordAuthenticationToken(emptyCustomUserDetails);
+            SecurityContextHolder.getContext().setAuthentication(authToken);
             filterChain.doFilter(request, response);
             return;
         }
@@ -51,16 +55,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             validateToken(response, jwtToken, userDetails);
 
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                userDetails,
-                null,
-                userDetails.getAuthorities()
-            );
+            UsernamePasswordAuthenticationToken authToken = createUserPasswordAuthenticationToken(userDetails);
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private UsernamePasswordAuthenticationToken createUserPasswordAuthenticationToken(CustomUserDetails userDetails) {
+        return new UsernamePasswordAuthenticationToken(
+            userDetails,
+            null,
+            userDetails.getAuthorities()
+        );
     }
 
     private void validateToken(HttpServletResponse response, String jwtToken, CustomUserDetails userDetails) throws IOException {

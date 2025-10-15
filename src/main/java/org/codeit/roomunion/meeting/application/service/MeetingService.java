@@ -70,11 +70,10 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
     @Override
     @Transactional(readOnly = true)
-    public Meeting getByMeetingId(Long meetingId, Long currentUserId) {
+    public Meeting getByMeetingId(Long meetingId, User user) {
         Meeting meeting = meetingRepository.findById(meetingId);
 
-        // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
-        boolean isJoined = isUserJoined(currentUserId, meeting);
+        boolean isJoined = isUserJoined(user, meeting);
         meeting = meeting.withJoined(isJoined);
 
         return getMeetingWithBadges(meeting);
@@ -83,25 +82,22 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size,
-                                Long currentUserId) {
+    public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, User user) {
         Page<Meeting> pageResult = meetingRepository.search(category, sort, page, size);
 
-        // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
         return pageResult
             .map(meeting -> {
-                boolean isHost = isUserJoined(currentUserId, meeting);
+                boolean isHost = isUserJoined(user, meeting);
                 return getMeetingWithBadges(meeting.withJoined(isHost));
             });
     }
 
-    private boolean isUserJoined(Long currentUserId, Meeting meeting) {
-        if (currentUserId == null) {
+    private boolean isUserJoined(User user, Meeting meeting) {
+        if (user.isEmpty()) {
             return false;
         }
-        Long hostId = (meeting.getHost() != null) ? meeting.getHost().getId() : null;
         // 가입 API 구현 이후 : return meetingMemberJpaRepository.existsByMeetingIdAndUserId(meeting.getId(), currentUserId);
-        return hostId != null && Objects.equals(currentUserId, hostId);
+        return Objects.equals(user, meeting.getHost());
     }
 
     private Meeting getMeetingWithBadges(Meeting meeting) {
