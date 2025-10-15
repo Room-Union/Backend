@@ -8,6 +8,7 @@ import org.codeit.roomunion.auth.domain.policy.EmailVerificationPolicy;
 import org.codeit.roomunion.common.application.port.out.EventPublisher;
 import org.codeit.roomunion.common.application.port.out.RandomNumberGenerator;
 import org.codeit.roomunion.common.application.port.out.TimeHolder;
+import org.codeit.roomunion.common.config.redis.RedisCacheKeys;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.common.jwt.JwtUtil;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
@@ -52,7 +53,7 @@ public class AuthService implements AuthUseCase {
     }
 
     @Override
-    @Cacheable(value = "login", key = "#email")
+    @Cacheable(value = RedisCacheKeys.LOGIN, key = "#email") // FIXME 테스트용도로 추후 제거 예정
     public String login(String email, String password) {
         try {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password);

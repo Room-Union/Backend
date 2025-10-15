@@ -15,7 +15,7 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public enum RedisCacheType {
 
-    LOGIN("login", Duration.ofSeconds(10)), // FIXME 제거 예정
+    LOGIN(RedisCacheKeys.LOGIN, Duration.ofSeconds(10)), // FIXME 제거 예정
     ;
 
     private final String cacheName;
