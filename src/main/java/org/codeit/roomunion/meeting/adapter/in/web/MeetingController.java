@@ -68,5 +68,15 @@ public class MeetingController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "특정 모임 가입하기", description = "meetingId로 특정 모임 가입 API. 중복 가입 X")
+    @PostMapping("/{meetingId}/join")
+    public ResponseEntity<MeetingResponse> join(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @PathVariable Long meetingId
+    ) {
+        Meeting meeting = meetingCommandUseCase.join(meetingId, userDetails.getId());
+        return ResponseEntity.ok(MeetingResponse.from(meeting));
+    }
+
 
 }

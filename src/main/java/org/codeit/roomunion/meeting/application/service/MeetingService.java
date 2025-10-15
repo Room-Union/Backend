@@ -69,14 +69,14 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     }
 
     @Override
+    public Meeting join(Long meetingId, Long userId) {
+
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Meeting getByMeetingId(Long meetingId, Long currentUserId) {
-        Meeting meeting = meetingRepository.findById(meetingId);
-
-        // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
-        boolean isJoined = isUserJoined(currentUserId, meeting);
-        meeting = meeting.withJoined(isJoined);
-
+        Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, currentUserId);
         return getMeetingWithBadges(meeting);
     }
 

@@ -9,16 +9,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 
 public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long> {
 
     @EntityGraph(attributePaths = {"meetingMembers", "meetingMembers.user"})
     @Query("""
-      SELECT m
-      FROM MeetingEntity m
-      WHERE (:category IS NULL OR m.category = :category)
-      ORDER BY m.createdAt DESC
-    """)
+          SELECT m
+          FROM MeetingEntity m
+          WHERE (:category IS NULL OR m.category = :category)
+          ORDER BY m.createdAt DESC
+        """)
     Page<MeetingEntity> findByCategoryOrderByCreatedAtDesc(
         @Param("category") MeetingCategory category,
         Pageable pageable
@@ -26,16 +28,25 @@ public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long>
 
     @EntityGraph(attributePaths = {"meetingMembers", "meetingMembers.user"})
     @Query("""
-      SELECT m
-      FROM MeetingEntity m
-      LEFT JOIN m.meetingMembers mm
-      WHERE (:category IS NULL OR m.category = :category)
-      GROUP BY m.id
-      ORDER BY COUNT(mm.id) DESC, m.createdAt DESC
-    """)
+          SELECT m
+          FROM MeetingEntity m
+          LEFT JOIN m.meetingMembers mm
+          WHERE (:category IS NULL OR m.category = :category)
+          GROUP BY m.id
+          ORDER BY COUNT(mm.id) DESC, m.createdAt DESC
+        """)
     Page<MeetingEntity> findByCategoryOrderByMemberCountDesc(
         @Param("category") MeetingCategory category,
         Pageable pageable
     );
+
+    @Query("""
+           SELECT m
+           FROM MeetingEntity m
+           left join fetch m.meetingMembers mm on mm.user.id == :userId
+           left join fetch mm.user u
+           where m.id = :meetingId
+        """)
+    Optional<MeetingEntity> findByIdWithUserJoinStatus(@Param("meetingId") Long meetingId, @Param("userId") Long userId);
 
 }

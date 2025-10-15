@@ -3,6 +3,7 @@ package org.codeit.roomunion.meeting.application.port.out;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingSort;
 import org.springframework.data.domain.Page;
 
@@ -16,5 +17,11 @@ public interface MeetingRepository {
     int countJoinedMembers(Long meetingId);
 
     Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size);
+
+    Meeting findByIdWithJoined(Long meetingId, Long currentUserId);
+
+    boolean isMeetingMember(Long meetingId, Long userId);
+
+    void insertMember(Long meetingId, Long userId, MeetingRole role);
 
 }
