@@ -1,8 +1,6 @@
 package org.codeit.roomunion.meeting.domain.model;
 
 import lombok.Getter;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingBadge;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.user.domain.model.User;
 
 import java.time.LocalDateTime;
