@@ -36,7 +36,7 @@ public class MeetingMemberEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private MeetingRole meetingRole; // HOST / MEMBER
+    private MeetingRole meetingRole;
 
     public boolean isHost() {
         return this.meetingRole == MeetingRole.HOST;

@@ -31,8 +31,6 @@ public class Meeting {
 
     private final LocalDateTime createdAt;
 
-//    private final String hostProfileImage;
-
     private final boolean isJoined;
 
     private final List<MeetingBadge> badges;

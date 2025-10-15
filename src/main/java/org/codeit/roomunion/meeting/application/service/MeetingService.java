@@ -52,7 +52,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         String imageUrl = null;
         if (image != null && !image.isEmpty()) {
             Uuid uuid = uuidRepository.save(Uuid.from(UUID.randomUUID().toString()));
-            String key = Meeting.getImagePath(uuid.getValue()); // 도메인에서 경로 생성
+            String key = Meeting.getImagePath(uuid.getValue());
             imageUrl = s3Manager.uploadFile(key, image);
         }
 
@@ -113,28 +113,23 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
         int max = meeting.getMaxMemberCount();
 
-        // 마감 여부 확인
         if (currentCount >= max) {
             badges.add(MeetingBadge.CLOSED);
             return badges;
         }
 
-        // 모집중
         if (currentCount < max) {
             badges.add(MeetingBadge.RECRUITING);
         }
 
-        // 신규 (7일)
         if (createdAt != null && !createdAt.isBefore(now.minusDays(7))) {
             badges.add(MeetingBadge.NEW);
         }
 
-        // 마감임박: 최대인원 5명당 마감임박기준을 1명
-        // ex) 최대 12명 중 3명 이하 남음(5명당 1명 기준) → 마감임박
-        int remaining = max - currentCount; // 12 - 10 = 2
-        int closingLimit = (int) Math.ceil(meeting.getMaxMemberCount() / 5.0); // ceil(12 / 5.0) = 3
+        int remaining = max - currentCount;
+        int closingLimit = (int) Math.ceil(meeting.getMaxMemberCount() / 5.0);
 
-        if (remaining > 0 && remaining <= closingLimit) { // 2 <= 3 → true
+        if (remaining > 0 && remaining <= closingLimit) {
             badges.add(MeetingBadge.CLOSING_SOON);
         }
 

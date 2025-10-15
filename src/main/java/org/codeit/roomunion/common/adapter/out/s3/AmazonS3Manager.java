@@ -30,7 +30,6 @@ public class AmazonS3Manager {
                 .contentType(file.getContentType())
                 .build();
 
-            // 파일을 S3에 업로드
             s3Client.putObject(putRequest,
                 RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
