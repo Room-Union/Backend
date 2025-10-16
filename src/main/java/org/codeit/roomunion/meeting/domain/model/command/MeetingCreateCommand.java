@@ -21,6 +21,8 @@ public class MeetingCreateCommand {
 
     private final int maxMemberCount;
 
+    private final int currentMemberCount;
+
     private final List<String> platformURL;
 
     private final Long userId;

@@ -16,7 +16,7 @@ public interface MeetingRepository {
 
     int countJoinedMembers(Long meetingId);
 
-    Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size);
+    Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, Long currentUserId);
 
     Meeting findByIdWithJoined(Long meetingId, Long currentUserId);
 

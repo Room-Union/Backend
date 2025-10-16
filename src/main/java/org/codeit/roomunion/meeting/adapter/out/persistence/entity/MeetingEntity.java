@@ -53,6 +53,9 @@ public class MeetingEntity {
     @ColumnDefault("1")
     private int maxMemberCount;
 
+    @Column(nullable = false)
+    private int currentMemberCount;
+
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<MeetingMemberEntity> meetingMembers = new ArrayList<>();
@@ -73,6 +76,7 @@ public class MeetingEntity {
             .category(command.getCategory())
             .meetingImage(command.getImageUrl())
             .maxMemberCount(command.getMaxMemberCount())
+            .currentMemberCount(command.getCurrentMemberCount())
             .platformUrls(command.getPlatformURL())
             .createdAt(command.getCreatedAt())
             .build();

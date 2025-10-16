@@ -41,12 +41,12 @@ public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long>
     );
 
     @Query("""
-           SELECT m
-           FROM MeetingEntity m
-           left join fetch m.meetingMembers mm on mm.user.id == :userId
-           left join fetch mm.user u
-           where m.id = :meetingId
+            select distinct m
+            from MeetingEntity m
+            left join fetch m.meetingMembers mm
+            left join fetch mm.user u
+            where m.id = :meetingId
         """)
-    Optional<MeetingEntity> findByIdWithUserJoinStatus(@Param("meetingId") Long meetingId, @Param("userId") Long userId);
+    Optional<MeetingEntity> findByIdWithMembers(@Param("meetingId") Long meetingId);
 
 }

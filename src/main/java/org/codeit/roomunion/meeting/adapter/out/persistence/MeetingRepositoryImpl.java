@@ -21,6 +21,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
 @Repository
 @RequiredArgsConstructor
 public class MeetingRepositoryImpl implements MeetingRepository {
@@ -61,23 +66,34 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     }
 
     @Override
-    public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size) {
+    public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, Long currentUserId) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<MeetingEntity> resultPage = switch (sort) {
+        Page<MeetingEntity> resultPage = switch (sort) { //목록 쿼리 1회
             case LATEST -> meetingJpaRepository.findByCategoryOrderByCreatedAtDesc(category, pageable);
             case MEMBER_DESC -> meetingJpaRepository.findByCategoryOrderByMemberCountDesc(category, pageable);
         };
 
-        return resultPage.map(MeetingEntity::toDomain);
+        // 로그인 안 했거나 결과가 없으면 전부 joined=false
+        if (currentUserId == null || resultPage.isEmpty()) {
+            return resultPage.map(e -> e.toDomain().withJoined(false));
+        }
+
+        // 페이지 내 meetingId 모아서 한 방에 내가 가입한 ID들 조회
+        List<Long> meetingIds = resultPage.map(MeetingEntity::getId).getContent();
+        Set<Long> joinedIds = new HashSet<>(meetingMemberJpaRepository.findJoinedMeetingIds(currentUserId, meetingIds)); // joined 한 방 쿼리 1회 (총 쿼리 2회 고정)
+
+        // joined는 메모리에서 contains로만 판정 (추가 쿼리 없음)
+        return resultPage.map(e -> e.toDomain().withJoined(joinedIds.contains(e.getId())));
     }
 
     @Override
     public Meeting findByIdWithJoined(Long meetingId, Long currentUserId) {
-        MeetingEntity entity = meetingJpaRepository.findByIdWithUserJoinStatus(meetingId, currentUserId)
+        MeetingEntity entity = meetingJpaRepository.findByIdWithMembers(meetingId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
 
-        boolean joined = !entity.getMeetingMembers().isEmpty();
+        boolean joined = currentUserId != null && entity.getMeetingMembers().stream()
+            .anyMatch(mm -> mm.getUser() != null && Objects.equals(mm.getUser().getId(), currentUserId));
 
         return entity.toDomain().withJoined(joined);
     }

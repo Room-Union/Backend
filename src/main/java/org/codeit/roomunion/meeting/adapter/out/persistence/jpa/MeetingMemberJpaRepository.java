@@ -6,10 +6,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface MeetingMemberJpaRepository extends JpaRepository<MeetingMemberEntity, Long> {
-    Optional<MeetingMemberEntity> findByMeetingIdAndMeetingRole(Long meetingId, MeetingRole meetingRole);
+
+    @Query("""
+            select mm.meeting.id
+            from MeetingMemberEntity mm
+            where mm.user.id = :userId
+              and mm.meeting.id in :meetingIds
+        """)
+    List<Long> findJoinedMeetingIds(@Param("userId") Long userId,
+                                    @Param("meetingIds") List<Long> meetingIds);
 
     @Query("""
             select (count(mm) > 0)
@@ -25,6 +33,12 @@ public interface MeetingMemberJpaRepository extends JpaRepository<MeetingMemberE
 
     int countByMeetingId(Long meetingId);
 
-    //특정 유저가 이미 해당 모임의 멤버인지 확인
-    boolean existsByMeetingIdAndUserId(Long meetingId, Long userId);
+    @Query("""
+            select (count(mm) > 0)
+            from MeetingMemberEntity mm
+            where mm.meeting.id = :meetingId
+              and mm.user.id = :userId
+        """)
+    boolean existsByMeetingIdAndUserId(@Param("meetingId") Long meetingId,
+                                       @Param("userId") Long userId);
 }
