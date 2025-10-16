@@ -111,10 +111,11 @@ public class MeetingRepositoryImpl implements MeetingRepository {
             .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
         if (meetingMemberJpaRepository.existsByMeetingIdAndUserId(meetingId, userId)) {
-            throw new CustomException(MeetingErrorCode.MEETING_MEMBER_NOT_FOUND);
+            throw new CustomException(MeetingErrorCode.ALREADY_JOINED);
         }
 
         MeetingMemberEntity mm = MeetingMemberEntity.of(meeting, user, role);
+        meeting.addMember(mm);
         meetingMemberJpaRepository.save(mm);
     }
 }

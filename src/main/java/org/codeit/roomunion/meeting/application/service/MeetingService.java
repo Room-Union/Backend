@@ -3,6 +3,7 @@ package org.codeit.roomunion.meeting.application.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.application.port.out.UuidRepository;
@@ -89,12 +90,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     @Override
     @Transactional(readOnly = true)
     public Meeting getByMeetingId(Long meetingId, Long currentUserId) {
-        Meeting meeting = meetingRepository.findById(meetingId);
-
-        // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
-        boolean isHost =  currentUserId != null && Objects.equals(meeting.getHost().getId(), currentUserId);
-        meeting = meeting.withJoined(isHost);
-
+        Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, currentUserId);
         return getMeetingWithBadges(meeting);
     }
 
@@ -107,15 +103,6 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         return pageResult.map(this::getMeetingWithBadges); // -> 문제 발생 (N + 1)
     }
 
-//    private boolean isUserJoined(Long currentUserId, Meeting meeting) {
-//        if (currentUserId == null) {
-//            return false;
-//        }
-//
-//        Long hostId = (meeting.getHost() != null) ? meeting.getHost().getId() : null;
-//        // 가입 API 구현 이후 : return meetingMemberJpaRepository.existsByMeetingIdAndUserId(meeting.getId(), currentUserId);
-//        return hostId != null && Objects.equals(currentUserId, hostId);
-//    }
 
     private Meeting getMeetingWithBadges(Meeting meeting) {
         int currentCount = meeting.getCurrentMemberCount();
