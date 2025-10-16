@@ -13,7 +13,9 @@ public enum MeetingErrorCode implements BaseErrorCode {
     DUPLICATE_MEETING_NAME("이미 동일한 이름의 모임을 보유하고 있습니다.", HttpStatus.BAD_REQUEST),
     MEETING_NOT_FOUND("존재하지 않는 모임입니다.", HttpStatus.NOT_FOUND),
     MEETING_MEMBER_NOT_FOUND("존재하지 않는 크루원입니다.", HttpStatus.NOT_FOUND),
-    MEETING_HOST_NOT_FOUND("모임장이 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+    MEETING_HOST_NOT_FOUND("모임장이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    MEETING_MEMBER_LIMIT_REACHED("모임 최대 멤버수에 도달하였습니다.", HttpStatus.BAD_REQUEST),
+    ALREADY_JOINED("이미 가입한 모임입니다.", HttpStatus.BAD_REQUEST);
 
     private final String message;
     private final HttpStatus status;
