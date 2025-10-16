@@ -12,6 +12,7 @@ import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingBadge;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingSort;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
@@ -25,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -69,7 +69,17 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     }
 
     @Override
+    @Transactional
     public Meeting join(Long meetingId, Long userId) {
+        if (meetingRepository.isMeetingMember(meetingId, userId)) {
+            Meeting joined = meetingRepository.findByIdWithJoined(meetingId, userId);
+            return getMeetingWithBadges(joined);
+        }
+
+        meetingRepository.insertMember(meetingId, userId, MeetingRole.MEMBER);
+
+        Meeting joinedMeeting = meetingRepository.findByIdWithJoined(meetingId, userId);
+        return getMeetingWithBadges(joinedMeeting);
 
     }
 
@@ -85,28 +95,22 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     @Transactional(readOnly = true)
     public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size,
                                 Long currentUserId) {
-        Page<Meeting> pageResult = meetingRepository.search(category, sort, page, size);
-
-        // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
-        return pageResult
-            .map(meeting -> {
-                boolean isHost = isUserJoined(currentUserId, meeting);
-                return getMeetingWithBadges(meeting.withJoined(isHost));
-            });
+        Page<Meeting> pageResult = meetingRepository.search(category, sort, page, size, currentUserId);
+        return pageResult.map(this::getMeetingWithBadges); // -> 문제 발생 (N + 1)
     }
 
-    private boolean isUserJoined(Long currentUserId, Meeting meeting) {
-        if (currentUserId == null) {
-            return false;
-        }
-
-        Long hostId = (meeting.getHost() != null) ? meeting.getHost().getId() : null;
-        // 가입 API 구현 이후 : return meetingMemberJpaRepository.existsByMeetingIdAndUserId(meeting.getId(), currentUserId);
-        return hostId != null && Objects.equals(currentUserId, hostId);
-    }
+//    private boolean isUserJoined(Long currentUserId, Meeting meeting) {
+//        if (currentUserId == null) {
+//            return false;
+//        }
+//
+//        Long hostId = (meeting.getHost() != null) ? meeting.getHost().getId() : null;
+//        // 가입 API 구현 이후 : return meetingMemberJpaRepository.existsByMeetingIdAndUserId(meeting.getId(), currentUserId);
+//        return hostId != null && Objects.equals(currentUserId, hostId);
+//    }
 
     private Meeting getMeetingWithBadges(Meeting meeting) {
-        int currentCount = meetingRepository.countJoinedMembers(meeting.getId());
+        int currentCount = meeting.getCurrentMemberCount();
         List<MeetingBadge> badges = calculateBadges(meeting, currentCount, LocalDateTime.now());
         return meeting.withBadges(badges);
     }
