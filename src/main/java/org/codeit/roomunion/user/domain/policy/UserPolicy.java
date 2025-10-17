@@ -2,7 +2,7 @@ package org.codeit.roomunion.user.domain.policy;
 
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.common.exception.GlobalErrorCode;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.command.UserModifyCommand;
 import org.codeit.roomunion.user.domain.exception.UserErrorCode;
@@ -39,7 +39,7 @@ public class UserPolicy {
     }
 
     public static void validate(UserModifyCommand userModifyCommand) {
-        validateNonNull(userModifyCommand.getGender(), userModifyCommand.getCategories());
+        validateNonNull(userModifyCommand.getNickname(), userModifyCommand.getGender(), userModifyCommand.getCategories());
 
         if (isNotValidateNickname(userModifyCommand.getNickname())) {
             throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);

@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.codeit.roomunion.auth.domain.exception.AuthErrorCode;
-import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
+import org.codeit.roomunion.auth.domain.model.LoginUserDetails;
 import org.codeit.roomunion.common.exception.BaseErrorCode;
 import org.codeit.roomunion.common.jwt.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -51,7 +51,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        CustomUserDetails customUserDetails = (CustomUserDetails) authResult.getPrincipal();
+        LoginUserDetails customUserDetails = (LoginUserDetails) authResult.getPrincipal();
         Long userId = customUserDetails.getId();
         String email = customUserDetails.getUsername();
 

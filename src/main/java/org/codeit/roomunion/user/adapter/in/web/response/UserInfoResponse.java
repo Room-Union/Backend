@@ -1,6 +1,6 @@
 package org.codeit.roomunion.user.adapter.in.web.response;
 
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 import org.codeit.roomunion.user.domain.model.Gender;
 import org.codeit.roomunion.user.domain.model.User;
 

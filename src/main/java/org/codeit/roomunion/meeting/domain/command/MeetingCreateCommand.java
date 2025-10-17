@@ -1,9 +1,9 @@
-package org.codeit.roomunion.meeting.domain.model.command;
+package org.codeit.roomunion.meeting.domain.command;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 
 import java.time.LocalDateTime;
 import java.util.List;

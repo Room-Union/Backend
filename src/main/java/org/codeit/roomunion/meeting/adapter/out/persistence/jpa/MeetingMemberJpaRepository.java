@@ -1,7 +1,7 @@
 package org.codeit.roomunion.meeting.adapter.out.persistence.jpa;
 
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
+import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

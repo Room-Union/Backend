@@ -1,7 +1,7 @@
 package org.codeit.roomunion.meeting.adapter.out.persistence.jpa;
 
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;

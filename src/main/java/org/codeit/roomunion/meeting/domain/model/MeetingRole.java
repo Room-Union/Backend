@@ -1,4 +1,4 @@
-package org.codeit.roomunion.meeting.domain.model.enums;
+package org.codeit.roomunion.meeting.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
