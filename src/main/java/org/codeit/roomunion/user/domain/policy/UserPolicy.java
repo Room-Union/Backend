@@ -39,7 +39,7 @@ public class UserPolicy {
     }
 
     public static void validate(UserModifyCommand userModifyCommand) {
-        validateNonNull(userModifyCommand.getGender(), userModifyCommand.getCategories());
+        validateNonNull(userModifyCommand.getNickname(), userModifyCommand.getGender(), userModifyCommand.getCategories());
 
         if (isNotValidateNickname(userModifyCommand.getNickname())) {
             throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
