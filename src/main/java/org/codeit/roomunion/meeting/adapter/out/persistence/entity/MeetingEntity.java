@@ -139,7 +139,6 @@ public class MeetingEntity {
         }
     }
 
-    // MeetingEntity 내부에 추가
     public void updateMeeting(MeetingUpdateCommand command, int currentMemberCount) {
         if (command.getMaxMemberCount() < currentMemberCount) {
             throw new CustomException(MeetingErrorCode.MAX_COUNT_LESS_THAN_CURRENT);
