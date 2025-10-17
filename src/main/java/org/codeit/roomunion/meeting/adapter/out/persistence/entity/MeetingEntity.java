@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
@@ -17,6 +18,7 @@ import org.hibernate.annotations.ColumnDefault;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(
@@ -136,6 +138,42 @@ public class MeetingEntity {
         }
     }
 
+    // MeetingEntity 내부에 추가
+    public void replaceAllFrom(MeetingUpdateCommand cmd, int currentMemberCount) {
+        // 방어적 검증 (PUT 전체 치환 가정)
+        if (cmd.getName() == null || cmd.getDescription() == null ||
+            cmd.getCategory() == null || cmd.getMaxMemberCount() == null ||
+            cmd.getPlatformURL() == null) {
+            throw new CustomException(MeetingErrorCode.MEETING_MODIFY_INVALID_REQUEST);
+        }
+
+        String newName = cmd.getName().trim();
+        String newDesc = cmd.getDescription().trim();
+        int newMax = cmd.getMaxMemberCount();
+
+        if (newName.isEmpty() || newDesc.isEmpty()) {
+            throw new CustomException(MeetingErrorCode.MEETING_MODIFY_INVALID_REQUEST);
+        }
+        if (newMax < currentMemberCount) {
+            throw new CustomException(MeetingErrorCode.MAX_COUNT_LESS_THAN_CURRENT);
+        }
+
+        // 전체 치환
+        this.name = newName;
+        this.description = newDesc;
+        this.category = cmd.getCategory();
+        this.maxMemberCount = newMax;
+
+        this.platformUrls.clear();
+        cmd.getPlatformURL().stream()
+            .filter(Objects::nonNull)
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .forEach(this.platformUrls::add);
+
+        // 이미지: null 허용 (정책에 따라 유지/제거 선택 가능)
+        this.meetingImage = cmd.getImageUrl();
+    }
 
 
 }

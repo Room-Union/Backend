@@ -1,9 +1,5 @@
 package org.codeit.roomunion.meeting.application.service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.application.port.out.UuidRepository;
@@ -14,6 +10,7 @@ import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingBadge;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
@@ -85,6 +82,25 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         Meeting joinedMeeting = meetingRepository.findByIdWithJoined(meetingId, userId);
         return getMeetingWithBadges(joinedMeeting);
 
+    }
+
+    @Override
+    public Meeting update(Long meetingId, Long currentId, MeetingUpdateCommand command, MultipartFile image) {
+        Meeting meeting = meetingRepository.findById(meetingId);
+
+        if (!meeting.isHost(currentId)) {
+            throw new CustomException(MeetingErrorCode.MEETING_MODIFY_FORBIDDEN);
+        }
+
+        String finalImageUrl = meeting.getMeetingImage();
+        if (image != null && !image.isEmpty()) {
+            Uuid uuid = uuidRepository.save(Uuid.from(UUID.randomUUID().toString()));
+            String key = Meeting.getImagePath(uuid.getValue());
+            finalImageUrl = s3Manager.uploadFile(key, image);
+        }
+
+        MeetingUpdateCommand commandWithImage = MeetingUpdateCommand.of(command, finalImageUrl);
+        return meetingRepository.updateMeeting(meetingId, commandWithImage);
     }
 
     @Override

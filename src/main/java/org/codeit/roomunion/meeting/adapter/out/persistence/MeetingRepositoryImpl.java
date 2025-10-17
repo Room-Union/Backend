@@ -9,6 +9,7 @@ import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingMemberJpa
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingSort;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -117,5 +119,20 @@ public class MeetingRepositoryImpl implements MeetingRepository {
         MeetingMemberEntity mm = MeetingMemberEntity.of(meeting, user, role);
         meeting.addMember(mm);
         meetingMemberJpaRepository.save(mm);
+    }
+
+    @Override
+    @Transactional
+    public Meeting updateMeeting(Long meetingId, MeetingUpdateCommand command) {
+        MeetingEntity entity = meetingJpaRepository.findById(meetingId)
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
+
+        int currentCount = meetingMemberJpaRepository.countByMeetingId(meetingId);
+
+        // 엔티티 내부 불변성 검증 + 전체 치환
+        entity.replaceAllFrom(command, currentCount);
+
+        // Dirty checking으로 반영 → 도메인으로 변환
+        return entity.toDomain();
     }
 }

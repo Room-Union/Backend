@@ -6,11 +6,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.meeting.adapter.in.web.request.CreateMeetingRequest;
+import org.codeit.roomunion.meeting.adapter.in.web.request.UpdateMeetingRequest;
 import org.codeit.roomunion.meeting.adapter.in.web.response.MeetingResponse;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingSort;
 import org.springframework.data.domain.Page;
@@ -76,6 +78,19 @@ public class MeetingController {
     ) {
         Meeting meeting = meetingCommandUseCase.join(meetingId, userDetails.getId());
         return ResponseEntity.ok(MeetingResponse.from(meeting));
+    }
+
+    @Operation(summary = "모임 수정 API", description = "모임장만 수정가능, 토큰 필수")
+    @PutMapping(value = "/{meetingId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MeetingResponse> updateMeeting(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @PathVariable Long meetingId,
+        @RequestPart("request") @Valid UpdateMeetingRequest request,
+        @RequestPart(value = "image", required = false) MultipartFile image
+    ) {
+        MeetingUpdateCommand command = request.toCommand();
+        Meeting updatedMeeting = meetingCommandUseCase.update(meetingId, userDetails.getId(), command, image);
+        return ResponseEntity.ok(MeetingResponse.from(updatedMeeting));
     }
 
 }

@@ -82,5 +82,9 @@ public class Meeting {
         );
     }
 
+    public boolean isHost(Long currentUserId) {
+        return this.host.getId().equals(currentUserId);
+    }
+
 
 }
