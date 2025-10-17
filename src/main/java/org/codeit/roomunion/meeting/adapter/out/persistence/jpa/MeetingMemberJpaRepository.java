@@ -6,10 +6,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface MeetingMemberJpaRepository extends JpaRepository<MeetingMemberEntity, Long> {
-    Optional<MeetingMemberEntity> findByMeetingIdAndMeetingRole(Long meetingId, MeetingRole meetingRole);
+
+    @Query("""
+            select mm.meeting.id
+            from MeetingMemberEntity mm
+            where mm.user.id = :userId
+              and mm.meeting.id in :meetingIds
+        """)
+    List<Long> findJoinedMeetingIds(@Param("userId") Long userId,
+                                    @Param("meetingIds") List<Long> meetingIds);
 
     @Query("""
             select (count(mm) > 0)
@@ -24,4 +32,22 @@ public interface MeetingMemberJpaRepository extends JpaRepository<MeetingMemberE
                                        @Param("role") MeetingRole role);
 
     int countByMeetingId(Long meetingId);
+
+    @Query("""
+            select (count(mm) > 0)
+            from MeetingMemberEntity mm
+            where mm.meeting.id = :meetingId
+              and mm.user.id = :userId
+        """)
+    boolean existsByMeetingIdAndUserId(@Param("meetingId") Long meetingId,
+                                       @Param("userId") Long userId);
+
+    @Query("""
+            select (count(mm) > 0)
+            from MeetingMemberEntity mm
+            where mm.meeting.id = :meetingId
+              and mm.user.id = :userId
+              and mm.meetingRole = :role
+      """)
+    boolean existsByMeetingIdAndUserIdAndRole(Long meetingId, Long userId, MeetingRole role);
 }

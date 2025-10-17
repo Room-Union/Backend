@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
@@ -17,6 +18,7 @@ import org.hibernate.annotations.ColumnDefault;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(
@@ -53,6 +55,10 @@ public class MeetingEntity {
     @ColumnDefault("1")
     private int maxMemberCount;
 
+    @Column(nullable = false)
+    @ColumnDefault("0")
+    private int currentMemberCount;
+
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<MeetingMemberEntity> meetingMembers = new ArrayList<>();
@@ -73,6 +79,7 @@ public class MeetingEntity {
             .category(command.getCategory())
             .meetingImage(command.getImageUrl())
             .maxMemberCount(command.getMaxMemberCount())
+            .currentMemberCount(0)
             .platformUrls(command.getPlatformURL())
             .createdAt(command.getCreatedAt())
             .build();
@@ -106,7 +113,7 @@ public class MeetingEntity {
             this.getMeetingImage(),
             this.getCategory(),
             this.getMaxMemberCount(),
-            this.meetingMembers.size(),
+            this.getCurrentMemberCount(),
             this.getPlatformUrls(),
             this.getCreatedAt(),
             false,
@@ -116,6 +123,38 @@ public class MeetingEntity {
 
     public void addMember(MeetingMemberEntity member) {
         this.meetingMembers.add(member);
+        increaseMemberCount();
+    }
+
+    public void increaseMemberCount() {
+        if (this.currentMemberCount >= this.maxMemberCount) {
+            throw new CustomException(MeetingErrorCode.MEETING_MEMBER_LIMIT_REACHED);
+        }
+        this.currentMemberCount++;
+    }
+
+    public void decreaseMemberCount() {
+        if (this.currentMemberCount > 0) {
+            this.currentMemberCount--;
+        }
+    }
+
+    public void updateMeeting(MeetingUpdateCommand command, int currentMemberCount) {
+        if (command.getMaxMemberCount() < currentMemberCount) {
+            throw new CustomException(MeetingErrorCode.MAX_COUNT_LESS_THAN_CURRENT);
+        }
+
+        this.name = command.getName();
+        this.description = command.getDescription();
+        this.category = command.getCategory();
+        this.maxMemberCount = command.getMaxMemberCount();
+
+        this.platformUrls.clear();
+        this.platformUrls.addAll(command.getPlatformURL());
+
+        if (command.getImageUrl() != null) {
+            this.meetingImage = command.getImageUrl();
+        }
     }
 
 

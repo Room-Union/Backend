@@ -10,8 +10,10 @@ import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingBadge;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingSort;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
@@ -25,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -52,7 +53,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         String imageUrl = null;
         if (image != null && !image.isEmpty()) {
             Uuid uuid = uuidRepository.save(Uuid.from(UUID.randomUUID().toString()));
-            String key = Meeting.getImagePath(uuid.getValue()); // 도메인에서 경로 생성
+            String key = Meeting.getImagePath(uuid.getValue());
             imageUrl = s3Manager.uploadFile(key, image);
         }
 
@@ -69,14 +70,61 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Meeting getByMeetingId(Long meetingId, Long currentUserId) {
+    @Transactional
+    public Meeting join(Long meetingId, Long userId) {
+        if (meetingRepository.isMeetingMember(meetingId, userId)) {
+            Meeting joined = meetingRepository.findByIdWithJoined(meetingId, userId);
+            return getMeetingWithBadges(joined);
+        }
+
+        meetingRepository.insertMember(meetingId, userId, MeetingRole.MEMBER);
+
+        Meeting joinedMeeting = meetingRepository.findByIdWithJoined(meetingId, userId);
+        return getMeetingWithBadges(joinedMeeting);
+
+    }
+
+    @Override
+    public Meeting update(Long meetingId, Long currentId, MeetingUpdateCommand command, MultipartFile image) {
         Meeting meeting = meetingRepository.findById(meetingId);
 
-        // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
-        boolean isJoined = isUserJoined(currentUserId, meeting);
-        meeting = meeting.withJoined(isJoined);
+        boolean isHost = meetingRepository.isHostMember(meetingId, currentId);
+        if (!isHost) {
+            throw new CustomException(MeetingErrorCode.MEETING_MODIFY_FORBIDDEN);
+        }
 
+        String finalImageUrl = meeting.getMeetingImage();
+        if (image != null && !image.isEmpty()) {
+            Uuid uuid = uuidRepository.save(Uuid.from(UUID.randomUUID().toString()));
+            String key = Meeting.getImagePath(uuid.getValue());
+            finalImageUrl = s3Manager.uploadFile(key, image);
+        }
+
+        MeetingUpdateCommand commandWithImage = MeetingUpdateCommand.of(command, finalImageUrl);
+        meetingRepository.updateMeeting(meetingId, commandWithImage);
+
+        Meeting joinedMeeting = meetingRepository.findByIdWithJoined(meetingId, currentId);
+        return getMeetingWithBadges(joinedMeeting);
+    }
+
+    @Override
+    public void deleteMeeting(Long meetingId, Long userId) {
+        if (!meetingRepository.existsMeetingById(meetingId)) {
+            throw new CustomException(MeetingErrorCode.MEETING_NOT_FOUND);
+        }
+
+        boolean isHost = meetingRepository.isHostMember(meetingId, userId);
+        if (!isHost) {
+            throw new CustomException(MeetingErrorCode.MEETING_DELETE_FORBIDDEN);
+        }
+
+        meetingRepository.deleteMeeting(meetingId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Meeting getByMeetingId(Long meetingId, Long currentUserId) {
+        Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, currentUserId);
         return getMeetingWithBadges(meeting);
     }
 
@@ -85,27 +133,13 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     @Transactional(readOnly = true)
     public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size,
                                 Long currentUserId) {
-        Page<Meeting> pageResult = meetingRepository.search(category, sort, page, size);
-
-        // TODO 현재는 호스트만 isJoined = true (모임 가입 API 도입 후 변경 예정)
-        return pageResult
-            .map(meeting -> {
-                boolean isHost = isUserJoined(currentUserId, meeting);
-                return getMeetingWithBadges(meeting.withJoined(isHost));
-            });
+        Page<Meeting> pageResult = meetingRepository.search(category, sort, page, size, currentUserId);
+        return pageResult.map(this::getMeetingWithBadges);
     }
 
-    private boolean isUserJoined(Long currentUserId, Meeting meeting) {
-        if (currentUserId == null) {
-            return false;
-        }
-        Long hostId = (meeting.getHost() != null) ? meeting.getHost().getId() : null;
-        // 가입 API 구현 이후 : return meetingMemberJpaRepository.existsByMeetingIdAndUserId(meeting.getId(), currentUserId);
-        return hostId != null && Objects.equals(currentUserId, hostId);
-    }
 
     private Meeting getMeetingWithBadges(Meeting meeting) {
-        int currentCount = meetingRepository.countJoinedMembers(meeting.getId());
+        int currentCount = meeting.getCurrentMemberCount();
         List<MeetingBadge> badges = calculateBadges(meeting, currentCount, LocalDateTime.now());
         return meeting.withBadges(badges);
     }
@@ -117,28 +151,23 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
         int max = meeting.getMaxMemberCount();
 
-        // 마감 여부 확인
         if (currentCount >= max) {
             badges.add(MeetingBadge.CLOSED);
             return badges;
         }
 
-        // 모집중
         if (currentCount < max) {
             badges.add(MeetingBadge.RECRUITING);
         }
 
-        // 신규 (7일)
         if (createdAt != null && !createdAt.isBefore(now.minusDays(7))) {
             badges.add(MeetingBadge.NEW);
         }
 
-        // 마감임박: 최대인원 5명당 마감임박기준을 1명
-        // ex) 최대 12명 중 3명 이하 남음(5명당 1명 기준) → 마감임박
-        int remaining = max - currentCount; // 12 - 10 = 2
-        int closingLimit = (int) Math.ceil(meeting.getMaxMemberCount() / 5.0); // ceil(12 / 5.0) = 3
+        int remaining = max - currentCount;
+        int closingLimit = (int) Math.ceil(meeting.getMaxMemberCount() / 5.0);
 
-        if (remaining > 0 && remaining <= closingLimit) { // 2 <= 3 → true
+        if (remaining > 0 && remaining <= closingLimit) {
             badges.add(MeetingBadge.CLOSING_SOON);
         }
 
