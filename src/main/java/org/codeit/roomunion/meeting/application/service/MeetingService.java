@@ -1,6 +1,7 @@
 package org.codeit.roomunion.meeting.application.service;
 
 import lombok.RequiredArgsConstructor;
+import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.application.port.out.UuidRepository;
 import org.codeit.roomunion.common.domain.model.Uuid;
@@ -70,10 +71,10 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
     @Override
     @Transactional(readOnly = true)
-    public Meeting getByMeetingId(Long meetingId, User user) {
+    public Meeting getByMeetingId(Long meetingId, CustomUserDetails userDetails) {
         Meeting meeting = meetingRepository.findById(meetingId);
 
-        boolean isJoined = isUserJoined(user, meeting);
+        boolean isJoined = isUserJoined(userDetails, meeting);
         meeting = meeting.withJoined(isJoined);
 
         return getMeetingWithBadges(meeting);
@@ -82,22 +83,22 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, User user) {
+    public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, CustomUserDetails userDetails) {
         Page<Meeting> pageResult = meetingRepository.search(category, sort, page, size);
 
         return pageResult
             .map(meeting -> {
-                boolean isHost = isUserJoined(user, meeting);
+                boolean isHost = isUserJoined(userDetails, meeting);
                 return getMeetingWithBadges(meeting.withJoined(isHost));
             });
     }
 
-    private boolean isUserJoined(User user, Meeting meeting) {
-        if (user.isEmpty()) {
+    private boolean isUserJoined(CustomUserDetails userDetails, Meeting meeting) {
+        if (!userDetails.isLoggedIn()) {
             return false;
         }
         // 가입 API 구현 이후 : return meetingMemberJpaRepository.existsByMeetingIdAndUserId(meeting.getId(), currentUserId);
-        return Objects.equals(user, meeting.getHost());
+        return Objects.equals(userDetails.getUser(), meeting.getHost());
     }
 
     private Meeting getMeetingWithBadges(Meeting meeting) {

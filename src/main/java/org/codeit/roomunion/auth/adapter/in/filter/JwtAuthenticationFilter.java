@@ -10,8 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.auth.application.service.JwtService;
 import org.codeit.roomunion.auth.domain.exception.AuthErrorCode;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
+import org.codeit.roomunion.auth.domain.model.LoginUserDetails;
+import org.codeit.roomunion.auth.domain.model.UnknownUserDetails;
 import org.codeit.roomunion.common.exception.BaseErrorCode;
-import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,8 +41,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
 
         if (isNotBearerToken(authHeader)) {
-            CustomUserDetails emptyCustomUserDetails = CustomUserDetails.from(User.empty());
-            UsernamePasswordAuthenticationToken authToken = createUserPasswordAuthenticationToken(emptyCustomUserDetails);
+            CustomUserDetails unknownUserDetails = UnknownUserDetails.getInstance();
+            UsernamePasswordAuthenticationToken authToken = createUserPasswordAuthenticationToken(unknownUserDetails);
             SecurityContextHolder.getContext().setAuthentication(authToken);
             filterChain.doFilter(request, response);
             return;
@@ -51,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String email = jwtService.extractUsername(jwtToken);
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(email);
+            LoginUserDetails userDetails = (LoginUserDetails) userDetailsService.loadUserByUsername(email);
 
             validateToken(response, jwtToken, userDetails);
 
@@ -71,7 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         );
     }
 
-    private void validateToken(HttpServletResponse response, String jwtToken, CustomUserDetails userDetails) throws IOException {
+    private void validateToken(HttpServletResponse response, String jwtToken, LoginUserDetails userDetails) throws IOException {
         if (jwtService.isTokenInvalid(jwtToken, userDetails)) {
             setErrorResponse(response, AuthErrorCode.INVALID_JWT);
             throw new JwtException("잘못된 토큰입니다.");

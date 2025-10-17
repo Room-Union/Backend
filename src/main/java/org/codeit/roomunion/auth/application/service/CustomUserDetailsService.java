@@ -1,6 +1,6 @@
 package org.codeit.roomunion.auth.application.service;
 
-import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
+import org.codeit.roomunion.auth.domain.model.LoginUserDetails;
 import org.codeit.roomunion.user.application.port.out.UserRepository;
 import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +21,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-        return CustomUserDetails.from(user);
+        return LoginUserDetails.from(user);
     }
 }

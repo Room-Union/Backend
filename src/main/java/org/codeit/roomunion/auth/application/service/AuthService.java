@@ -3,7 +3,7 @@ package org.codeit.roomunion.auth.application.service;
 import org.codeit.roomunion.auth.application.port.in.AuthUseCase;
 import org.codeit.roomunion.auth.domain.event.EmailVerificationCodeEvent;
 import org.codeit.roomunion.auth.domain.exception.AuthErrorCode;
-import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
+import org.codeit.roomunion.auth.domain.model.LoginUserDetails;
 import org.codeit.roomunion.auth.domain.policy.EmailVerificationPolicy;
 import org.codeit.roomunion.common.application.port.out.EventPublisher;
 import org.codeit.roomunion.common.application.port.out.RandomNumberGenerator;
@@ -59,7 +59,7 @@ public class AuthService implements AuthUseCase {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password);
             Authentication authentication = authenticationManager.authenticate(authToken);
 
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            LoginUserDetails userDetails = (LoginUserDetails) authentication.getPrincipal();
             Long userId = userDetails.getId();
             String userEmail = userDetails.getUsername();
 
