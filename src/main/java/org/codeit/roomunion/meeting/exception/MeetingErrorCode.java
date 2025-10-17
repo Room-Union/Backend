@@ -18,7 +18,8 @@ public enum MeetingErrorCode implements BaseErrorCode {
     ALREADY_JOINED("이미 가입한 모임입니다.", HttpStatus.BAD_REQUEST),
 
     MEETING_MODIFY_FORBIDDEN("모임장만 수정할 수 있습니다.", HttpStatus.FORBIDDEN),
-    MEETING_MODIFY_INVALID_REQUEST("모임 수정에서 잘못된 요청 데이터입니다.", HttpStatus.BAD_REQUEST),
+    MEETING_DELETE_FORBIDDEN("모임장만 삭제할 수 있습니다.", HttpStatus.FORBIDDEN),
+    MEETING_MODIFY_INVALID_REQUEST("모임 수정 요청에 빈 값이 존재합니다.", HttpStatus.BAD_REQUEST),
     MAX_COUNT_LESS_THAN_CURRENT("현재 참여자 수보다 작은 최대 인원으로 수정할 수 없습니다.", HttpStatus.BAD_REQUEST);
     
     private final String message;

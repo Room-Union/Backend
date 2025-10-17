@@ -3,6 +3,8 @@ package org.codeit.roomunion.meeting.adapter.in.web;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.meeting.adapter.in.web.request.CreateMeetingRequest;
@@ -80,7 +82,7 @@ public class MeetingController {
         return ResponseEntity.ok(MeetingResponse.from(meeting));
     }
 
-    @Operation(summary = "모임 수정 API", description = "모임장만 수정가능, 토큰 필수")
+    @Operation(summary = "모임 수정", description = "모임장만 수정가능, 토큰 필수")
     @PutMapping(value = "/{meetingId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MeetingResponse> updateMeeting(
         @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -92,5 +94,19 @@ public class MeetingController {
         Meeting updatedMeeting = meetingCommandUseCase.update(meetingId, userDetails.getId(), command, image);
         return ResponseEntity.ok(MeetingResponse.from(updatedMeeting));
     }
+
+    @Operation(summary = "모임 삭제", description = "모임장만 삭제 가능, 토큰 필수")
+    @DeleteMapping("/{meetingId}")
+    public ResponseEntity<Map<String, String>> deleteMeeting(
+        @PathVariable Long meetingId,
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        meetingCommandUseCase.deleteMeeting(meetingId, userDetails.getId());
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "모임이 성공적으로 삭제되었습니다.");
+        return ResponseEntity.ok(response);
+    }
+
 
 }

@@ -56,6 +56,7 @@ public class MeetingEntity {
     private int maxMemberCount;
 
     @Column(nullable = false)
+    @ColumnDefault("0")
     private int currentMemberCount;
 
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -139,40 +140,22 @@ public class MeetingEntity {
     }
 
     // MeetingEntity 내부에 추가
-    public void replaceAllFrom(MeetingUpdateCommand cmd, int currentMemberCount) {
-        // 방어적 검증 (PUT 전체 치환 가정)
-        if (cmd.getName() == null || cmd.getDescription() == null ||
-            cmd.getCategory() == null || cmd.getMaxMemberCount() == null ||
-            cmd.getPlatformURL() == null) {
-            throw new CustomException(MeetingErrorCode.MEETING_MODIFY_INVALID_REQUEST);
-        }
-
-        String newName = cmd.getName().trim();
-        String newDesc = cmd.getDescription().trim();
-        int newMax = cmd.getMaxMemberCount();
-
-        if (newName.isEmpty() || newDesc.isEmpty()) {
-            throw new CustomException(MeetingErrorCode.MEETING_MODIFY_INVALID_REQUEST);
-        }
-        if (newMax < currentMemberCount) {
+    public void updateMeeting(MeetingUpdateCommand command, int currentMemberCount) {
+        if (command.getMaxMemberCount() < currentMemberCount) {
             throw new CustomException(MeetingErrorCode.MAX_COUNT_LESS_THAN_CURRENT);
         }
 
-        // 전체 치환
-        this.name = newName;
-        this.description = newDesc;
-        this.category = cmd.getCategory();
-        this.maxMemberCount = newMax;
+        this.name = command.getName();
+        this.description = command.getDescription();
+        this.category = command.getCategory();
+        this.maxMemberCount = command.getMaxMemberCount();
 
         this.platformUrls.clear();
-        cmd.getPlatformURL().stream()
-            .filter(Objects::nonNull)
-            .map(String::trim)
-            .filter(s -> !s.isEmpty())
-            .forEach(this.platformUrls::add);
+        this.platformUrls.addAll(command.getPlatformURL());
 
-        // 이미지: null 허용 (정책에 따라 유지/제거 선택 가능)
-        this.meetingImage = cmd.getImageUrl();
+        if (command.getImageUrl() != null) {
+            this.meetingImage = command.getImageUrl();
+        }
     }
 
 

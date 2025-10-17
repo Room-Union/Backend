@@ -1,5 +1,9 @@
 package org.codeit.roomunion.meeting.adapter.out.persistence;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
@@ -22,11 +26,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -60,6 +59,11 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     @Override
     public boolean existsMeetingNameForHost(Long userId, String name) {
         return meetingMemberJpaRepository.existsMeetingByHostAndName(userId, name, MeetingRole.HOST);
+    }
+
+    @Override
+    public boolean existsMeetingById(Long meetingId) {
+        return meetingJpaRepository.existsById(meetingId);
     }
 
     @Override
@@ -106,6 +110,11 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     }
 
     @Override
+    public boolean isHostMember(Long meetingId, Long userId) {
+        return meetingMemberJpaRepository.existsByMeetingIdAndUserIdAndRole(meetingId, userId, MeetingRole.HOST);
+    }
+
+    @Override
     public void insertMember(Long meetingId, Long userId, MeetingRole role) {
         MeetingEntity meeting = meetingJpaRepository.findById(meetingId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
@@ -123,16 +132,21 @@ public class MeetingRepositoryImpl implements MeetingRepository {
 
     @Override
     @Transactional
-    public Meeting updateMeeting(Long meetingId, MeetingUpdateCommand command) {
+    public void updateMeeting(Long meetingId, MeetingUpdateCommand command) {
         MeetingEntity entity = meetingJpaRepository.findById(meetingId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
 
         int currentCount = meetingMemberJpaRepository.countByMeetingId(meetingId);
 
-        // 엔티티 내부 불변성 검증 + 전체 치환
-        entity.replaceAllFrom(command, currentCount);
+        entity.updateMeeting(command, currentCount);
 
-        // Dirty checking으로 반영 → 도메인으로 변환
-        return entity.toDomain();
+        meetingJpaRepository.save(entity);
+    }
+
+    @Override
+    public void deleteMeeting(Long meetingId) {
+        MeetingEntity entity = meetingJpaRepository.findById(meetingId)
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
+        meetingJpaRepository.delete(entity);
     }
 }

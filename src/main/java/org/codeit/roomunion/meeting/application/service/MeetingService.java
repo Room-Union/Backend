@@ -88,7 +88,8 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     public Meeting update(Long meetingId, Long currentId, MeetingUpdateCommand command, MultipartFile image) {
         Meeting meeting = meetingRepository.findById(meetingId);
 
-        if (!meeting.isHost(currentId)) {
+        boolean isHost = meetingRepository.isHostMember(meetingId, currentId);
+        if (!isHost) {
             throw new CustomException(MeetingErrorCode.MEETING_MODIFY_FORBIDDEN);
         }
 
@@ -100,7 +101,24 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         }
 
         MeetingUpdateCommand commandWithImage = MeetingUpdateCommand.of(command, finalImageUrl);
-        return meetingRepository.updateMeeting(meetingId, commandWithImage);
+        meetingRepository.updateMeeting(meetingId, commandWithImage);
+
+        Meeting joinedMeeting = meetingRepository.findByIdWithJoined(meetingId, currentId);
+        return getMeetingWithBadges(joinedMeeting);
+    }
+
+    @Override
+    public void deleteMeeting(Long meetingId, Long userId) {
+        if (!meetingRepository.existsMeetingById(meetingId)) {
+            throw new CustomException(MeetingErrorCode.MEETING_NOT_FOUND);
+        }
+
+        boolean isHost = meetingRepository.isHostMember(meetingId, userId);
+        if (!isHost) {
+            throw new CustomException(MeetingErrorCode.MEETING_DELETE_FORBIDDEN);
+        }
+
+        meetingRepository.deleteMeeting(meetingId);
     }
 
     @Override

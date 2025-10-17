@@ -11,4 +11,6 @@ public interface MeetingCommandUseCase {
     Meeting join(Long meetingId, Long userId);
 
     Meeting update(Long meetingId, Long currentId, MeetingUpdateCommand command, MultipartFile image);
+
+    void deleteMeeting(Long meetingId, Long userId);
 }

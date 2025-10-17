@@ -15,6 +15,8 @@ public interface MeetingRepository {
 
     boolean existsMeetingNameForHost(Long userId, String name); // 해당 사용자가 같은 이름의 모임을 이미 보유하고 있는지
 
+    boolean existsMeetingById(Long meetingId);
+
     int countJoinedMembers(Long meetingId);
 
     Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, Long currentUserId);
@@ -23,8 +25,14 @@ public interface MeetingRepository {
 
     boolean isMeetingMember(Long meetingId, Long userId);
 
+    boolean isHostMember(Long meetingId, Long userId);
+
     void insertMember(Long meetingId, Long userId, MeetingRole role);
 
-    Meeting updateMeeting(Long meetingId, MeetingUpdateCommand command);
+    void updateMeeting(Long meetingId, MeetingUpdateCommand command);
+
+    void deleteMeeting(Long meetingId);
+
+
 
 }

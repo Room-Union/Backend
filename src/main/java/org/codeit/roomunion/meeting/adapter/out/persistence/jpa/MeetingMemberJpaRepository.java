@@ -41,4 +41,13 @@ public interface MeetingMemberJpaRepository extends JpaRepository<MeetingMemberE
         """)
     boolean existsByMeetingIdAndUserId(@Param("meetingId") Long meetingId,
                                        @Param("userId") Long userId);
+
+    @Query("""
+            select (count(mm) > 0)
+            from MeetingMemberEntity mm
+            where mm.meeting.id = :meetingId
+              and mm.user.id = :userId
+              and mm.meetingRole = :role
+      """)
+    boolean existsByMeetingIdAndUserIdAndRole(Long meetingId, Long userId, MeetingRole role);
 }
