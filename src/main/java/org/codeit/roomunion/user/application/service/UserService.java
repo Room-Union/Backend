@@ -128,9 +128,7 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
         if (nickname.equals(user.getNickname())) {
             return;
         }
-        if (userRepository.findByNickname(nickname).isPresent()) {
-            throw new CustomException(UserErrorCode.ALREADY_REGISTERED_NICKNAME);
-        }
+        validateNicknameExists(nickname);
     }
 
 }
