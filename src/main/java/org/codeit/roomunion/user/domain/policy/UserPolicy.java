@@ -61,11 +61,11 @@ public class UserPolicy {
 
     private static void validateNonNull(Object... objects) {
         for (Object o : objects) {
-            validateIsNull(o);
+            validateIsNotNull(o);
         }
     }
 
-    private static void validateIsNull(Object object) {
+    private static void validateIsNotNull(Object object) {
         if (object == null) {
             throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
         }

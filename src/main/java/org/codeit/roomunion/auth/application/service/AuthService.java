@@ -73,6 +73,7 @@ public class AuthService implements AuthUseCase {
     @Override
     @Transactional
     public void sendVerificationCode(String email) {
+        EmailVerificationPolicy.validateEmailFormat(email);
         userQueryUseCase.validateEmailExists(email);
 
         LocalDateTime currentAt = timeHolder.localDateTime();
