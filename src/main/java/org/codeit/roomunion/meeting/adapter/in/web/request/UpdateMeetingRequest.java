@@ -7,10 +7,10 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import org.codeit.roomunion.meeting.domain.model.command.MeetingUpdateCommand;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
 
 import java.util.List;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 
 @Getter
 @Schema(title = "UpdateMeetingRequest : Meeting 수정 요청 DTO")

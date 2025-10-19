@@ -1,5 +1,6 @@
 package org.codeit.roomunion.meeting.adapter.out.persistence.jpa;
 
+import java.util.List;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 import org.springframework.data.domain.Page;
@@ -45,8 +46,17 @@ public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long>
             from MeetingEntity m
             left join fetch m.meetingMembers mm
             left join fetch mm.user u
+            left join fetch m.platformUrls
             where m.id = :meetingId
         """)
     Optional<MeetingEntity> findByIdWithMembers(@Param("meetingId") Long meetingId);
+
+    @Query("""
+    select distinct m
+    from MeetingEntity m
+    left join fetch m.platformUrls pu
+    where m.id in :ids
+""")
+    List<MeetingEntity> findAllWithPlatformUrlsByIdIn(@Param("ids") List<Long> ids);
 
 }

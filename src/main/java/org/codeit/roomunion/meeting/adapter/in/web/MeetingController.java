@@ -76,7 +76,7 @@ public class MeetingController {
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @PathVariable Long meetingId
     ) {
-        Meeting meeting = meetingCommandUseCase.join(meetingId, userDetails.getId());
+        Meeting meeting = meetingCommandUseCase.join(meetingId, userDetails.getUser().getId());
         return ResponseEntity.ok(MeetingResponse.from(meeting));
     }
 
@@ -89,7 +89,7 @@ public class MeetingController {
         @RequestPart(value = "image", required = false) MultipartFile image
     ) {
         MeetingUpdateCommand command = request.toCommand();
-        Meeting updatedMeeting = meetingCommandUseCase.update(meetingId, userDetails.getId(), command, image);
+        Meeting updatedMeeting = meetingCommandUseCase.update(meetingId, userDetails.getUser().getId(), command, image);
         return ResponseEntity.ok(MeetingResponse.from(updatedMeeting));
     }
 
@@ -99,7 +99,7 @@ public class MeetingController {
         @PathVariable Long meetingId,
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        meetingCommandUseCase.deleteMeeting(meetingId, userDetails.getId());
+        meetingCommandUseCase.deleteMeeting(meetingId, userDetails.getUser().getId());
 
         Map<String, String> response = new HashMap<>();
         response.put("message", "모임이 성공적으로 삭제되었습니다.");

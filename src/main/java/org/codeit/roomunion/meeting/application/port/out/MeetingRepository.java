@@ -17,8 +17,6 @@ public interface MeetingRepository {
 
     boolean existsMeetingById(Long meetingId);
 
-    int countJoinedMembers(Long meetingId);
-
     Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, Long currentUserId);
 
     Meeting findByIdWithJoined(Long meetingId, Long currentUserId);
@@ -27,9 +25,9 @@ public interface MeetingRepository {
 
     boolean isHostMember(Long meetingId, Long userId);
 
-    void insertMember(Long meetingId, Long userId, MeetingRole role);
+    Meeting insertMember(Long meetingId, Long userId, MeetingRole role);
 
-    void updateMeeting(Long meetingId, MeetingUpdateCommand command);
+    Meeting updateMeeting(Long meetingId, MeetingUpdateCommand command);
 
     void deleteMeeting(Long meetingId);
 

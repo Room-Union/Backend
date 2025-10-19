@@ -67,11 +67,6 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     }
 
     @Override
-    public int countJoinedMembers(Long meetingId) {
-        return meetingMemberJpaRepository.countByMeetingId(meetingId);
-    }
-
-    @Override
     public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, Long currentUserId) {
         Pageable pageable = PageRequest.of(page, size);
 
@@ -80,13 +75,15 @@ public class MeetingRepositoryImpl implements MeetingRepository {
             case MEMBER_DESC -> meetingJpaRepository.findByCategoryOrderByMemberCountDesc(category, pageable);
         };
 
-        if (currentUserId == null || resultPage.isEmpty()) {
+        if (currentUserId == 0L || resultPage.isEmpty()) {
             return resultPage.map(e -> e.toDomain().withJoined(false));
         }
 
         List<Long> meetingIds = resultPage.stream()
             .map(MeetingEntity::getId)
             .toList();
+
+        meetingJpaRepository.findAllWithPlatformUrlsByIdIn(meetingIds);
 
         Set<Long> joinedIds = new HashSet<>(meetingMemberJpaRepository.findJoinedMeetingIds(currentUserId, meetingIds));
 
@@ -111,6 +108,7 @@ public class MeetingRepositoryImpl implements MeetingRepository {
      * @return 유저가 모임 멤버로 포함되어 있으면 true, 아니면 false
      */
     private boolean isUserJoined(Long currentUserId, MeetingEntity entity) {
+        if (currentUserId == 0L) return false;
         return entity.getMeetingMembers().stream() // 멤버 리스트 순회
             .anyMatch(mm -> Objects.equals(mm.getUser().getId(), currentUserId)); // anyMatch : 조건에 맞으면 true (모임 유저의 id와 currentUserId 비교)
     }
@@ -126,24 +124,20 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     }
 
     @Override
-    public void insertMember(Long meetingId, Long userId, MeetingRole role) {
+    public Meeting insertMember(Long meetingId, Long userId, MeetingRole role) {
         MeetingEntity meeting = meetingJpaRepository.findById(meetingId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
         UserEntity user = userJpaRepository.findById(userId)
             .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
-        if (meetingMemberJpaRepository.existsByMeetingIdAndUserId(meetingId, userId)) {
-            throw new CustomException(MeetingErrorCode.ALREADY_JOINED);
-        }
-
-        MeetingMemberEntity mm = MeetingMemberEntity.of(meeting, user, role);
-        meeting.addMember(mm);
-        meetingMemberJpaRepository.save(mm);
+        MeetingMemberEntity memberEntity = MeetingMemberEntity.of(meeting, user, role);
+        meeting.addMember(memberEntity);
+        return meeting.toDomain().withJoined(true);
     }
 
     @Override
     @Transactional
-    public void updateMeeting(Long meetingId, MeetingUpdateCommand command) {
+    public Meeting updateMeeting(Long meetingId, MeetingUpdateCommand command) {
         MeetingEntity entity = meetingJpaRepository.findById(meetingId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
 
@@ -151,12 +145,11 @@ public class MeetingRepositoryImpl implements MeetingRepository {
         Meeting afterDomain = beforeDomain.update(command);
 
         entity.applyFromDomain(afterDomain);
+        return afterDomain;
     }
 
     @Override
     public void deleteMeeting(Long meetingId) {
-        MeetingEntity entity = meetingJpaRepository.findById(meetingId)
-            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
-        meetingJpaRepository.delete(entity);
+        meetingJpaRepository.deleteById(meetingId);
     }
 }
