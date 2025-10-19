@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
+import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 
 @Entity
@@ -15,8 +15,12 @@ import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 @AllArgsConstructor
 @Table(
     name = "meeting_member",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_meeting_user", columnNames = {"meeting_id", "user_id"})
+    },
     indexes = {
-        @Index(name = "idx_meeting_member_meeting_id", columnList = "meeting_id")
+        @Index(name = "idx_meeting_member_meeting_id", columnList = "meeting_id"),
+        @Index(name = "idx_meeting_member_user_id", columnList = "user_id")
     }
 
 )
@@ -36,10 +40,18 @@ public class MeetingMemberEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private MeetingRole meetingRole; // HOST / MEMBER
+    private MeetingRole meetingRole;
 
     public boolean isHost() {
         return this.meetingRole == MeetingRole.HOST;
+    }
+
+    public static MeetingMemberEntity of(MeetingEntity meeting, UserEntity user, MeetingRole role) {
+        return MeetingMemberEntity.builder()
+            .meeting(meeting)
+            .user(user)
+            .meetingRole(role)
+            .build();
     }
 
 

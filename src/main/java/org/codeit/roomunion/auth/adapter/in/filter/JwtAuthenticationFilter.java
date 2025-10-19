@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.auth.application.service.JwtService;
 import org.codeit.roomunion.auth.domain.exception.AuthErrorCode;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
+import org.codeit.roomunion.auth.domain.model.LoginUserDetails;
+import org.codeit.roomunion.auth.domain.model.UnknownUserDetails;
 import org.codeit.roomunion.common.exception.BaseErrorCode;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,6 +41,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
 
         if (isNotBearerToken(authHeader)) {
+            CustomUserDetails unknownUserDetails = UnknownUserDetails.getInstance();
+            UsernamePasswordAuthenticationToken unknownToken = new UsernamePasswordAuthenticationToken(unknownUserDetails, null);
+            SecurityContextHolder.getContext().setAuthentication(unknownToken);
             filterChain.doFilter(request, response);
             return;
         }
@@ -47,15 +52,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String email = jwtService.extractUsername(jwtToken);
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(email);
+            LoginUserDetails userDetails = (LoginUserDetails) userDetailsService.loadUserByUsername(email);
 
             validateToken(response, jwtToken, userDetails);
 
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                userDetails,
-                null,
-                userDetails.getAuthorities()
-            );
+            UsernamePasswordAuthenticationToken authToken = createUserPasswordAuthenticationToken(userDetails);
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
         }
@@ -63,7 +64,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void validateToken(HttpServletResponse response, String jwtToken, CustomUserDetails userDetails) throws IOException {
+    private UsernamePasswordAuthenticationToken createUserPasswordAuthenticationToken(CustomUserDetails userDetails) {
+        return new UsernamePasswordAuthenticationToken(
+            userDetails,
+            null,
+            userDetails.getAuthorities()
+        );
+    }
+
+    private void validateToken(HttpServletResponse response, String jwtToken, LoginUserDetails userDetails) throws IOException {
         if (jwtService.isTokenInvalid(jwtToken, userDetails)) {
             setErrorResponse(response, AuthErrorCode.INVALID_JWT);
             throw new JwtException("잘못된 토큰입니다.");

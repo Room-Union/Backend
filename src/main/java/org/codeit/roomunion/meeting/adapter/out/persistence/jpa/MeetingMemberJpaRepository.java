@@ -1,27 +1,59 @@
 package org.codeit.roomunion.meeting.adapter.out.persistence.jpa;
 
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
+import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface MeetingMemberJpaRepository extends JpaRepository<MeetingMemberEntity, Long> {
-    Optional<MeetingMemberEntity> findByMeetingIdAndMeetingRole(Long meetingId, MeetingRole meetingRole);
 
     @Query("""
-            select (count(mm) > 0)
+            select mm.meeting.id
             from MeetingMemberEntity mm
-            join mm.meeting m
-            where mm.meetingRole = :role
-              and mm.user.id = :userId
-              and lower(m.name) = lower(:name)
+            where mm.user.id = :userId
+              and mm.meeting.id in :meetingIds
+        """)
+    List<Long> findJoinedMeetingIds(@Param("userId") Long userId,
+                                    @Param("meetingIds") List<Long> meetingIds);
+
+    @Query("""
+            select case when exists (
+                select 1
+                from MeetingMemberEntity mm
+                join mm.meeting m
+                where mm.meetingRole = :role
+                  and mm.user.id = :userId
+                  and lower(m.name) = lower(:name)
+            ) then true else false end
         """)
     boolean existsMeetingByHostAndName(@Param("userId") Long userId,
                                        @Param("name") String name,
                                        @Param("role") MeetingRole role);
 
     int countByMeetingId(Long meetingId);
+
+    @Query("""
+            select case when exists (
+                select 1
+                from MeetingMemberEntity mm
+                where mm.meeting.id = :meetingId
+                  and mm.user.id = :userId
+            ) then true else false end
+        """)
+    boolean existsByMeetingIdAndUserId(@Param("meetingId") Long meetingId,
+                                       @Param("userId") Long userId);
+
+    @Query("""
+            select case when exists (
+                select 1
+                from MeetingMemberEntity mm
+                where mm.meeting.id = :meetingId
+                  and mm.user.id = :userId
+                  and mm.meetingRole = :role
+            ) then true else false end
+        """)
+    boolean existsByMeetingIdAndUserIdAndRole(Long meetingId, Long userId, MeetingRole role);
 }
