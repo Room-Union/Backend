@@ -20,12 +20,14 @@ public interface MeetingMemberJpaRepository extends JpaRepository<MeetingMemberE
                                     @Param("meetingIds") List<Long> meetingIds);
 
     @Query("""
-            select (count(mm) > 0)
-            from MeetingMemberEntity mm
-            join mm.meeting m
-            where mm.meetingRole = :role
-              and mm.user.id = :userId
-              and lower(m.name) = lower(:name)
+            select case when exists (
+                select 1
+                from MeetingMemberEntity mm
+                join mm.meeting m
+                where mm.meetingRole = :role
+                  and mm.user.id = :userId
+                  and lower(m.name) = lower(:name)
+            ) then true else false end
         """)
     boolean existsMeetingByHostAndName(@Param("userId") Long userId,
                                        @Param("name") String name,
@@ -34,20 +36,24 @@ public interface MeetingMemberJpaRepository extends JpaRepository<MeetingMemberE
     int countByMeetingId(Long meetingId);
 
     @Query("""
-            select (count(mm) > 0)
-            from MeetingMemberEntity mm
-            where mm.meeting.id = :meetingId
-              and mm.user.id = :userId
+            select case when exists (
+                select 1
+                from MeetingMemberEntity mm
+                where mm.meeting.id = :meetingId
+                  and mm.user.id = :userId
+            ) then true else false end
         """)
     boolean existsByMeetingIdAndUserId(@Param("meetingId") Long meetingId,
                                        @Param("userId") Long userId);
 
     @Query("""
-            select (count(mm) > 0)
-            from MeetingMemberEntity mm
-            where mm.meeting.id = :meetingId
-              and mm.user.id = :userId
-              and mm.meetingRole = :role
-      """)
+            select case when exists (
+                select 1
+                from MeetingMemberEntity mm
+                where mm.meeting.id = :meetingId
+                  and mm.user.id = :userId
+                  and mm.meetingRole = :role
+            ) then true else false end
+        """)
     boolean existsByMeetingIdAndUserIdAndRole(Long meetingId, Long userId, MeetingRole role);
 }

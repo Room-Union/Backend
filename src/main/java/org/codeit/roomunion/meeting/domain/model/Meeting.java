@@ -1,8 +1,11 @@
 package org.codeit.roomunion.meeting.domain.model;
 
 import lombok.Getter;
+import org.codeit.roomunion.common.exception.CustomException;
+import org.codeit.roomunion.meeting.domain.model.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingBadge;
 import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.domain.model.User;
 
 import java.time.LocalDateTime;
@@ -79,6 +82,31 @@ public class Meeting {
     public Meeting withJoined(boolean joined) {
         return new Meeting(
             this.id, this.name, this.description, this.meetingImage, this.category, this.maxMemberCount, this.currentMemberCount, this.platformURL, this.createdAt, joined, this.badges, this.host
+        );
+    }
+
+    public Meeting update(MeetingUpdateCommand command) {
+        if (command.getMaxMemberCount() < this.currentMemberCount) {
+            throw new CustomException(MeetingErrorCode.MAX_COUNT_LESS_THAN_CURRENT);
+        }
+
+        String nextImage = (command.getImageUrl() != null)
+            ? command.getImageUrl()
+            : this.meetingImage;
+
+        return new Meeting(
+            this.id,
+            command.getName(),
+            command.getDescription(),
+            nextImage,
+            command.getCategory(),
+            command.getMaxMemberCount(),
+            this.currentMemberCount,
+            command.getPlatformURL(),
+            this.createdAt,
+            this.isJoined,
+            this.badges,
+            this.host
         );
     }
 

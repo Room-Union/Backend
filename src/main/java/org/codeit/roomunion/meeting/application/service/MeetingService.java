@@ -109,6 +109,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
     @Override
     public void deleteMeeting(Long meetingId, Long userId) {
+        meetingRepository.findById(meetingId);
         if (!meetingRepository.existsMeetingById(meetingId)) {
             throw new CustomException(MeetingErrorCode.MEETING_NOT_FOUND);
         }

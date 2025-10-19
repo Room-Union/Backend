@@ -139,23 +139,16 @@ public class MeetingEntity {
         }
     }
 
-    public void updateMeeting(MeetingUpdateCommand command, int currentMemberCount) {
-        if (command.getMaxMemberCount() < currentMemberCount) {
-            throw new CustomException(MeetingErrorCode.MAX_COUNT_LESS_THAN_CURRENT);
-        }
-
-        this.name = command.getName();
-        this.description = command.getDescription();
-        this.category = command.getCategory();
-        this.maxMemberCount = command.getMaxMemberCount();
+    public void applyFromDomain(Meeting meeting) {
+        this.name = meeting.getName();
+        this.description = meeting.getDescription();
+        this.meetingImage = meeting.getMeetingImage();
+        this.category = meeting.getCategory();
+        this.maxMemberCount = meeting.getMaxMemberCount();
+        this.currentMemberCount = meeting.getCurrentMemberCount();
 
         this.platformUrls.clear();
-        this.platformUrls.addAll(command.getPlatformURL());
-
-        if (command.getImageUrl() != null) {
-            this.meetingImage = command.getImageUrl();
-        }
+        this.platformUrls.addAll(meeting.getPlatformURL());
     }
-
 
 }

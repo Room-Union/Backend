@@ -84,7 +84,10 @@ public class MeetingRepositoryImpl implements MeetingRepository {
             return resultPage.map(e -> e.toDomain().withJoined(false));
         }
 
-        List<Long> meetingIds = resultPage.map(MeetingEntity::getId).getContent();
+        List<Long> meetingIds = resultPage.stream()
+            .map(MeetingEntity::getId)
+            .toList();
+
         Set<Long> joinedIds = new HashSet<>(meetingMemberJpaRepository.findJoinedMeetingIds(currentUserId, meetingIds));
 
         return resultPage.map(e -> e.toDomain().withJoined(joinedIds.contains(e.getId())));
@@ -95,10 +98,21 @@ public class MeetingRepositoryImpl implements MeetingRepository {
         MeetingEntity entity = meetingJpaRepository.findByIdWithMembers(meetingId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
 
-        boolean joined = currentUserId != null && entity.getMeetingMembers().stream()
-            .anyMatch(mm -> mm.getUser() != null && Objects.equals(mm.getUser().getId(), currentUserId));
+        boolean joined = isUserJoined(currentUserId, entity);
 
         return entity.toDomain().withJoined(joined);
+    }
+
+    /**
+     * 특정 모임에 현재 유저가 포함되어 있는지 여부를 확인합니다.
+     *
+     * @param entity 조회된 모임 엔티티
+     * @param currentUserId 현재 로그인한 유저의 ID
+     * @return 유저가 모임 멤버로 포함되어 있으면 true, 아니면 false
+     */
+    private boolean isUserJoined(Long currentUserId, MeetingEntity entity) {
+        return entity.getMeetingMembers().stream() // 멤버 리스트 순회
+            .anyMatch(mm -> Objects.equals(mm.getUser().getId(), currentUserId)); // anyMatch : 조건에 맞으면 true (모임 유저의 id와 currentUserId 비교)
     }
 
     @Override
@@ -133,11 +147,10 @@ public class MeetingRepositoryImpl implements MeetingRepository {
         MeetingEntity entity = meetingJpaRepository.findById(meetingId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
 
-        int currentCount = meetingMemberJpaRepository.countByMeetingId(meetingId);
+        Meeting beforeDomain = entity.toDomain();
+        Meeting afterDomain = beforeDomain.update(command);
 
-        entity.updateMeeting(command, currentCount);
-
-        meetingJpaRepository.save(entity);
+        entity.applyFromDomain(afterDomain);
     }
 
     @Override
