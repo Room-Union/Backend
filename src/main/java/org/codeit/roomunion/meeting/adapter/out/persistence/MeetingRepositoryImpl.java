@@ -97,6 +97,7 @@ public class MeetingRepositoryImpl implements MeetingRepository {
 
         boolean joined = isUserJoined(currentUserId, entity);
 
+        //TODO : N+1 문제 발생하는데 나중에 해결 (platformUrl fetch join시 List 2개라 hibernate에서 예외터트림)
         return entity.toDomain().withJoined(joined);
     }
 
