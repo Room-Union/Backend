@@ -9,10 +9,12 @@ import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
+import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.model.MeetingBadge;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.codeit.roomunion.meeting.domain.model.MeetingSort;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
@@ -51,11 +53,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         }
 
         String imageUrl = null;
-        if (image != null && !image.isEmpty()) {
-            Uuid uuid = uuidRepository.save(Uuid.from(UUID.randomUUID().toString()));
-            String key = Meeting.getImagePath(uuid.getValue());
-            imageUrl = s3Manager.uploadFile(key, image);
-        }
+        imageUrl = uploadMeetingImage(image, imageUrl);
 
         User host = userQueryUseCase.findByEmail(command.getHostEmail())
             .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
@@ -70,49 +68,85 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     }
 
     @Override
+    @Transactional
+    public Meeting join(Long meetingId, Long userId) {
+        if (meetingRepository.isMeetingMember(meetingId, userId)) {
+            throw new CustomException(MeetingErrorCode.ALREADY_JOINED);
+        }
+
+        Meeting meeting = meetingRepository.insertMember(meetingId, userId, MeetingRole.MEMBER);
+        return getMeetingWithBadges(meeting);
+
+    }
+
+    @Override
+    public Meeting update(Long meetingId, Long currentId, MeetingUpdateCommand command, MultipartFile image) {
+        Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, currentId);
+
+        if (!meeting.isHost(currentId)) {
+            throw new CustomException(MeetingErrorCode.MEETING_MODIFY_FORBIDDEN);
+        }
+
+        String finalImageUrl = meeting.getMeetingImage();
+        finalImageUrl = uploadMeetingImage(image, finalImageUrl);
+
+        MeetingUpdateCommand commandWithImage = MeetingUpdateCommand.of(command, finalImageUrl);
+        Meeting updatedMeeting = meetingRepository.updateMeeting(meetingId, commandWithImage);
+
+        return getMeetingWithBadges(updatedMeeting);
+    }
+
+    private String uploadMeetingImage(MultipartFile image, String finalImageUrl) {
+        if (image != null && !image.isEmpty()) {
+            Uuid uuid = uuidRepository.save(Uuid.from(UUID.randomUUID().toString()));
+            String key = Meeting.getImagePath(uuid.getValue());
+            finalImageUrl = s3Manager.uploadFile(key, image);
+        }
+        return finalImageUrl;
+    }
+
+    @Override
+    public void deleteMeeting(Long meetingId, Long userId) {
+        Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, userId);
+
+        if (!meeting.isHost(userId)) {
+            throw new CustomException(MeetingErrorCode.MEETING_DELETE_FORBIDDEN);
+        }
+
+        meetingRepository.deleteMeeting(meetingId);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Meeting getByMeetingId(Long meetingId, CustomUserDetails userDetails) {
-        Meeting meeting = meetingRepository.findById(meetingId);
-
-        boolean isJoined = isUserJoined(userDetails, meeting);
-        meeting = meeting.withJoined(isJoined);
-
+        Long currentUserId = userDetails.isLoggedIn() ? userDetails.getUser().getId() : 0L;
+        Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, currentUserId);
         return getMeetingWithBadges(meeting);
     }
 
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, CustomUserDetails userDetails) {
-        Page<Meeting> pageResult = meetingRepository.search(category, sort, page, size);
-
-        return pageResult
-            .map(meeting -> {
-                boolean isHost = isUserJoined(userDetails, meeting);
-                return getMeetingWithBadges(meeting.withJoined(isHost));
-            });
+    public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size,
+        CustomUserDetails userDetails) {
+        Long currentUserId = userDetails.isLoggedIn() ? userDetails.getUser().getId() : 0L;
+        Page<Meeting> pageResult = meetingRepository.search(category, sort, page, size, currentUserId);
+        return pageResult.map(this::getMeetingWithBadges);
     }
 
-    private boolean isUserJoined(CustomUserDetails userDetails, Meeting meeting) {
-        if (!userDetails.isLoggedIn()) {
-            return false;
-        }
-        // 가입 API 구현 이후 : return meetingMemberJpaRepository.existsByMeetingIdAndUserId(meeting.getId(), currentUserId);
-        return Objects.equals(userDetails.getUser(), meeting.getHost());
-    }
 
     private Meeting getMeetingWithBadges(Meeting meeting) {
-        int currentCount = meetingRepository.countJoinedMembers(meeting.getId());
-        List<MeetingBadge> badges = calculateBadges(meeting, currentCount, LocalDateTime.now());
+        List<MeetingBadge> badges = calculateBadges(meeting, LocalDateTime.now());
         return meeting.withBadges(badges);
     }
 
 
-    private List<MeetingBadge> calculateBadges(Meeting meeting, int currentCount, LocalDateTime now) {
+    private List<MeetingBadge> calculateBadges(Meeting meeting, LocalDateTime now) {
         List<MeetingBadge> badges = new ArrayList<>();
         LocalDateTime createdAt = meeting.getCreatedAt();
 
         int max = meeting.getMaxMemberCount();
+        int currentCount = meeting.getCurrentMemberCount();
 
         if (currentCount >= max) {
             badges.add(MeetingBadge.CLOSED);

@@ -53,6 +53,10 @@ public class MeetingEntity {
     @ColumnDefault("1")
     private int maxMemberCount;
 
+    @Column(nullable = false)
+    @ColumnDefault("0")
+    private int currentMemberCount;
+
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<MeetingMemberEntity> meetingMembers = new ArrayList<>();
@@ -73,6 +77,7 @@ public class MeetingEntity {
             .category(command.getCategory())
             .meetingImage(command.getImageUrl())
             .maxMemberCount(command.getMaxMemberCount())
+            .currentMemberCount(0)
             .platformUrls(command.getPlatformURL())
             .createdAt(command.getCreatedAt())
             .build();
@@ -106,7 +111,7 @@ public class MeetingEntity {
             this.getMeetingImage(),
             this.getCategory(),
             this.getMaxMemberCount(),
-            this.meetingMembers.size(),
+            this.getCurrentMemberCount(),
             this.getPlatformUrls(),
             this.getCreatedAt(),
             false,
@@ -116,7 +121,32 @@ public class MeetingEntity {
 
     public void addMember(MeetingMemberEntity member) {
         this.meetingMembers.add(member);
+        increaseMemberCount();
     }
 
+    public void increaseMemberCount() {
+        if (this.currentMemberCount >= this.maxMemberCount) {
+            throw new CustomException(MeetingErrorCode.MEETING_MEMBER_LIMIT_REACHED);
+        }
+        this.currentMemberCount++;
+    }
+
+    public void decreaseMemberCount() {
+        if (this.currentMemberCount > 0) {
+            this.currentMemberCount--;
+        }
+    }
+
+    public void applyFromDomain(Meeting meeting) {
+        this.name = meeting.getName();
+        this.description = meeting.getDescription();
+        this.meetingImage = meeting.getMeetingImage();
+        this.category = meeting.getCategory();
+        this.maxMemberCount = meeting.getMaxMemberCount();
+        this.currentMemberCount = meeting.getCurrentMemberCount();
+
+        this.platformUrls.clear();
+        this.platformUrls.addAll(meeting.getPlatformURL());
+    }
 
 }
