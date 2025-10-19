@@ -13,10 +13,10 @@ import org.codeit.roomunion.meeting.adapter.in.web.response.MeetingResponse;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
-import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
-import org.codeit.roomunion.meeting.domain.model.command.MeetingUpdateCommand;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingSort;
+import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingSort;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +41,7 @@ public class MeetingController {
         @RequestPart("request") @Valid CreateMeetingRequest request,
         @RequestPart(value = "image", required = false) MultipartFile image
     ) {
-        MeetingCreateCommand command = request.toCommand(userDetails.getId(), userDetails.getUsername());
+        MeetingCreateCommand command = request.toCommand(userDetails.getUser());
         Meeting meeting = meetingCommandUseCase.create(command, image);
         return ResponseEntity.ok(MeetingResponse.from(meeting));
     }
@@ -52,8 +52,7 @@ public class MeetingController {
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @PathVariable Long meetingId
     ) {
-        Long userId = (userDetails != null) ? userDetails.getId() : null;
-        Meeting meeting = meetingQueryUseCase.getByMeetingId(meetingId, userId);
+        Meeting meeting = meetingQueryUseCase.getByMeetingId(meetingId, userDetails);
         return ResponseEntity.ok(MeetingResponse.from(meeting));
     }
 
@@ -66,8 +65,7 @@ public class MeetingController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
-        Long userId = (userDetails != null) ? userDetails.getId() : null;
-        Page<Meeting> meetings = meetingQueryUseCase.search(category, sort, page, size, userId);
+        Page<Meeting> meetings = meetingQueryUseCase.search(category, sort, page, size, userDetails);
         Page<MeetingResponse> response = meetings.map(MeetingResponse::from);
         return ResponseEntity.ok(response);
     }

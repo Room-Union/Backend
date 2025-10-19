@@ -11,12 +11,12 @@ import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMember
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingJpaRepository;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingMemberJpaRepository;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
+import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
-import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
-import org.codeit.roomunion.meeting.domain.model.command.MeetingUpdateCommand;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingSort;
+import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingRole;
+import org.codeit.roomunion.meeting.domain.model.MeetingSort;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.codeit.roomunion.user.adapter.out.persistence.jpa.UserJpaRepository;

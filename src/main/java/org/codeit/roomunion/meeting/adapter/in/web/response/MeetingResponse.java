@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingBadge;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingBadge;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,9 +45,6 @@ public class MeetingResponse {
     @Schema(description = "만든 사람 userId", example = "1")
     private Long userId;
 
-//    @Schema(description = "만든 사람 프로필 이미지", example = "https://...")
-//    private String profileImage;
-
     @Schema(description = "만든 사람 닉네임", example = "비쿠")
     private String nickname;
 
@@ -69,7 +66,6 @@ public class MeetingResponse {
             .platformURL(meeting.getPlatformURL())
             .meetingImage(meeting.getMeetingImage())
             .userId(meeting.getHost().getId())
-//            .profileImage(host.getProfileImage())
             .nickname(meeting.getHost().getNickname())
             .createdAt(meeting.getCreatedAt())
             .badges(meeting.getBadges())

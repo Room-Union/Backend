@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
+import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 
 @Entity
@@ -40,7 +40,7 @@ public class MeetingMemberEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private MeetingRole meetingRole; // HOST / MEMBER
+    private MeetingRole meetingRole;
 
     public boolean isHost() {
         return this.meetingRole == MeetingRole.HOST;

@@ -1,6 +1,7 @@
 package org.codeit.roomunion.meeting.application.service;
 
 import lombok.RequiredArgsConstructor;
+import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.application.port.out.UuidRepository;
 import org.codeit.roomunion.common.domain.model.Uuid;
@@ -8,13 +9,13 @@ import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
+import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
-import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
-import org.codeit.roomunion.meeting.domain.model.command.MeetingUpdateCommand;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingBadge;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingSort;
+import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.MeetingBadge;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingRole;
+import org.codeit.roomunion.meeting.domain.model.MeetingSort;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
 import org.codeit.roomunion.user.domain.exception.UserErrorCode;
@@ -27,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -124,7 +126,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
     @Override
     @Transactional(readOnly = true)
-    public Meeting getByMeetingId(Long meetingId, Long currentUserId) {
+    public Meeting getByMeetingId(Long meetingId, CustomUserDetails userDetails) {
         Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, currentUserId);
         return getMeetingWithBadges(meeting);
     }
@@ -133,7 +135,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     @Override
     @Transactional(readOnly = true)
     public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size,
-                                Long currentUserId) {
+        CustomUserDetails userDetails) {
         Page<Meeting> pageResult = meetingRepository.search(category, sort, page, size, currentUserId);
         return pageResult.map(this::getMeetingWithBadges);
     }

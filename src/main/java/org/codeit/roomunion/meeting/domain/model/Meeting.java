@@ -3,8 +3,6 @@ package org.codeit.roomunion.meeting.domain.model;
 import lombok.Getter;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.domain.model.command.MeetingUpdateCommand;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingBadge;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.domain.model.User;
 
@@ -33,8 +31,6 @@ public class Meeting {
     private final List<String> platformURL;
 
     private final LocalDateTime createdAt;
-
-//    private final String hostProfileImage;
 
     private final boolean isJoined;
 
