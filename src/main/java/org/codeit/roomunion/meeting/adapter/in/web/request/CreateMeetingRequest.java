@@ -3,8 +3,9 @@ package org.codeit.roomunion.meeting.adapter.in.web.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
-import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
+import org.codeit.roomunion.user.domain.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,15 +36,15 @@ public class CreateMeetingRequest {
     @Schema(example = "[\"https://zoom.us/12345\", \"https://discord.gg/abcde\"]")
     private List<String> platformURL;
 
-    public MeetingCreateCommand toCommand(Long userId, String hostEmail) {
+    public MeetingCreateCommand toCommand(User user) {
         return MeetingCreateCommand.builder()
             .name(this.name)
             .description(this.description)
             .category(this.category)
             .maxMemberCount(this.maxMemberCount)
             .platformURL(this.platformURL)
-            .hostEmail(hostEmail)
-            .userId(userId)
+            .hostEmail(user.getEmail())
+            .userId(user.getId())
             .createdAt(LocalDateTime.now())
             .build();
     }

@@ -2,15 +2,18 @@ package org.codeit.roomunion.user.domain.model;
 
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 
 import java.util.Set;
 
 @Getter
+@EqualsAndHashCode(of = "id")
 public class User {
 
     public static final String PROFILE_IMAGE_PATH = "user/%s/profile";
+    private static final User EMPTY = new User(0L, "", "", "", Gender.NONE, Set.of(), "");
 
     private final Long id;
     private final String email;
@@ -47,5 +50,13 @@ public class User {
 
     public String getProfileImagePath() {
         return PROFILE_IMAGE_PATH.formatted(id);
+    }
+
+    public static User empty() {
+        return EMPTY;
+    }
+
+    public boolean isEmpty() {
+        return this == EMPTY;
     }
 }

@@ -3,15 +3,17 @@ package org.codeit.roomunion.auth.application.service;
 import org.codeit.roomunion.auth.application.port.in.AuthUseCase;
 import org.codeit.roomunion.auth.domain.event.EmailVerificationCodeEvent;
 import org.codeit.roomunion.auth.domain.exception.AuthErrorCode;
-import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
+import org.codeit.roomunion.auth.domain.model.LoginUserDetails;
 import org.codeit.roomunion.auth.domain.policy.EmailVerificationPolicy;
 import org.codeit.roomunion.common.application.port.out.EventPublisher;
 import org.codeit.roomunion.common.application.port.out.RandomNumberGenerator;
 import org.codeit.roomunion.common.application.port.out.TimeHolder;
+import org.codeit.roomunion.common.config.redis.RedisCacheKeys;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.common.jwt.JwtUtil;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -51,12 +53,13 @@ public class AuthService implements AuthUseCase {
     }
 
     @Override
+    @Cacheable(value = RedisCacheKeys.LOGIN, key = "#email") // FIXME 테스트용도로 추후 제거 예정
     public String login(String email, String password) {
         try {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password);
             Authentication authentication = authenticationManager.authenticate(authToken);
 
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            LoginUserDetails userDetails = (LoginUserDetails) authentication.getPrincipal();
             Long userId = userDetails.getId();
             String userEmail = userDetails.getUsername();
 
@@ -70,6 +73,7 @@ public class AuthService implements AuthUseCase {
     @Override
     @Transactional
     public void sendVerificationCode(String email) {
+        EmailVerificationPolicy.validateEmailFormat(email);
         userQueryUseCase.validateEmailExists(email);
 
         LocalDateTime currentAt = timeHolder.localDateTime();
