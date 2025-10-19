@@ -46,7 +46,6 @@ public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long>
             from MeetingEntity m
             left join fetch m.meetingMembers mm
             left join fetch mm.user u
-            left join fetch m.platformUrls
             where m.id = :meetingId
         """)
     Optional<MeetingEntity> findByIdWithMembers(@Param("meetingId") Long meetingId);
