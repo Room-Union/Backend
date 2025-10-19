@@ -5,13 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
-import org.codeit.roomunion.auth.domain.model.LoginUserDetails;
 import org.codeit.roomunion.meeting.adapter.in.web.request.CreateMeetingRequest;
 import org.codeit.roomunion.meeting.adapter.in.web.response.MeetingResponse;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
-import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.MeetingSort;
 import org.springframework.data.domain.Page;
@@ -34,11 +33,11 @@ public class MeetingController {
     @Operation(summary = "모임 생성", description = "모임 생성 버튼을 눌렀을때 요청되는 API")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MeetingResponse> createMeeting(
-        @AuthenticationPrincipal LoginUserDetails userDetails,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
         @RequestPart("request") @Valid CreateMeetingRequest request,
         @RequestPart(value = "image", required = false) MultipartFile image
     ) {
-        MeetingCreateCommand command = request.toCommand(userDetails.getId(), userDetails.getUsername());
+        MeetingCreateCommand command = request.toCommand(userDetails.getUser());
         Meeting meeting = meetingCommandUseCase.create(command, image);
         return ResponseEntity.ok(MeetingResponse.from(meeting));
     }
