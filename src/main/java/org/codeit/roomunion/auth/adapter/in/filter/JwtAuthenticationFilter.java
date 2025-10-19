@@ -42,8 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (isNotBearerToken(authHeader)) {
             CustomUserDetails unknownUserDetails = UnknownUserDetails.getInstance();
-            UsernamePasswordAuthenticationToken authToken = createUserPasswordAuthenticationToken(unknownUserDetails);
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+            UsernamePasswordAuthenticationToken unknownToken = new UsernamePasswordAuthenticationToken(unknownUserDetails, null);
+            SecurityContextHolder.getContext().setAuthentication(unknownToken);
             filterChain.doFilter(request, response);
             return;
         }
