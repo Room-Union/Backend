@@ -1,13 +1,12 @@
 package org.codeit.roomunion.user.application.service;
 
-import org.codeit.roomunion.common.application.port.out.EventPublisher;
+import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.user.application.port.in.UserCommandUseCase;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
 import org.codeit.roomunion.user.application.port.out.UserRepository;
 import org.codeit.roomunion.user.domain.command.UserCreateCommand;
 import org.codeit.roomunion.user.domain.command.UserModifyCommand;
-import org.codeit.roomunion.user.domain.event.ProfileImageUploadEvent;
 import org.codeit.roomunion.user.domain.exception.UserErrorCode;
 import org.codeit.roomunion.user.domain.model.User;
 import org.codeit.roomunion.user.domain.policy.UserPolicy;
@@ -26,12 +25,12 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EventPublisher eventPublisher;
+    private final AmazonS3Manager amazonS3Manager;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EventPublisher eventPublisher) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AmazonS3Manager amazonS3Manager) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.eventPublisher = eventPublisher;
+        this.amazonS3Manager = amazonS3Manager;
     }
 
     @Override
@@ -93,8 +92,7 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
 
     private void updateProfileImage(User user, MultipartFile profileImage) {
         if (hasImage(profileImage)) {
-            ProfileImageUploadEvent profileImageUploadEvent = ProfileImageUploadEvent.of(user.getProfileImagePath(), profileImage);
-            eventPublisher.publish(profileImageUploadEvent);
+            amazonS3Manager.uploadFile(user.getProfileImagePath(), profileImage);
         }
     }
 
