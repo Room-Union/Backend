@@ -67,7 +67,7 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
     @Transactional
     public void modify(User user, UserModifyCommand userModifyCommand, MultipartFile profileImage) {
         UserPolicy.validate(userModifyCommand);
-        validateNicknameExists(userModifyCommand.getNickname());
+        validateNicknameExists(user, userModifyCommand.getNickname());
         userRepository.update(user, userModifyCommand, hasImage(profileImage));
         updateProfileImage(user, profileImage);
     }
@@ -122,6 +122,13 @@ public class UserService implements UserQueryUseCase, UserCommandUseCase {
         if (userRepository.findByNickname(nickname).isPresent()) {
             throw new CustomException(UserErrorCode.ALREADY_REGISTERED_NICKNAME);
         }
+    }
+
+    private void validateNicknameExists(User user, String nickname) {
+        if (nickname.equals(user.getNickname())) {
+            return;
+        }
+        validateNicknameExists(nickname);
     }
 
 }

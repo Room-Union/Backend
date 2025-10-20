@@ -1,32 +1,46 @@
-package org.codeit.roomunion.meeting.domain.model.command;
+package org.codeit.roomunion.meeting.domain.command;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Builder
 @AllArgsConstructor
-public class MeetingUpdateCommand {
+public class MeetingCreateCommand {
 
     private final String name;
+
     private final String description;
+
     private final MeetingCategory category;
-    private final Integer maxMemberCount;
+
+    private final int maxMemberCount;
+
     private final List<String> platformURL;
+
+    private final Long userId;
+
+    private final String hostEmail;
+
     private final String imageUrl;
 
-    public static MeetingUpdateCommand of(MeetingUpdateCommand baseCommand, String imageUrl) {
-        return MeetingUpdateCommand.builder()
+    private final LocalDateTime createdAt;
+
+    public static MeetingCreateCommand of(MeetingCreateCommand baseCommand, String imageUrl) {
+        return MeetingCreateCommand.builder()
             .name(baseCommand.getName())
             .description(baseCommand.getDescription())
             .category(baseCommand.getCategory())
             .maxMemberCount(baseCommand.getMaxMemberCount())
+            .userId(baseCommand.getUserId())
             .platformURL(baseCommand.getPlatformURL())
             .imageUrl(imageUrl)
+            .createdAt(LocalDateTime.now())
             .build();
     }
 

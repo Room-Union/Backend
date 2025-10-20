@@ -1,5 +1,9 @@
 package org.codeit.roomunion.meeting.adapter.out.persistence;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
@@ -7,12 +11,12 @@ import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMember
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingJpaRepository;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingMemberJpaRepository;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
+import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
-import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
-import org.codeit.roomunion.meeting.domain.model.command.MeetingUpdateCommand;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingSort;
+import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingRole;
+import org.codeit.roomunion.meeting.domain.model.MeetingSort;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.codeit.roomunion.user.adapter.out.persistence.jpa.UserJpaRepository;
@@ -22,11 +26,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -63,29 +62,31 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     }
 
     @Override
-    public int countJoinedMembers(Long meetingId) {
-        return meetingMemberJpaRepository.countByMeetingId(meetingId);
+    public boolean existsMeetingById(Long meetingId) {
+        return meetingJpaRepository.existsById(meetingId);
     }
 
     @Override
     public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, Long currentUserId) {
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<MeetingEntity> resultPage = switch (sort) { //목록 쿼리 1회
+        Page<MeetingEntity> resultPage = switch (sort) {
             case LATEST -> meetingJpaRepository.findByCategoryOrderByCreatedAtDesc(category, pageable);
             case MEMBER_DESC -> meetingJpaRepository.findByCategoryOrderByMemberCountDesc(category, pageable);
         };
 
-        // 로그인 안 했거나 결과가 없으면 전부 joined=false
-        if (currentUserId == null || resultPage.isEmpty()) {
+        if (currentUserId == 0L || resultPage.isEmpty()) {
             return resultPage.map(e -> e.toDomain().withJoined(false));
         }
 
-        // 페이지 내 meetingId 모아서 한 방에 내가 가입한 ID들 조회
-        List<Long> meetingIds = resultPage.map(MeetingEntity::getId).getContent();
-        Set<Long> joinedIds = new HashSet<>(meetingMemberJpaRepository.findJoinedMeetingIds(currentUserId, meetingIds)); // joined 한 방 쿼리 1회 (총 쿼리 2회 고정)
+        List<Long> meetingIds = resultPage.stream()
+            .map(MeetingEntity::getId)
+            .toList();
 
-        // joined는 메모리에서 contains로만 판정 (추가 쿼리 없음)
+        meetingJpaRepository.findAllWithPlatformUrlsByIdIn(meetingIds);
+
+        Set<Long> joinedIds = new HashSet<>(meetingMemberJpaRepository.findJoinedMeetingIds(currentUserId, meetingIds));
+
         return resultPage.map(e -> e.toDomain().withJoined(joinedIds.contains(e.getId())));
     }
 
@@ -94,10 +95,23 @@ public class MeetingRepositoryImpl implements MeetingRepository {
         MeetingEntity entity = meetingJpaRepository.findByIdWithMembers(meetingId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
 
-        boolean joined = currentUserId != null && entity.getMeetingMembers().stream()
-            .anyMatch(mm -> mm.getUser() != null && Objects.equals(mm.getUser().getId(), currentUserId));
+        boolean joined = isUserJoined(currentUserId, entity);
 
+        //TODO : N+1 문제 발생하는데 나중에 해결 (platformUrl fetch join시 List 2개라 hibernate에서 예외터트림)
         return entity.toDomain().withJoined(joined);
+    }
+
+    /**
+     * 특정 모임에 현재 유저가 포함되어 있는지 여부를 확인합니다.
+     *
+     * @param entity 조회된 모임 엔티티
+     * @param currentUserId 현재 로그인한 유저의 ID
+     * @return 유저가 모임 멤버로 포함되어 있으면 true, 아니면 false
+     */
+    private boolean isUserJoined(Long currentUserId, MeetingEntity entity) {
+        if (currentUserId == 0L) return false;
+        return entity.getMeetingMembers().stream() // 멤버 리스트 순회
+            .anyMatch(mm -> Objects.equals(mm.getUser().getId(), currentUserId)); // anyMatch : 조건에 맞으면 true (모임 유저의 id와 currentUserId 비교)
     }
 
     @Override
@@ -106,19 +120,20 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     }
 
     @Override
-    public void insertMember(Long meetingId, Long userId, MeetingRole role) {
+    public boolean isHostMember(Long meetingId, Long userId) {
+        return meetingMemberJpaRepository.existsByMeetingIdAndUserIdAndRole(meetingId, userId, MeetingRole.HOST);
+    }
+
+    @Override
+    public Meeting insertMember(Long meetingId, Long userId, MeetingRole role) {
         MeetingEntity meeting = meetingJpaRepository.findById(meetingId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
         UserEntity user = userJpaRepository.findById(userId)
             .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
-        if (meetingMemberJpaRepository.existsByMeetingIdAndUserId(meetingId, userId)) {
-            throw new CustomException(MeetingErrorCode.ALREADY_JOINED);
-        }
-
-        MeetingMemberEntity mm = MeetingMemberEntity.of(meeting, user, role);
-        meeting.addMember(mm);
-        meetingMemberJpaRepository.save(mm);
+        MeetingMemberEntity memberEntity = MeetingMemberEntity.of(meeting, user, role);
+        meeting.addMember(memberEntity);
+        return meeting.toDomain().withJoined(true);
     }
 
     @Override
@@ -127,12 +142,15 @@ public class MeetingRepositoryImpl implements MeetingRepository {
         MeetingEntity entity = meetingJpaRepository.findById(meetingId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
 
-        int currentCount = meetingMemberJpaRepository.countByMeetingId(meetingId);
+        Meeting beforeDomain = entity.toDomain();
+        Meeting afterDomain = beforeDomain.update(command);
 
-        // 엔티티 내부 불변성 검증 + 전체 치환
-        entity.replaceAllFrom(command, currentCount);
+        entity.applyFromDomain(afterDomain);
+        return afterDomain;
+    }
 
-        // Dirty checking으로 반영 → 도메인으로 변환
-        return entity.toDomain();
+    @Override
+    public void deleteMeeting(Long meetingId) {
+        meetingJpaRepository.deleteById(meetingId);
     }
 }

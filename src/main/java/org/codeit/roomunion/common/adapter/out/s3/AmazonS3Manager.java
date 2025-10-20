@@ -6,12 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.codeit.roomunion.common.config.S3.S3Properties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+
+import java.io.IOException;
 
 @Slf4j
 @Component
@@ -30,7 +30,6 @@ public class AmazonS3Manager {
                 .contentType(file.getContentType())
                 .build();
 
-            // 파일을 S3에 업로드
             s3Client.putObject(putRequest,
                 RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 

@@ -7,13 +7,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
-//CorsConfig 설정
 @Configuration
 public class CorsConfig {
 
     private static final List<String> ALLOWED_METHODS = List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS");
     private static final List<String> ALLOWED_HEADERS = List.of("Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin");
-    private static final List<String> ALLOWED_ORIGINS = List.of("http://localhost:3000");
+    private static final List<String> ALLOWED_ORIGINS = List.of("http://localhost:3000", "https://zip-kok.vercel.app", "https://hyunjun.store");
 
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {

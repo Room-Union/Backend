@@ -1,7 +1,7 @@
 package org.codeit.roomunion.user.domain.command;
 
 import lombok.Getter;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 import org.codeit.roomunion.user.domain.model.Gender;
 
 import java.util.Set;

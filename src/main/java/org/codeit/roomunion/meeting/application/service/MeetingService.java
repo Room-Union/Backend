@@ -1,6 +1,7 @@
 package org.codeit.roomunion.meeting.application.service;
 
 import lombok.RequiredArgsConstructor;
+import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.application.port.out.UuidRepository;
 import org.codeit.roomunion.common.domain.model.Uuid;
@@ -8,13 +9,13 @@ import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
+import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
-import org.codeit.roomunion.meeting.domain.model.command.MeetingCreateCommand;
-import org.codeit.roomunion.meeting.domain.model.command.MeetingUpdateCommand;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingBadge;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingCategory;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingRole;
-import org.codeit.roomunion.meeting.domain.model.enums.MeetingSort;
+import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.MeetingBadge;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingRole;
+import org.codeit.roomunion.meeting.domain.model.MeetingSort;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
 import org.codeit.roomunion.user.domain.exception.UserErrorCode;
@@ -27,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -51,11 +53,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         }
 
         String imageUrl = null;
-        if (image != null && !image.isEmpty()) {
-            Uuid uuid = uuidRepository.save(Uuid.from(UUID.randomUUID().toString()));
-            String key = Meeting.getImagePath(uuid.getValue()); // 도메인에서 경로 생성
-            imageUrl = s3Manager.uploadFile(key, image);
-        }
+        imageUrl = uploadMeetingImage(image, imageUrl);
 
         User host = userQueryUseCase.findByEmail(command.getHostEmail())
             .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
@@ -73,39 +71,55 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     @Transactional
     public Meeting join(Long meetingId, Long userId) {
         if (meetingRepository.isMeetingMember(meetingId, userId)) {
-            Meeting joined = meetingRepository.findByIdWithJoined(meetingId, userId);
-            return getMeetingWithBadges(joined);
+            throw new CustomException(MeetingErrorCode.ALREADY_JOINED);
         }
 
-        meetingRepository.insertMember(meetingId, userId, MeetingRole.MEMBER);
-
-        Meeting joinedMeeting = meetingRepository.findByIdWithJoined(meetingId, userId);
-        return getMeetingWithBadges(joinedMeeting);
+        Meeting meeting = meetingRepository.insertMember(meetingId, userId, MeetingRole.MEMBER);
+        return getMeetingWithBadges(meeting);
 
     }
 
     @Override
     public Meeting update(Long meetingId, Long currentId, MeetingUpdateCommand command, MultipartFile image) {
-        Meeting meeting = meetingRepository.findById(meetingId);
+        Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, currentId);
 
         if (!meeting.isHost(currentId)) {
             throw new CustomException(MeetingErrorCode.MEETING_MODIFY_FORBIDDEN);
         }
 
         String finalImageUrl = meeting.getMeetingImage();
+        finalImageUrl = uploadMeetingImage(image, finalImageUrl);
+
+        MeetingUpdateCommand commandWithImage = MeetingUpdateCommand.of(command, finalImageUrl);
+        Meeting updatedMeeting = meetingRepository.updateMeeting(meetingId, commandWithImage);
+
+        return getMeetingWithBadges(updatedMeeting);
+    }
+
+    private String uploadMeetingImage(MultipartFile image, String finalImageUrl) {
         if (image != null && !image.isEmpty()) {
             Uuid uuid = uuidRepository.save(Uuid.from(UUID.randomUUID().toString()));
             String key = Meeting.getImagePath(uuid.getValue());
             finalImageUrl = s3Manager.uploadFile(key, image);
         }
+        return finalImageUrl;
+    }
 
-        MeetingUpdateCommand commandWithImage = MeetingUpdateCommand.of(command, finalImageUrl);
-        return meetingRepository.updateMeeting(meetingId, commandWithImage);
+    @Override
+    public void deleteMeeting(Long meetingId, Long userId) {
+        Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, userId);
+
+        if (!meeting.isHost(userId)) {
+            throw new CustomException(MeetingErrorCode.MEETING_DELETE_FORBIDDEN);
+        }
+
+        meetingRepository.deleteMeeting(meetingId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Meeting getByMeetingId(Long meetingId, Long currentUserId) {
+    public Meeting getByMeetingId(Long meetingId, CustomUserDetails userDetails) {
+        Long currentUserId = userDetails.isLoggedIn() ? userDetails.getUser().getId() : 0L;
         Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, currentUserId);
         return getMeetingWithBadges(meeting);
     }
@@ -114,47 +128,43 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     @Override
     @Transactional(readOnly = true)
     public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size,
-                                Long currentUserId) {
+        CustomUserDetails userDetails) {
+        Long currentUserId = userDetails.isLoggedIn() ? userDetails.getUser().getId() : 0L;
         Page<Meeting> pageResult = meetingRepository.search(category, sort, page, size, currentUserId);
-        return pageResult.map(this::getMeetingWithBadges); // -> 문제 발생 (N + 1)
+        return pageResult.map(this::getMeetingWithBadges);
     }
 
 
     private Meeting getMeetingWithBadges(Meeting meeting) {
-        int currentCount = meeting.getCurrentMemberCount();
-        List<MeetingBadge> badges = calculateBadges(meeting, currentCount, LocalDateTime.now());
+        List<MeetingBadge> badges = calculateBadges(meeting, LocalDateTime.now());
         return meeting.withBadges(badges);
     }
 
 
-    private List<MeetingBadge> calculateBadges(Meeting meeting, int currentCount, LocalDateTime now) {
+    private List<MeetingBadge> calculateBadges(Meeting meeting, LocalDateTime now) {
         List<MeetingBadge> badges = new ArrayList<>();
         LocalDateTime createdAt = meeting.getCreatedAt();
 
         int max = meeting.getMaxMemberCount();
+        int currentCount = meeting.getCurrentMemberCount();
 
-        // 마감 여부 확인
         if (currentCount >= max) {
             badges.add(MeetingBadge.CLOSED);
             return badges;
         }
 
-        // 모집중
         if (currentCount < max) {
             badges.add(MeetingBadge.RECRUITING);
         }
 
-        // 신규 (7일)
         if (createdAt != null && !createdAt.isBefore(now.minusDays(7))) {
             badges.add(MeetingBadge.NEW);
         }
 
-        // 마감임박: 최대인원 5명당 마감임박기준을 1명
-        // ex) 최대 12명 중 3명 이하 남음(5명당 1명 기준) → 마감임박
-        int remaining = max - currentCount; // 12 - 10 = 2
-        int closingLimit = (int) Math.ceil(meeting.getMaxMemberCount() / 5.0); // ceil(12 / 5.0) = 3
+        int remaining = max - currentCount;
+        int closingLimit = (int) Math.ceil(meeting.getMaxMemberCount() / 5.0);
 
-        if (remaining > 0 && remaining <= closingLimit) { // 2 <= 3 → true
+        if (remaining > 0 && remaining <= closingLimit) {
             badges.add(MeetingBadge.CLOSING_SOON);
         }
 
