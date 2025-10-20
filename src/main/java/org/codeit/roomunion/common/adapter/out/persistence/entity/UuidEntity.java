@@ -12,6 +12,7 @@ import org.codeit.roomunion.common.domain.model.Uuid;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "uuid")
 public class UuidEntity {
 
     @Id
