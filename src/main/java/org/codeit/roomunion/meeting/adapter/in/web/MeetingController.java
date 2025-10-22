@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.meeting.adapter.in.web.request.CreateMeetingRequest;
 import org.codeit.roomunion.meeting.adapter.in.web.request.UpdateMeetingRequest;
@@ -16,6 +17,7 @@ import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.codeit.roomunion.meeting.domain.model.MeetingSort;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -103,6 +105,19 @@ public class MeetingController {
 
         Map<String, String> response = new HashMap<>();
         response.put("message", "모임이 성공적으로 삭제되었습니다.");
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "내가 생성한/가입한 모임 리스트 조회 (역할 필터 필수)", description = "role=HOST(내가 생성), role=MEMBER(내가 가입)")
+    @GetMapping("/mine")
+    public ResponseEntity<Page<MeetingResponse>> getMyMeetings(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestParam MeetingRole role,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<Meeting> meetings = meetingQueryUseCase.getMyMeetings(role, page, size, userDetails.getUser().getId());
+        Page<MeetingResponse> response = meetings.map(MeetingResponse::from);
         return ResponseEntity.ok(response);
     }
 

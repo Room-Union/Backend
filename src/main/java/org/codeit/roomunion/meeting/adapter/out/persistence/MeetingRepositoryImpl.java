@@ -91,6 +91,16 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     }
 
     @Override
+    public Page<Meeting> findMyMeetings(MeetingRole role, int page, int size, Long currentUserId) {
+        PageRequest pageable = PageRequest.of(page, size);
+
+        Page<MeetingEntity> resultPage = meetingJpaRepository.findByUserAndRole(currentUserId, role, pageable);
+
+        return resultPage.map(e -> e.toDomain().withJoined(true));
+
+    }
+
+    @Override
     public Meeting findByIdWithJoined(Long meetingId, Long currentUserId) {
         MeetingEntity entity = meetingJpaRepository.findByIdWithMembers(meetingId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));

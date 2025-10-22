@@ -3,6 +3,7 @@ package org.codeit.roomunion.meeting.adapter.out.persistence.jpa;
 import java.util.List;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -61,5 +62,21 @@ public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long>
             where m.id in :ids
         """)
     List<MeetingEntity> findAllWithPlatformUrlsByIdIn(@Param("ids") List<Long> ids);
+
+
+    @EntityGraph(attributePaths = {"meetingMembers", "meetingMembers.user"})
+    @Query("""
+          select m
+          from MeetingEntity m
+          join m.meetingMembers mm
+          where mm.user.id = :userId
+            and mm.meetingRole = :role
+          order by m.createdAt desc
+       """)
+    Page<MeetingEntity> findByUserAndRole(
+        @Param("userId") Long userId,
+        @Param("role") MeetingRole role,
+        Pageable pageable
+    );
 
 }

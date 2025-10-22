@@ -28,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -127,10 +126,16 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size,
-        CustomUserDetails userDetails) {
+    public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, CustomUserDetails userDetails) {
         Long currentUserId = userDetails.isLoggedIn() ? userDetails.getUser().getId() : 0L;
         Page<Meeting> pageResult = meetingRepository.search(category, sort, page, size, currentUserId);
+        return pageResult.map(this::getMeetingWithBadges);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Meeting> getMyMeetings(MeetingRole role, int page, int size, Long currentUserId) {
+        Page<Meeting> pageResult = meetingRepository.findMyMeetings(role, page, size, currentUserId);
         return pageResult.map(this::getMeetingWithBadges);
     }
 

@@ -19,6 +19,8 @@ public interface MeetingRepository {
 
     Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, Long currentUserId);
 
+    Page<Meeting> findMyMeetings(MeetingRole role, int page, int size, Long currentUserId);
+
     Meeting findByIdWithJoined(Long meetingId, Long currentUserId);
 
     boolean isMeetingMember(Long meetingId, Long userId);
