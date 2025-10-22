@@ -12,6 +12,7 @@ import org.codeit.roomunion.meeting.adapter.in.web.request.UpdateMeetingRequest;
 import org.codeit.roomunion.meeting.adapter.in.web.response.MeetingResponse;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
+import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;

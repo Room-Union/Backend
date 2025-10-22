@@ -7,7 +7,6 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
-import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingJpaRepository;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingMemberJpaRepository;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
