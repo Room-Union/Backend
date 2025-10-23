@@ -7,6 +7,7 @@ import org.codeit.roomunion.meeting.application.port.in.AppointmentCommandUseCas
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.out.AppointmentRepository;
 import org.codeit.roomunion.meeting.domain.command.AppointmentCreateCommand;
+import org.codeit.roomunion.meeting.domain.command.AppointmentModifyCommand;
 import org.codeit.roomunion.meeting.domain.model.Appointment;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.policy.AppointmentPolicy;
@@ -47,6 +48,22 @@ public class AppointmentService implements AppointmentCommandUseCase {
         AppointmentPolicy.validateIsHost(meeting, user);
 
         Appointment appointment = appointmentRepository.save(command, user, hasImage(image), currentAt);
+
+        updateProfileImage(appointment, image);
+    }
+
+    @Override
+    @Transactional
+    public void modify(CustomUserDetails userDetails, AppointmentModifyCommand command, MultipartFile image) {
+        LocalDateTime currentAt = timeHolder.localDateTime();
+        AppointmentPolicy.validate(command, currentAt);
+
+        Meeting meeting = meetingQueryUseCase.getByMeetingId(command.getMeetingId(), userDetails);
+
+        User user = userDetails.getUser();
+        AppointmentPolicy.validateIsHost(meeting, user);
+
+        Appointment appointment = appointmentRepository.modify(command, user, hasImage(image), currentAt);
 
         updateProfileImage(appointment, image);
     }

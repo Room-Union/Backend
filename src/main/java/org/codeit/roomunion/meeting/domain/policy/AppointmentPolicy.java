@@ -3,6 +3,7 @@ package org.codeit.roomunion.meeting.domain.policy;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.common.exception.GlobalErrorCode;
 import org.codeit.roomunion.meeting.domain.command.AppointmentCreateCommand;
+import org.codeit.roomunion.meeting.domain.command.AppointmentModifyCommand;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.domain.model.User;
@@ -21,6 +22,19 @@ public class AppointmentPolicy {
 
     public static void validate(AppointmentCreateCommand command, LocalDateTime currentAt) {
         validateNonNull(command, command.getMeetingId(), command.getTitle(), command.getMaxMemberCount(), command.getScheduledAt());
+        if (validateTitle(command.getTitle())) {
+            throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
+        }
+        if (validateMaxMemberCount(command.getMaxMemberCount())) {
+            throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
+        }
+        if (validateScheduledAt(command.getScheduledAt(), currentAt)) {
+            throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
+        }
+    }
+
+    public static void validate(AppointmentModifyCommand command, LocalDateTime currentAt) {
+        validateNonNull(command, command.getMeetingId(), command.getAppointmentId(), command.getTitle(), command.getMaxMemberCount(), command.getScheduledAt());
         if (validateTitle(command.getTitle())) {
             throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
         }

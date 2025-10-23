@@ -6,8 +6,18 @@ import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 
 import java.time.LocalDateTime;
 
-@Entity(name = "appointment_members")
+@Entity
 @Getter
+@Table(
+    name = "appointment_members",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_appointment_members", columnNames = {"appointment_id", "user_id"})
+    },
+    indexes = {
+        @Index(name = "idx_appointment_members_meeting_id", columnList = "appointment_id"),
+        @Index(name = "idx_appointment_members_user_id", columnList = "user_id")
+    }
+)
 class AppointmentMemberEntity {
 
     @Id

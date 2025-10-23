@@ -7,6 +7,7 @@ import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingJpaRepository;
 import org.codeit.roomunion.meeting.application.port.out.AppointmentRepository;
 import org.codeit.roomunion.meeting.domain.command.AppointmentCreateCommand;
+import org.codeit.roomunion.meeting.domain.command.AppointmentModifyCommand;
 import org.codeit.roomunion.meeting.domain.model.Appointment;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
@@ -36,6 +37,22 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
         appointmentEntity.join(userProxy, currentAt);
 
         meetingEntity.createAppointment(appointmentEntity);
+        return appointmentEntity.toDomain();
+    }
+
+    @Override
+    public Appointment modify(AppointmentModifyCommand command, User user, boolean hasImage, LocalDateTime currentAt) {
+        MeetingEntity meetingEntity = meetingJpaRepository.findByIdWithAppointments(command.getMeetingId())
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
+
+        AppointmentEntity appointmentEntity = meetingEntity.getAppointments()
+            .stream()
+            .filter(entity -> entity.equalsById(command.getAppointmentId()))
+            .findFirst()
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.APPOINTMENT_NOT_FOUND));
+
+        appointmentEntity.modify(command, hasImage);
+
         return appointmentEntity.toDomain();
     }
 }

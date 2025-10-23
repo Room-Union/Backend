@@ -2,8 +2,10 @@ package org.codeit.roomunion.meeting.adapter.in.web;
 
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.meeting.adapter.in.web.request.CreateAppointmentRequest;
+import org.codeit.roomunion.meeting.adapter.in.web.request.ModifyAppointmentRequest;
 import org.codeit.roomunion.meeting.application.port.in.AppointmentCommandUseCase;
 import org.codeit.roomunion.meeting.domain.command.AppointmentCreateCommand;
+import org.codeit.roomunion.meeting.domain.command.AppointmentModifyCommand;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,20 @@ public class AppointmentController {
     ) {
         AppointmentCreateCommand command = request.toCommand(meetingId);
         appointmentCommandUseCase.create(customUserDetails, command, image);
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @PutMapping("/{meetingId}/appointments/{appointmentId}")
+    public ResponseEntity<Void> modifyAppointment(
+        @PathVariable Long meetingId,
+        @PathVariable Long appointmentId,
+        @AuthenticationPrincipal CustomUserDetails customUserDetails,
+        @ModelAttribute ModifyAppointmentRequest request,
+        @RequestPart(required = false) MultipartFile image
+    ) {
+        AppointmentModifyCommand command = request.toCommand(meetingId, appointmentId);
+        appointmentCommandUseCase.modify(customUserDetails, command, image);
         return ResponseEntity.noContent()
             .build();
     }

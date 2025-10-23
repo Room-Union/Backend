@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.codeit.roomunion.meeting.domain.command.AppointmentCreateCommand;
+import org.codeit.roomunion.meeting.domain.command.AppointmentModifyCommand;
 import org.codeit.roomunion.meeting.domain.model.Appointment;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.hibernate.annotations.ColumnDefault;
@@ -60,5 +61,18 @@ public class AppointmentEntity {
 
     public Appointment toDomain() {
         return Appointment.of(id, title, maxMemberCount, scheduledAt, hasImage);
+    }
+
+    public boolean equalsById(Long appointmentId) {
+        return id.equals(appointmentId);
+    }
+
+    public void modify(AppointmentModifyCommand command, boolean hasImage) {
+        this.title = command.getTitle();
+        this.scheduledAt = command.getScheduledAt();
+        this.maxMemberCount = command.getMaxMemberCount();
+        if (hasImage) {
+            this.hasImage = true;
+        }
     }
 }
