@@ -13,5 +13,5 @@ public interface MeetingQueryUseCase {
 
     Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, CustomUserDetails userDetails);
 
-    Page<Meeting> getMyMeetings(MeetingRole role, int page, int size, Long currentUserId);
+    Page<Meeting> getMyMeetings(MeetingRole role, int page, int size, CustomUserDetails userDetails);
 }

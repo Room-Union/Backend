@@ -68,7 +68,8 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
     @Override
     @Transactional
-    public Meeting join(Long meetingId, Long userId) {
+    public Meeting join(Long meetingId, CustomUserDetails userDetails) {
+        Long userId = userDetails.getUser().getId();
         if (meetingRepository.isMeetingMember(meetingId, userId)) {
             throw new CustomException(MeetingErrorCode.ALREADY_JOINED);
         }
@@ -79,7 +80,8 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     }
 
     @Override
-    public Meeting update(Long meetingId, Long currentId, MeetingUpdateCommand command, MultipartFile image) {
+    public Meeting update(Long meetingId, CustomUserDetails userDetails, MeetingUpdateCommand command, MultipartFile image) {
+        Long currentId = userDetails.getUser().getId();
         Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, currentId);
 
         if (!meeting.isHost(currentId)) {
@@ -105,7 +107,8 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     }
 
     @Override
-    public void deleteMeeting(Long meetingId, Long userId) {
+    public void deleteMeeting(Long meetingId, CustomUserDetails userDetails) {
+        Long userId = userDetails.getUser().getId();
         Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, userId);
 
         if (!meeting.isHost(userId)) {
@@ -134,7 +137,8 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Meeting> getMyMeetings(MeetingRole role, int page, int size, Long currentUserId) {
+    public Page<Meeting> getMyMeetings(MeetingRole role, int page, int size, CustomUserDetails userDetails) {
+        Long currentUserId = userDetails.getUser().getId();
         Page<Meeting> pageResult = meetingRepository.findMyMeetings(role, page, size, currentUserId);
         return pageResult.map(this::getMeetingWithBadges);
     }

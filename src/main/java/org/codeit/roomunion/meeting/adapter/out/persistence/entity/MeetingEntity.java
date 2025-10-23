@@ -120,21 +120,11 @@ public class MeetingEntity {
     }
 
     public void addMember(MeetingMemberEntity member) {
-        this.meetingMembers.add(member);
-        increaseMemberCount();
-    }
-
-    public void increaseMemberCount() {
-        if (this.currentMemberCount >= this.maxMemberCount) {
+        if (this.meetingMembers.size() >= this.maxMemberCount) {
             throw new CustomException(MeetingErrorCode.MEETING_MEMBER_LIMIT_REACHED);
         }
-        this.currentMemberCount++;
-    }
-
-    public void decreaseMemberCount() {
-        if (this.currentMemberCount > 0) {
-            this.currentMemberCount--;
-        }
+        this.meetingMembers.add(member);
+        this.currentMemberCount = this.meetingMembers.size();
     }
 
     public void applyFromDomain(Meeting meeting) {
@@ -143,7 +133,7 @@ public class MeetingEntity {
         this.meetingImage = meeting.getMeetingImage();
         this.category = meeting.getCategory();
         this.maxMemberCount = meeting.getMaxMemberCount();
-        this.currentMemberCount = meeting.getCurrentMemberCount();
+        this.currentMemberCount = this.meetingMembers.size();
 
         this.platformUrls.clear();
         this.platformUrls.addAll(meeting.getPlatformURL());

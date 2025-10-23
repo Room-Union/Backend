@@ -1,5 +1,6 @@
 package org.codeit.roomunion.meeting.adapter.out.persistence.jpa;
 
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -78,5 +80,10 @@ public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long>
         @Param("role") MeetingRole role,
         Pageable pageable
     );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select m from MeetingEntity m where m.id = :id")
+    Optional<MeetingEntity> findWithLockById(@Param("id") Long id);
+
 
 }

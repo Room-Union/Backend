@@ -121,12 +121,12 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     private boolean isUserJoined(Long currentUserId, MeetingEntity entity) {
         if (currentUserId == 0L) return false;
         return entity.getMeetingMembers().stream() // 멤버 리스트 순회
-            .anyMatch(mm -> Objects.equals(mm.getUser().getId(), currentUserId)); // anyMatch : 조건에 맞으면 true (모임 유저의 id와 currentUserId 비교)
+            .anyMatch(meetingMemberEntity -> Objects.equals(meetingMemberEntity.getUser().getId(), currentUserId)); // anyMatch : 조건에 맞으면 true (모임 유저의 id와 currentUserId 비교)
     }
 
     @Override
     public boolean isMeetingMember(Long meetingId, Long userId) {
-        return meetingMemberJpaRepository.existsByMeetingIdAndUserId(meetingId, userId);
+        return meetingMemberJpaRepository.existsByMeeting_IdAndUser_Id(meetingId, userId);
     }
 
     @Override
@@ -136,7 +136,7 @@ public class MeetingRepositoryImpl implements MeetingRepository {
 
     @Override
     public Meeting insertMember(Long meetingId, Long userId, MeetingRole role) {
-        MeetingEntity meeting = meetingJpaRepository.findById(meetingId)
+        MeetingEntity meeting = meetingJpaRepository.findWithLockById(meetingId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
         UserEntity user = userJpaRepository.findById(userId)
             .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
