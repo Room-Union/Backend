@@ -91,4 +91,12 @@ public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long>
     Optional<MeetingEntity> findWithLockById(@Param("id") Long id);
 
 
+    @Query("""
+            select meeting
+            from MeetingEntity meeting
+            left join fetch meeting.appointments appointments
+            where meeting.id = :meetingId
+        """)
+    Optional<MeetingEntity> findByIdWithAppointments(@Param("meetingId") Long meetingId);
+
 }

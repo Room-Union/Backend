@@ -20,8 +20,11 @@ public enum MeetingErrorCode implements BaseErrorCode {
     MEETING_MODIFY_FORBIDDEN("모임장만 수정할 수 있습니다.", HttpStatus.FORBIDDEN),
     MEETING_DELETE_FORBIDDEN("모임장만 삭제할 수 있습니다.", HttpStatus.FORBIDDEN),
     MEETING_MODIFY_INVALID_REQUEST("모임 수정 요청에 빈 값이 존재합니다.", HttpStatus.BAD_REQUEST),
-    MAX_COUNT_LESS_THAN_CURRENT("현재 참여자 수보다 작은 최대 인원으로 수정할 수 없습니다.", HttpStatus.BAD_REQUEST);
-    
+    MAX_COUNT_LESS_THAN_CURRENT("현재 참여자 수보다 작은 최대 인원으로 수정할 수 없습니다.", HttpStatus.BAD_REQUEST),
+
+    APPOINTMENT_CUD_FORBIDDEN("모임 일정은 모임장만 생성/변경할 수 있습니다.", HttpStatus.FORBIDDEN),
+    ;
+
     private final String message;
     private final HttpStatus status;
 

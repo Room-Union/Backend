@@ -2,6 +2,7 @@ package org.codeit.roomunion.meeting.domain.model;
 
 import lombok.Getter;
 import org.codeit.roomunion.common.exception.CustomException;
+import org.codeit.roomunion.meeting.domain.command.AppointmentCreateCommand;
 import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.domain.model.User;
@@ -108,6 +109,7 @@ public class Meeting {
         return this.host.getId().equals(currentUserId);
     }
 
-
-
+    public boolean isNotHost(Long userId) {
+        return !isHost(userId);
+    }
 }

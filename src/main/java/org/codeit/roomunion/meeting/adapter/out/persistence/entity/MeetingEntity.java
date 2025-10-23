@@ -71,6 +71,10 @@ public class MeetingEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<String> platformUrls = new ArrayList<>();
 
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<AppointmentEntity> appointments = new ArrayList<>();
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -141,6 +145,10 @@ public class MeetingEntity {
 
         this.platformUrls.clear();
         this.platformUrls.addAll(meeting.getPlatformURL());
+    }
+
+    public void createAppointment(AppointmentEntity appointment) {
+        appointments.add(appointment);
     }
 
 }
