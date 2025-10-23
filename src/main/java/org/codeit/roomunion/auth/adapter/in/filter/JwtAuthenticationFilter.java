@@ -1,7 +1,6 @@
 package org.codeit.roomunion.auth.adapter.in.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,13 +47,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String jwtToken = authHeader.substring(7);
-        String email = jwtService.extractUsername(jwtToken);
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            String jwtToken = authHeader.substring(7);
+            String email;
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+            try {
+                email = extractEmailFromJwt(jwtToken, response);
+            } catch (Exception e) {
+                setErrorResponse(response, AuthErrorCode.INVALID_JWT);
+                return;
+            }
             LoginUserDetails userDetails = (LoginUserDetails) userDetailsService.loadUserByUsername(email);
 
-            validateToken(response, jwtToken, userDetails);
+            if (jwtService.isTokenInvalid(jwtToken, userDetails)) {
+                setErrorResponse(response, AuthErrorCode.INVALID_JWT);
+                return;
+            }
 
             UsernamePasswordAuthenticationToken authToken = createUserPasswordAuthenticationToken(userDetails);
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -64,23 +73,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    private String extractEmailFromJwt(String jwtToken, HttpServletResponse response) throws IOException {
+        return jwtService.extractUsername(jwtToken);
+    }
+
     private UsernamePasswordAuthenticationToken createUserPasswordAuthenticationToken(CustomUserDetails userDetails) {
         return new UsernamePasswordAuthenticationToken(
             userDetails,
             null,
             userDetails.getAuthorities()
         );
-    }
-
-    private void validateToken(HttpServletResponse response, String jwtToken, LoginUserDetails userDetails) throws IOException {
-        if (jwtService.isTokenInvalid(jwtToken, userDetails)) {
-            setErrorResponse(response, AuthErrorCode.INVALID_JWT);
-            throw new JwtException("잘못된 토큰입니다.");
-        }
-        if (jwtService.isTokenExpired(jwtToken)) {
-            setErrorResponse(response, AuthErrorCode.EXPIRED_JWT);
-            throw new JwtException("만료된 토큰입니다.");
-        }
     }
 
     private boolean isNotBearerToken(String authHeader) {
