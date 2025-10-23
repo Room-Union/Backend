@@ -85,4 +85,13 @@ public class AmazonS3Manager {
             return null;
         }
     }
+
+    public void deleteFile(String keyName) {
+        try {
+            s3Client.deleteObject(builder -> builder.bucket(s3Properties.getBucket()).key(keyName));
+        } catch (Exception e) {
+            log.error("error at AmazonS3Manager deleteFile", e);
+            throw new RuntimeException("S3 삭제 중 오류 발생", e);
+        }
+    }
 }

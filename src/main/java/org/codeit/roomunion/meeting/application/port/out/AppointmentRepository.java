@@ -12,4 +12,6 @@ public interface AppointmentRepository {
     Appointment save(AppointmentCreateCommand command, User user, boolean hasImage, LocalDateTime currentAt);
 
     Appointment modify(AppointmentModifyCommand command, User user, boolean hasImage, LocalDateTime currentAt);
+
+    Appointment deleteAppointment(Long meetingId, Long appointmentId);
 }

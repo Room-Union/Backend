@@ -55,4 +55,12 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
 
         return appointmentEntity.toDomain();
     }
+
+    @Override
+    public Appointment deleteAppointment(Long meetingId, Long appointmentId) {
+        return meetingJpaRepository.findByIdWithAppointments(meetingId)
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND))
+            .deleteAppointment(appointmentId)
+            .toDomain();
+    }
 }

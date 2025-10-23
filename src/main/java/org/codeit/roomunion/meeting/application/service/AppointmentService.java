@@ -68,6 +68,19 @@ public class AppointmentService implements AppointmentCommandUseCase {
         updateProfileImage(appointment, image);
     }
 
+    @Override
+    @Transactional
+    public void delete(CustomUserDetails customUserDetails, Long meetingId, Long appointmentId) {
+        Meeting meeting = meetingQueryUseCase.getByMeetingId(meetingId, customUserDetails);
+
+        User user = customUserDetails.getUser();
+        AppointmentPolicy.validateIsHost(meeting, user);
+
+        Appointment appointment = appointmentRepository.deleteAppointment(meetingId, appointmentId);
+
+//        amazonS3Manager.deleteFile(appointment.getProfileImagePath());
+    }
+
     private boolean hasImage(MultipartFile profileImage) {
         return profileImage != null && !profileImage.isEmpty() && !Objects.equals(profileImage.getOriginalFilename(), "null");
     }

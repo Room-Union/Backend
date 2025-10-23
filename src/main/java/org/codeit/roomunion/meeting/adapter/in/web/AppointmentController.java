@@ -47,4 +47,15 @@ public class AppointmentController {
         return ResponseEntity.noContent()
             .build();
     }
+
+    @DeleteMapping("/{meetingId}/appointments/{appointmentId}")
+    public ResponseEntity<Void> deleteAppointment(
+        @PathVariable Long meetingId,
+        @PathVariable Long appointmentId,
+        @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        appointmentCommandUseCase.delete(customUserDetails, meetingId, appointmentId);
+        return ResponseEntity.noContent()
+            .build();
+    }
 }
