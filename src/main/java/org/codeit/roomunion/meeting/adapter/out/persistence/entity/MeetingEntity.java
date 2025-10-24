@@ -152,12 +152,12 @@ public class MeetingEntity {
     }
 
     public AppointmentEntity deleteAppointment(Long appointmentId) {
-        AppointmentEntity appointment = this.appointments.stream()
+        AppointmentEntity appointment = appointments.stream()
             .filter(entity -> entity.equalsById(appointmentId))
             .findFirst()
             .orElseThrow(() -> new CustomException(MeetingErrorCode.APPOINTMENT_NOT_FOUND));
 
-        this.appointments.remove(appointment);
+        appointments.remove(appointment);
         return appointment;
     }
 }

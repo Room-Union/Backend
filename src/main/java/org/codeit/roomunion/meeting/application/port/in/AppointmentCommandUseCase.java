@@ -12,4 +12,6 @@ public interface AppointmentCommandUseCase {
     void modify(CustomUserDetails userDetails, AppointmentModifyCommand command, MultipartFile image);
 
     void delete(CustomUserDetails customUserDetails, Long meetingId, Long appointmentId);
+
+    void join(CustomUserDetails customUserDetails, Long meetingId, Long appointmentId);
 }

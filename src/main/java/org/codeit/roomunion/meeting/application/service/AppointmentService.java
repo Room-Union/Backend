@@ -78,7 +78,16 @@ public class AppointmentService implements AppointmentCommandUseCase {
 
         Appointment appointment = appointmentRepository.deleteAppointment(meetingId, appointmentId);
 
+        //TODO s3 삭제 권한 생성되면 추가하기
 //        amazonS3Manager.deleteFile(appointment.getProfileImagePath());
+    }
+
+    @Override
+    public void join(CustomUserDetails customUserDetails, Long meetingId, Long appointmentId) {
+        Meeting meeting = meetingQueryUseCase.getByMeetingId(meetingId, customUserDetails);
+
+        User user = customUserDetails.getUser();
+        AppointmentPolicy.validateIsParticipant(meeting, user);
     }
 
     private boolean hasImage(MultipartFile profileImage) {

@@ -58,4 +58,15 @@ public class AppointmentController {
         return ResponseEntity.noContent()
             .build();
     }
+
+    @PostMapping("/{meetingId}/appointments/{appointmentId}/join")
+    public ResponseEntity<Void> joinAppointment(
+        @PathVariable Long meetingId,
+        @PathVariable Long appointmentId,
+        @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        appointmentCommandUseCase.join(customUserDetails, meetingId, appointmentId);
+        return ResponseEntity.noContent()
+            .build();
+    }
 }
