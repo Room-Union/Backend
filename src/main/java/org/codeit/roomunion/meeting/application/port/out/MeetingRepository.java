@@ -1,8 +1,10 @@
 package org.codeit.roomunion.meeting.application.port.out;
 
+import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.codeit.roomunion.meeting.domain.model.MeetingSort;
 import org.springframework.data.domain.Page;
 
@@ -13,8 +15,24 @@ public interface MeetingRepository {
 
     boolean existsMeetingNameForHost(Long userId, String name);
 
-    int countJoinedMembers(Long meetingId);
+    boolean existsMeetingById(Long meetingId);
 
-    Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size);
+    Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, Long currentUserId);
+
+    Page<Meeting> findMyMeetings(MeetingRole role, int page, int size, Long currentUserId);
+
+    Meeting findByIdWithJoined(Long meetingId, Long currentUserId);
+
+    boolean isMeetingMember(Long meetingId, Long userId);
+
+    boolean isHostMember(Long meetingId, Long userId);
+
+    Meeting insertMember(Long meetingId, Long userId);
+
+    Meeting updateMeeting(Long meetingId, MeetingUpdateCommand command);
+
+    void deleteMeeting(Long meetingId);
+
+
 
 }

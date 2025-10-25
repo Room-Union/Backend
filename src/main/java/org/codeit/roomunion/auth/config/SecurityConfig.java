@@ -28,6 +28,7 @@ public class SecurityConfig {
     private static final String[] PUBLIC_ENDPOINTS = {"/v1/users/sign-up", "/v1/auth/login", "/v2/auth/login", "/v1/auth/email/send", "/v1/auth/email/verify", "/v1/auth/email/extend"};
     private static final String[] PUBLIC_GET_ENDPOINTS = {"/v1/meetings", "/v1/meetings/*"};
     private static final String[] SWAGGER_ENDPOINTS = {"/swagger-ui/**", "/v3/api-docs/**"};
+    private static final String[] AUTH_REQUIRED_GET_ENDPOINTS = {"/v1/meetings/mine"};
 
     private final CorsConfig corsConfig;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -54,6 +55,7 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
             .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+            .requestMatchers(HttpMethod.GET, AUTH_REQUIRED_GET_ENDPOINTS).authenticated()
             .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll()
             .anyRequest()
             .authenticated();

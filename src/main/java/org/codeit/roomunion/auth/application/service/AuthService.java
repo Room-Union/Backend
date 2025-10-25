@@ -53,7 +53,6 @@ public class AuthService implements AuthUseCase {
     }
 
     @Override
-    @Cacheable(value = RedisCacheKeys.LOGIN, key = "#email") // FIXME 테스트용도로 추후 제거 예정
     public String login(String email, String password) {
         try {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password);

@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Schema(title = "BaseResponse DTO", description = "공통 API 응답 형식")
+@Schema(title = "ErrorResponse DTO", description = "공통 API 응답 형식")
 public class ErrorResponse {
 
     @Schema(description = "에러 코드", example = "INVALID_INPUT_VALUE")

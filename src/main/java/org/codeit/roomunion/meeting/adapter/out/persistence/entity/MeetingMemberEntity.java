@@ -15,8 +15,12 @@ import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 @AllArgsConstructor
 @Table(
     name = "meeting_member",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_meeting_user", columnNames = {"meeting_id", "user_id"})
+    },
     indexes = {
-        @Index(name = "idx_meeting_member_meeting_id", columnList = "meeting_id")
+        @Index(name = "idx_meeting_member_meeting_id", columnList = "meeting_id"),
+        @Index(name = "idx_meeting_member_user_id", columnList = "user_id")
     }
 
 )
@@ -40,6 +44,14 @@ public class MeetingMemberEntity {
 
     public boolean isHost() {
         return this.meetingRole == MeetingRole.HOST;
+    }
+
+    public static MeetingMemberEntity of(MeetingEntity meeting, UserEntity user) {
+        return MeetingMemberEntity.builder()
+            .meeting(meeting)
+            .user(user)
+            .meetingRole(MeetingRole.MEMBER)
+            .build();
     }
 
 
