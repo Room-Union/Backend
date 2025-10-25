@@ -8,6 +8,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
+import org.codeit.roomunion.common.adapter.in.web.response.SimplePageResponse;
 import org.codeit.roomunion.meeting.adapter.in.web.request.CreateMeetingRequest;
 import org.codeit.roomunion.meeting.adapter.in.web.request.UpdateMeetingRequest;
 import org.codeit.roomunion.meeting.adapter.in.web.response.MeetingResponse;
@@ -60,7 +61,7 @@ public class MeetingController {
 
     @Operation(summary = "전체/카테고리 모임 리스트 조회(토큰 없이도 가능)", description = "전체/카테고리별 조회 + 정렬(최신순/사람많은 순) + 페이징처리. 로그인 시 isJoined 계산, 비로그인은 false")
     @GetMapping
-    public ResponseEntity<Page<MeetingResponse>> getMeetingList(
+    public ResponseEntity<SimplePageResponse<MeetingResponse>> getMeetingList(
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @RequestParam(required = false) MeetingCategory category,
         @RequestParam(defaultValue = "LATEST") MeetingSort sort,
@@ -69,7 +70,7 @@ public class MeetingController {
     ) {
         Page<Meeting> meetings = meetingQueryUseCase.search(category, sort, page, size, userDetails);
         Page<MeetingResponse> response = meetings.map(MeetingResponse::from);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(SimplePageResponse.from(response));
     }
 
     @Operation(summary = "특정 모임 가입하기", description = "meetingId로 특정 모임 가입 API. 중복 가입 X")
@@ -110,7 +111,7 @@ public class MeetingController {
 
     @Operation(summary = "내가 생성한/가입한 모임 리스트 조회 (역할 필터 필수)", description = "role=HOST(내가 생성), role=MEMBER(내가 가입)")
     @GetMapping("/mine")
-    public ResponseEntity<Page<MeetingResponse>> getMyMeetings(
+    public ResponseEntity<SimplePageResponse<MeetingResponse>> getMyMeetings(
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @RequestParam MeetingRole role,
         @RequestParam(defaultValue = "0") int page,
@@ -118,7 +119,7 @@ public class MeetingController {
     ) {
         Page<Meeting> meetings = meetingQueryUseCase.getMyMeetings(role, page, size, userDetails);
         Page<MeetingResponse> response = meetings.map(MeetingResponse::from);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(SimplePageResponse.from(response));
     }
 
 
