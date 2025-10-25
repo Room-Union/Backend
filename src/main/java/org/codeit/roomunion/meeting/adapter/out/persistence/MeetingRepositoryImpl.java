@@ -135,13 +135,13 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     }
 
     @Override
-    public Meeting insertMember(Long meetingId, Long userId, MeetingRole role) {
+    public Meeting insertMember(Long meetingId, Long userId) {
         MeetingEntity meeting = meetingJpaRepository.findWithLockById(meetingId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
         UserEntity user = userJpaRepository.findById(userId)
             .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
-        MeetingMemberEntity memberEntity = MeetingMemberEntity.of(meeting, user, role);
+        MeetingMemberEntity memberEntity = MeetingMemberEntity.of(meeting, user);
         meeting.addMember(memberEntity);
         return meeting.toDomain().withJoined(true);
     }

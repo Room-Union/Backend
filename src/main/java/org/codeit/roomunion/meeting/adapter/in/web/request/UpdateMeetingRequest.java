@@ -38,6 +38,8 @@ public class UpdateMeetingRequest {
     @Schema(example = "[\"https://zoom.us/12345\", \"https://discord.gg/abcde\"]")
     private List<@NotBlank String> platformURL;
 
+    private String removeImageUrl;
+
     public MeetingUpdateCommand toCommand() {
         return MeetingUpdateCommand.builder()
             .name(this.name)
@@ -45,6 +47,7 @@ public class UpdateMeetingRequest {
             .category(this.category)
             .maxMemberCount(this.maxMemberCount)
             .platformURL(this.platformURL)
+            .removeImageUrl(this.removeImageUrl)
             .build();
     }
 }

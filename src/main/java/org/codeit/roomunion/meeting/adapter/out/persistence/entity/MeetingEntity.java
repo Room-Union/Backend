@@ -17,6 +17,8 @@ import org.hibernate.annotations.ColumnDefault;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(
@@ -59,12 +61,14 @@ public class MeetingEntity {
 
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @OnDelete(action = OnDeleteAction.CASCADE) // DB에 ON DELETE CASCADE 설정할시 자식들에 delete 쿼리 안보냄
     private List<MeetingMemberEntity> meetingMembers = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "meeting_platform_urls", joinColumns = @JoinColumn(name = "meeting_id"))
     @Column(name = "platform_url", length = 500)
     @Builder.Default
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<String> platformUrls = new ArrayList<>();
 
     @Column(nullable = false)

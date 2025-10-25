@@ -27,7 +27,7 @@ public interface MeetingRepository {
 
     boolean isHostMember(Long meetingId, Long userId);
 
-    Meeting insertMember(Long meetingId, Long userId, MeetingRole role);
+    Meeting insertMember(Long meetingId, Long userId);
 
     Meeting updateMeeting(Long meetingId, MeetingUpdateCommand command);
 
