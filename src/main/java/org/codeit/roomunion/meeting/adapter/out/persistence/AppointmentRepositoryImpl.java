@@ -77,17 +77,24 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
 
     @Override
     public void join(Long appointmentId, User user, LocalDateTime currentAt) {
-        // 하나의 쿼리로 appointment 존재 여부 + members 조회
         AppointmentEntity appointment = appointmentDslRepository.findByIdWithMembers(appointmentId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.APPOINTMENT_NOT_FOUND));
-
-        // 이미 멤버인지 확인
         if (appointment.isMember(user.getId())) {
             throw new CustomException(MeetingErrorCode.APPOINTMENT_ALREADY_JOINED);
         }
 
-        // 멤버 추가
         UserEntity userProxy = entityManager.getReference(UserEntity.class, user.getId());
         appointment.join(userProxy, currentAt);
+    }
+
+    @Override
+    public void leave(Long appointmentId, User user) {
+        AppointmentEntity appointment = appointmentDslRepository.findByIdWithMembers(appointmentId)
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.APPOINTMENT_NOT_FOUND));
+        if (!appointment.isMember(user.getId())) {
+            throw new CustomException(MeetingErrorCode.APPOINTMENT_NOT_JOINED);
+        }
+
+        appointment.leave(user.getId());
     }
 }

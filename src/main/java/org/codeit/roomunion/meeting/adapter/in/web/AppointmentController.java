@@ -69,4 +69,15 @@ public class AppointmentController {
         return ResponseEntity.noContent()
             .build();
     }
+
+    @DeleteMapping("/{meetingId}/appointments/{appointmentId}/leave")
+    public ResponseEntity<Void> leaveAppointment(
+        @PathVariable Long meetingId,
+        @PathVariable Long appointmentId,
+        @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        appointmentCommandUseCase.leave(customUserDetails, appointmentId);
+        return ResponseEntity.noContent()
+            .build();
+    }
 }

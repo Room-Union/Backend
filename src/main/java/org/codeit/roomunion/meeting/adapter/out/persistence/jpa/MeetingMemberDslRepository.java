@@ -18,11 +18,6 @@ public class MeetingMemberDslRepository {
         this.jpaQueryFactory = jpaQueryFactory;
     }
 
-
-    /**
-     * meetingId와 userId로 MeetingMember가 존재하는지 확인 (fetchJoin 사용)
-     * meeting 정보도 함께 로드됨
-     */
     public Optional<MeetingMemberEntity> findBy(Long meetingId, Long userId) {
         MeetingMemberEntity meetingMemberEntity = jpaQueryFactory
             .selectFrom(QMeetingMemberEntity.meetingMemberEntity)

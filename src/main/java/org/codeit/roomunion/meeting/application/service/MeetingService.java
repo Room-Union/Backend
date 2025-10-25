@@ -156,12 +156,10 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         return meetingRepository.existsMemberBy(meetingId, user);
     }
 
-
     private Meeting getMeetingWithBadges(Meeting meeting) {
         List<MeetingBadge> badges = calculateBadges(meeting, LocalDateTime.now());
         return meeting.withBadges(badges);
     }
-
 
     private List<MeetingBadge> calculateBadges(Meeting meeting, LocalDateTime now) {
         List<MeetingBadge> badges = new ArrayList<>();
@@ -191,6 +189,5 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         }
 
         return badges;
-
     }
 }

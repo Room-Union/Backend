@@ -14,4 +14,6 @@ public interface AppointmentCommandUseCase {
     void delete(CustomUserDetails customUserDetails, Long meetingId, Long appointmentId);
 
     void join(CustomUserDetails customUserDetails, Long meetingId, Long appointmentId);
+
+    void leave(CustomUserDetails customUserDetails, Long appointmentId);
 }

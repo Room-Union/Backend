@@ -64,6 +64,10 @@ public class AppointmentEntity {
             .anyMatch(member -> member.getUser().getId().equals(userId));
     }
 
+    public void leave(Long userId) {
+        members.removeIf(member -> member.getUser().getId().equals(userId));
+    }
+
     public Appointment toDomain() {
         return Appointment.of(id, title, maxMemberCount, scheduledAt, hasImage);
     }

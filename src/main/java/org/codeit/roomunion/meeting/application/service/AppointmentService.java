@@ -97,6 +97,13 @@ public class AppointmentService implements AppointmentCommandUseCase {
         appointmentRepository.join(appointmentId, user, currentAt);
     }
 
+    @Override
+    @Transactional
+    public void leave(CustomUserDetails userDetails, Long appointmentId) {
+        User user = userDetails.getUser();
+        appointmentRepository.leave(appointmentId, user);
+    }
+
     private boolean hasImage(MultipartFile profileImage) {
         return profileImage != null && !profileImage.isEmpty() && !Objects.equals(profileImage.getOriginalFilename(), "null");
     }

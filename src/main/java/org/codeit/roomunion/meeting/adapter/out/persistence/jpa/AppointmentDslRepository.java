@@ -18,17 +18,12 @@ public class AppointmentDslRepository {
         this.jpaQueryFactory = jpaQueryFactory;
     }
 
-    /**
-     * Appointment를 조회하면서 members도 함께 가져옴 (하나의 쿼리)
-     * - Appointment 존재 여부 확인
-     * - members 컬렉션을 통해 이미 멤버인지 확인 가능
-     */
     public Optional<AppointmentEntity> findByIdWithMembers(Long appointmentId) {
-        AppointmentEntity result = jpaQueryFactory
+        AppointmentEntity entity = jpaQueryFactory
             .selectFrom(appointmentEntity)
             .leftJoin(appointmentEntity.members, appointmentMemberEntity).fetchJoin()
             .where(appointmentEntity.id.eq(appointmentId))
             .fetchOne();
-        return Optional.ofNullable(result);
+        return Optional.ofNullable(entity);
     }
 }

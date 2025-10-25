@@ -16,4 +16,6 @@ public interface AppointmentRepository {
     Appointment deleteAppointment(Long meetingId, Long appointmentId);
 
     void join(Long appointmentId, User user, LocalDateTime currentAt);
+
+    void leave(Long appointmentId, User user);
 }

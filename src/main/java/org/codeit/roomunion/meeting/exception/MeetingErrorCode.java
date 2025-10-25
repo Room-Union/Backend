@@ -26,6 +26,7 @@ public enum MeetingErrorCode implements BaseErrorCode {
     APPOINTMENT_CUD_FORBIDDEN("모임 일정은 모임장만 생성/변경할 수 있습니다.", HttpStatus.FORBIDDEN),
     APPOINTMENT_NOT_FOUND("약속을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     APPOINTMENT_ALREADY_JOINED("이미 가입한 약속입니다.", HttpStatus.BAD_REQUEST),
+    APPOINTMENT_NOT_JOINED("가입한 약속이 아닙니다.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String message;
