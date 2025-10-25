@@ -14,4 +14,6 @@ public interface AppointmentRepository {
     Appointment modify(AppointmentModifyCommand command, User user, boolean hasImage, LocalDateTime currentAt);
 
     Appointment deleteAppointment(Long meetingId, Long appointmentId);
+
+    void join(Long appointmentId, User user, LocalDateTime currentAt);
 }

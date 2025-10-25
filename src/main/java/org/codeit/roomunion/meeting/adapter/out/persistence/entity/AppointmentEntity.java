@@ -59,6 +59,11 @@ public class AppointmentEntity {
         members.add(appointmentMemberEntity);
     }
 
+    public boolean isMember(Long userId) {
+        return members.stream()
+            .anyMatch(member -> member.getUser().getId().equals(userId));
+    }
+
     public Appointment toDomain() {
         return Appointment.of(id, title, maxMemberCount, scheduledAt, hasImage);
     }

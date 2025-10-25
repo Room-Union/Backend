@@ -16,6 +16,7 @@ public enum MeetingErrorCode implements BaseErrorCode {
     MEETING_HOST_NOT_FOUND("모임장이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     MEETING_MEMBER_LIMIT_REACHED("모임 최대 멤버수에 도달하였습니다.", HttpStatus.BAD_REQUEST),
     ALREADY_JOINED("이미 가입한 모임입니다.", HttpStatus.BAD_REQUEST),
+    NOT_JOINED("가입한 모임이 아닙니다.", HttpStatus.BAD_REQUEST),
 
     MEETING_MODIFY_FORBIDDEN("모임장만 수정할 수 있습니다.", HttpStatus.FORBIDDEN),
     MEETING_DELETE_FORBIDDEN("모임장만 삭제할 수 있습니다.", HttpStatus.FORBIDDEN),
@@ -24,6 +25,7 @@ public enum MeetingErrorCode implements BaseErrorCode {
 
     APPOINTMENT_CUD_FORBIDDEN("모임 일정은 모임장만 생성/변경할 수 있습니다.", HttpStatus.FORBIDDEN),
     APPOINTMENT_NOT_FOUND("약속을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    APPOINTMENT_ALREADY_JOINED("이미 가입한 약속입니다.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String message;

@@ -4,7 +4,9 @@ import jakarta.persistence.EntityManager;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.AppointmentEntity;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
+import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.AppointmentDslRepository;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingJpaRepository;
+import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingMemberDslRepository;
 import org.codeit.roomunion.meeting.application.port.out.AppointmentRepository;
 import org.codeit.roomunion.meeting.domain.command.AppointmentCreateCommand;
 import org.codeit.roomunion.meeting.domain.command.AppointmentModifyCommand;
@@ -21,10 +23,19 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
 
     private final EntityManager entityManager;
     private final MeetingJpaRepository meetingJpaRepository;
+    private final MeetingMemberDslRepository meetingMemberDslRepository;
+    private final AppointmentDslRepository appointmentDslRepository;
 
-    public AppointmentRepositoryImpl(EntityManager entityManager, MeetingJpaRepository meetingJpaRepository) {
+    public AppointmentRepositoryImpl(
+        EntityManager entityManager,
+        MeetingJpaRepository meetingJpaRepository,
+        MeetingMemberDslRepository meetingMemberDslRepository,
+        AppointmentDslRepository appointmentDslRepository
+    ) {
         this.entityManager = entityManager;
         this.meetingJpaRepository = meetingJpaRepository;
+        this.meetingMemberDslRepository = meetingMemberDslRepository;
+        this.appointmentDslRepository = appointmentDslRepository;
     }
 
     @Override
@@ -62,5 +73,21 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND))
             .deleteAppointment(appointmentId)
             .toDomain();
+    }
+
+    @Override
+    public void join(Long appointmentId, User user, LocalDateTime currentAt) {
+        // 하나의 쿼리로 appointment 존재 여부 + members 조회
+        AppointmentEntity appointment = appointmentDslRepository.findByIdWithMembers(appointmentId)
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.APPOINTMENT_NOT_FOUND));
+
+        // 이미 멤버인지 확인
+        if (appointment.isMember(user.getId())) {
+            throw new CustomException(MeetingErrorCode.APPOINTMENT_ALREADY_JOINED);
+        }
+
+        // 멤버 추가
+        UserEntity userProxy = entityManager.getReference(UserEntity.class, user.getId());
+        appointment.join(userProxy, currentAt);
     }
 }

@@ -3,6 +3,7 @@ package org.codeit.roomunion.meeting.application.service;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.application.port.out.TimeHolder;
+import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.application.port.in.AppointmentCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.out.AppointmentRepository;
@@ -11,6 +12,7 @@ import org.codeit.roomunion.meeting.domain.command.AppointmentModifyCommand;
 import org.codeit.roomunion.meeting.domain.model.Appointment;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.policy.AppointmentPolicy;
+import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,11 +85,16 @@ public class AppointmentService implements AppointmentCommandUseCase {
     }
 
     @Override
-    public void join(CustomUserDetails customUserDetails, Long meetingId, Long appointmentId) {
-        Meeting meeting = meetingQueryUseCase.getByMeetingId(meetingId, customUserDetails);
+    @Transactional
+    public void join(CustomUserDetails userDetails, Long meetingId, Long appointmentId) {
+        User user = userDetails.getUser();
+        boolean isMember = meetingQueryUseCase.existsMemberBy(meetingId, user);
+        if (!isMember) {
+            throw new CustomException(MeetingErrorCode.NOT_JOINED);
+        }
 
-        User user = customUserDetails.getUser();
-        AppointmentPolicy.validateIsParticipant(meeting, user);
+        LocalDateTime currentAt = timeHolder.localDateTime();
+        appointmentRepository.join(appointmentId, user, currentAt);
     }
 
     private boolean hasImage(MultipartFile profileImage) {

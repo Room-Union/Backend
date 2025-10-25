@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
         @Index(name = "idx_appointment_members_user_id", columnList = "user_id")
     }
 )
-class AppointmentMemberEntity {
+public class AppointmentMemberEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

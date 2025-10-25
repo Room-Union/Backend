@@ -1,19 +1,16 @@
 package org.codeit.roomunion.meeting.adapter.out.persistence;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingJpaRepository;
+import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingMemberDslRepository;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingMemberJpaRepository;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
+import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
-import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.codeit.roomunion.meeting.domain.model.MeetingSort;
@@ -21,11 +18,17 @@ import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.codeit.roomunion.user.adapter.out.persistence.jpa.UserJpaRepository;
 import org.codeit.roomunion.user.domain.exception.UserErrorCode;
+import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -34,6 +37,7 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     private final MeetingJpaRepository meetingJpaRepository;
     private final MeetingMemberJpaRepository meetingMemberJpaRepository;
     private final UserJpaRepository userJpaRepository;
+    private final MeetingMemberDslRepository meetingMemberDslRepository;
 
     @Override
     public Meeting createMeeting(MeetingCreateCommand command) {
@@ -46,7 +50,6 @@ public class MeetingRepositoryImpl implements MeetingRepository {
 
         return savedMeetingEntity.toDomain();
     }
-
 
     @Override
     public Meeting findById(Long meetingId) {
@@ -162,5 +165,11 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     @Override
     public void deleteMeeting(Long meetingId) {
         meetingJpaRepository.deleteById(meetingId);
+    }
+
+    @Override
+    public boolean existsMemberBy(Long meetingId, User user) {
+        return meetingMemberDslRepository.findBy(meetingId, user.getId())
+            .isPresent();
     }
 }

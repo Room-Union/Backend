@@ -6,6 +6,7 @@ import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.codeit.roomunion.meeting.domain.model.MeetingSort;
+import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.data.domain.Page;
 
 public interface MeetingRepository {
@@ -33,6 +34,5 @@ public interface MeetingRepository {
 
     void deleteMeeting(Long meetingId);
 
-
-
+    boolean existsMemberBy(Long meetingId, User user);
 }
