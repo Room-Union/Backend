@@ -68,13 +68,13 @@ public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long>
 
     @EntityGraph(attributePaths = {"meetingMembers", "meetingMembers.user"})
     @Query("""
-          select m
-          from MeetingEntity m
-          join m.meetingMembers mm
-          where mm.user.id = :userId
-            and mm.meetingRole = :role
-          order by m.createdAt desc
-       """)
+           select m
+           from MeetingEntity m
+           join m.meetingMembers mm
+           where mm.user.id = :userId
+             and mm.meetingRole = :role
+           order by m.createdAt desc
+        """)
     Page<MeetingEntity> findByUserAndRole(
         @Param("userId") Long userId,
         @Param("role") MeetingRole role,
@@ -82,7 +82,12 @@ public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long>
     );
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select m from MeetingEntity m where m.id = :id")
+    @Query("""
+            select m from MeetingEntity m
+            left join fetch m.meetingMembers mm
+            left join fetch mm.user
+            where m.id = :id
+        """)
     Optional<MeetingEntity> findWithLockById(@Param("id") Long id);
 
 
