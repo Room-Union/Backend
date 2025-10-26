@@ -80,7 +80,6 @@ public class AppointmentService implements AppointmentCommandUseCase {
 
         Appointment appointment = appointmentRepository.deleteAppointment(meetingId, appointmentId);
 
-        //TODO s3 삭제 권한 생성되면 추가하기
         amazonS3Manager.deleteFile(appointment.getProfileImagePath());
     }
 

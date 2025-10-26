@@ -1,16 +1,12 @@
 package org.codeit.roomunion.meeting.adapter.in.web.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 
 import java.util.List;
-import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 
 @Getter
 @Schema(title = "UpdateMeetingRequest : Meeting 수정 요청 DTO")
