@@ -9,6 +9,8 @@ import org.codeit.roomunion.meeting.domain.command.AppointmentModifyCommand;
 import org.codeit.roomunion.meeting.domain.model.Appointment;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -40,6 +42,7 @@ public class AppointmentEntity {
     private Boolean hasImage;
 
     @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<AppointmentMemberEntity> members = new ArrayList<>();
 
     private AppointmentEntity(String title, LocalDateTime scheduledAt, Integer maxMemberCount, Boolean hasImage, MeetingEntity meeting) {
