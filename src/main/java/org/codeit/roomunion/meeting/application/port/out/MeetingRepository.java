@@ -19,13 +19,15 @@ public interface MeetingRepository {
 
     Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, Long currentUserId);
 
+    Page<Meeting> findMyMeetings(MeetingRole role, int page, int size, Long currentUserId);
+
     Meeting findByIdWithJoined(Long meetingId, Long currentUserId);
 
     boolean isMeetingMember(Long meetingId, Long userId);
 
     boolean isHostMember(Long meetingId, Long userId);
 
-    Meeting insertMember(Long meetingId, Long userId, MeetingRole role);
+    Meeting insertMember(Long meetingId, Long userId);
 
     Meeting updateMeeting(Long meetingId, MeetingUpdateCommand command);
 

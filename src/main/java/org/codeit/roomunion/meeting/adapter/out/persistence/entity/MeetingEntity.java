@@ -17,6 +17,8 @@ import org.hibernate.annotations.ColumnDefault;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(
@@ -59,12 +61,14 @@ public class MeetingEntity {
 
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @OnDelete(action = OnDeleteAction.CASCADE) // DB에 ON DELETE CASCADE 설정할시 자식들에 delete 쿼리 안보냄
     private List<MeetingMemberEntity> meetingMembers = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "meeting_platform_urls", joinColumns = @JoinColumn(name = "meeting_id"))
     @Column(name = "platform_url", length = 500)
     @Builder.Default
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<String> platformUrls = new ArrayList<>();
 
     @Column(nullable = false)
@@ -120,21 +124,11 @@ public class MeetingEntity {
     }
 
     public void addMember(MeetingMemberEntity member) {
-        this.meetingMembers.add(member);
-        increaseMemberCount();
-    }
-
-    public void increaseMemberCount() {
-        if (this.currentMemberCount >= this.maxMemberCount) {
+        if (this.meetingMembers.size() >= this.maxMemberCount) {
             throw new CustomException(MeetingErrorCode.MEETING_MEMBER_LIMIT_REACHED);
         }
-        this.currentMemberCount++;
-    }
-
-    public void decreaseMemberCount() {
-        if (this.currentMemberCount > 0) {
-            this.currentMemberCount--;
-        }
+        this.meetingMembers.add(member);
+        this.currentMemberCount = this.meetingMembers.size();
     }
 
     public void applyFromDomain(Meeting meeting) {
@@ -143,7 +137,7 @@ public class MeetingEntity {
         this.meetingImage = meeting.getMeetingImage();
         this.category = meeting.getCategory();
         this.maxMemberCount = meeting.getMaxMemberCount();
-        this.currentMemberCount = meeting.getCurrentMemberCount();
+        this.currentMemberCount = this.meetingMembers.size();
 
         this.platformUrls.clear();
         this.platformUrls.addAll(meeting.getPlatformURL());
