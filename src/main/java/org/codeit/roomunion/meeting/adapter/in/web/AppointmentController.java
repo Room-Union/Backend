@@ -28,6 +28,15 @@ public class AppointmentController {
         this.appointmentQueryUseCase = appointmentQueryUseCase;
     }
 
+    @GetMapping("/{meetingId}/appointments")
+    public ResponseEntity<AppointmentsResponse> getAppointments(
+        @PathVariable Long meetingId,
+        @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        List<Appointment> appointments = appointmentQueryUseCase.getAppointments(meetingId, customUserDetails);
+        return ResponseEntity.ok(AppointmentsResponse.from(appointments));
+    }
+
     @PostMapping("/{meetingId}/appointments")
     public ResponseEntity<Void> createAppointment(
         @PathVariable Long meetingId,
@@ -86,14 +95,5 @@ public class AppointmentController {
         appointmentCommandUseCase.leave(customUserDetails, appointmentId);
         return ResponseEntity.noContent()
             .build();
-    }
-
-    @GetMapping("/{meetingId}/appointments")
-    public ResponseEntity<AppointmentsResponse> getAppointments(
-        @PathVariable Long meetingId,
-        @AuthenticationPrincipal CustomUserDetails customUserDetails
-    ) {
-        List<Appointment> appointments = appointmentQueryUseCase.getAppointments(meetingId, customUserDetails);
-        return ResponseEntity.ok(AppointmentsResponse.from(appointments));
     }
 }

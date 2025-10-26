@@ -26,8 +26,8 @@ import java.util.Objects;
 @Service
 @Transactional(readOnly = true)
 public class AppointmentService implements AppointmentCommandUseCase, AppointmentQueryUseCase {
-
     private final MeetingQueryUseCase meetingQueryUseCase;
+
     private final AppointmentRepository appointmentRepository;
     private final AmazonS3Manager amazonS3Manager;
 
@@ -38,6 +38,13 @@ public class AppointmentService implements AppointmentCommandUseCase, Appointmen
         this.appointmentRepository = appointmentRepository;
         this.amazonS3Manager = amazonS3Manager;
         this.timeHolder = timeHolder;
+    }
+
+    @Override
+    public List<Appointment> getAppointments(Long meetingId, CustomUserDetails userDetails) {
+        meetingQueryUseCase.getByMeetingId(meetingId, userDetails);
+
+        return appointmentRepository.findAllBy(meetingId, userDetails);
     }
 
     @Override
@@ -103,13 +110,6 @@ public class AppointmentService implements AppointmentCommandUseCase, Appointmen
     public void leave(CustomUserDetails userDetails, Long appointmentId) {
         User user = userDetails.getUser();
         appointmentRepository.leave(appointmentId, user);
-    }
-
-    @Override
-    public List<Appointment> getAppointments(Long meetingId, CustomUserDetails userDetails) {
-        meetingQueryUseCase.getByMeetingId(meetingId, userDetails);
-
-        return appointmentRepository.findAllBy(meetingId, userDetails);
     }
 
     private boolean hasImage(MultipartFile profileImage) {
