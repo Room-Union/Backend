@@ -6,7 +6,9 @@ import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
+import org.codeit.roomunion.common.adapter.in.web.response.SimplePageResponse;
 import org.codeit.roomunion.meeting.adapter.in.web.request.CreateMeetingRequest;
 import org.codeit.roomunion.meeting.adapter.in.web.request.UpdateMeetingRequest;
 import org.codeit.roomunion.meeting.adapter.in.web.response.MeetingResponse;
@@ -16,6 +18,7 @@ import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.codeit.roomunion.meeting.domain.model.MeetingSort;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -58,7 +61,7 @@ public class MeetingController {
 
     @Operation(summary = "전체/카테고리 모임 리스트 조회(토큰 없이도 가능)", description = "전체/카테고리별 조회 + 정렬(최신순/사람많은 순) + 페이징처리. 로그인 시 isJoined 계산, 비로그인은 false")
     @GetMapping
-    public ResponseEntity<Page<MeetingResponse>> getMeetingList(
+    public ResponseEntity<SimplePageResponse<MeetingResponse>> getMeetingList(
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @RequestParam(required = false) MeetingCategory category,
         @RequestParam(defaultValue = "LATEST") MeetingSort sort,
@@ -67,7 +70,7 @@ public class MeetingController {
     ) {
         Page<Meeting> meetings = meetingQueryUseCase.search(category, sort, page, size, userDetails);
         Page<MeetingResponse> response = meetings.map(MeetingResponse::from);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(SimplePageResponse.from(response));
     }
 
     @Operation(summary = "특정 모임 가입하기", description = "meetingId로 특정 모임 가입 API. 중복 가입 X")
@@ -76,7 +79,7 @@ public class MeetingController {
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @PathVariable Long meetingId
     ) {
-        Meeting meeting = meetingCommandUseCase.join(meetingId, userDetails.getUser().getId());
+        Meeting meeting = meetingCommandUseCase.join(meetingId, userDetails);
         return ResponseEntity.ok(MeetingResponse.from(meeting));
     }
 
@@ -89,7 +92,7 @@ public class MeetingController {
         @RequestPart(value = "image", required = false) MultipartFile image
     ) {
         MeetingUpdateCommand command = request.toCommand();
-        Meeting updatedMeeting = meetingCommandUseCase.update(meetingId, userDetails.getUser().getId(), command, image);
+        Meeting updatedMeeting = meetingCommandUseCase.update(meetingId, userDetails, command, image);
         return ResponseEntity.ok(MeetingResponse.from(updatedMeeting));
     }
 
@@ -99,11 +102,24 @@ public class MeetingController {
         @PathVariable Long meetingId,
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        meetingCommandUseCase.deleteMeeting(meetingId, userDetails.getUser().getId());
+        meetingCommandUseCase.deleteMeeting(meetingId, userDetails);
 
         Map<String, String> response = new HashMap<>();
         response.put("message", "모임이 성공적으로 삭제되었습니다.");
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "내가 생성한/가입한 모임 리스트 조회 (역할 필터 필수)", description = "role=HOST(내가 생성), role=MEMBER(내가 가입)")
+    @GetMapping("/mine")
+    public ResponseEntity<SimplePageResponse<MeetingResponse>> getMyMeetings(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestParam MeetingRole role,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<Meeting> meetings = meetingQueryUseCase.getMyMeetings(role, page, size, userDetails);
+        Page<MeetingResponse> response = meetings.map(MeetingResponse::from);
+        return ResponseEntity.ok(SimplePageResponse.from(response));
     }
 
 
