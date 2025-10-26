@@ -31,7 +31,7 @@ public class ImageFactory {
         if (!appointmentEntity.getHasImage()) {
             return EMPTY_STRING;
         }
-        String appointmentImagePath = Appointment.PROFILE_IMAGE_PATH.formatted(appointmentEntity.getId());
+        String appointmentImagePath = Appointment.APPOINTMENT_IMAGE_PATH.formatted(appointmentEntity.getId());
         return IMAGE_PATH_FORMAT.formatted(s3Properties.getBucket(), appointmentImagePath);
     }
 
