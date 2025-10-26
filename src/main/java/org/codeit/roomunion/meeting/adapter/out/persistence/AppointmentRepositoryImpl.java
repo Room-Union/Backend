@@ -14,6 +14,7 @@ import org.codeit.roomunion.meeting.domain.command.AppointmentModifyCommand;
 import org.codeit.roomunion.meeting.domain.model.Appointment;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
+import org.codeit.roomunion.user.adapter.out.persistence.factory.ImageFactory;
 import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.stereotype.Repository;
 
@@ -27,17 +28,20 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
     private final MeetingJpaRepository meetingJpaRepository;
     private final MeetingMemberDslRepository meetingMemberDslRepository;
     private final AppointmentDslRepository appointmentDslRepository;
+    private final ImageFactory imageFactory;
 
     public AppointmentRepositoryImpl(
         EntityManager entityManager,
         MeetingJpaRepository meetingJpaRepository,
         MeetingMemberDslRepository meetingMemberDslRepository,
-        AppointmentDslRepository appointmentDslRepository
+        AppointmentDslRepository appointmentDslRepository,
+        ImageFactory imageFactory
     ) {
         this.entityManager = entityManager;
         this.meetingJpaRepository = meetingJpaRepository;
         this.meetingMemberDslRepository = meetingMemberDslRepository;
         this.appointmentDslRepository = appointmentDslRepository;
+        this.imageFactory = imageFactory;
     }
 
     @Override
@@ -50,7 +54,8 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
         appointmentEntity.join(userProxy, currentAt);
 
         meetingEntity.createAppointment(appointmentEntity);
-        return appointmentEntity.toDomain();
+        String imagePath = imageFactory.createAppointmentImagePath(appointmentEntity);
+        return appointmentEntity.toDomain(imagePath);
     }
 
     @Override
@@ -66,15 +71,17 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
 
         appointmentEntity.modify(command, hasImage);
 
-        return appointmentEntity.toDomain();
+        String imagePath = imageFactory.createAppointmentImagePath(appointmentEntity);
+        return appointmentEntity.toDomain(imagePath);
     }
 
     @Override
     public Appointment deleteAppointment(Long meetingId, Long appointmentId) {
-        return meetingJpaRepository.findByIdWithAppointments(meetingId)
+        AppointmentEntity appointmentEntity = meetingJpaRepository.findByIdWithAppointments(meetingId)
             .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND))
-            .deleteAppointment(appointmentId)
-            .toDomain();
+            .deleteAppointment(appointmentId);
+        String imagePath = imageFactory.createAppointmentImagePath(appointmentEntity);
+        return appointmentEntity.toDomain(imagePath);
     }
 
     @Override
@@ -104,7 +111,10 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
     public List<Appointment> findAllBy(Long meetingId, CustomUserDetails userDetails) {
         return appointmentDslRepository.findAllBy(meetingId)
             .stream()
-            .map(entity -> entity.toDomain(userDetails))
+            .map(entity -> {
+                String imagePath = imageFactory.createAppointmentImagePath(entity);
+                return entity.toDomain(imagePath, userDetails);
+            })
             .toList();
     }
 }

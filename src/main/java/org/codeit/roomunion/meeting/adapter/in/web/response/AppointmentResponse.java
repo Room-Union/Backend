@@ -9,7 +9,7 @@ public record AppointmentResponse(
     String title,
     int maxMemberCount,
     LocalDateTime scheduledAt,
-    boolean hasImage,
+    String profileImageUrl,
     int currentMemberCount,
     boolean isJoined
 ) {
@@ -19,7 +19,7 @@ public record AppointmentResponse(
             appointment.getTitle(),
             appointment.getMaxMemberCount(),
             appointment.getScheduledAt(),
-            appointment.isHasImage(),
+            appointment.getProfileImageUrl(),
             appointment.getCurrentMemberCount(),
             appointment.isJoined()
         );

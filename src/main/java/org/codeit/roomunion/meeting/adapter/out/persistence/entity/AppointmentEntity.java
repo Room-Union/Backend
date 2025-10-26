@@ -72,19 +72,23 @@ public class AppointmentEntity {
         members.removeIf(member -> member.getUser().getId().equals(userId));
     }
 
-    public Appointment toDomain() {
-        return Appointment.of(id, title, maxMemberCount, scheduledAt, hasImage);
+    public Appointment toDomain(String imagePath) {
+        return Appointment.of(id, title, maxMemberCount, scheduledAt, imagePath);
     }
 
-    public Appointment toDomain(CustomUserDetails userDetails) {
-        List<Long> memberIds = members.stream()
-            .map(member -> member.getUser().getId())
-            .toList();
+    public Appointment toDomain(String imagePath, CustomUserDetails userDetails) {
+        List<Long> memberIds = extractMemberIds();
         if (userDetails.isLoggedIn()) {
             boolean isJoined = memberIds.contains(userDetails.getUser().getId());
-            return Appointment.of(id, title, maxMemberCount, scheduledAt, hasImage, memberIds, isJoined);
+            return Appointment.of(id, title, maxMemberCount, scheduledAt, imagePath, memberIds, isJoined);
         }
-        return Appointment.of(id, title, maxMemberCount, scheduledAt, hasImage, memberIds, false);
+        return Appointment.of(id, title, maxMemberCount, scheduledAt, imagePath, memberIds, false);
+    }
+
+    private List<Long> extractMemberIds() {
+        return members.stream()
+            .map(AppointmentMemberEntity::getUserId)
+            .toList();
     }
 
     public boolean equalsById(Long appointmentId) {
