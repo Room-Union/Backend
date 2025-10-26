@@ -47,4 +47,8 @@ public class AppointmentMemberEntity {
         return new AppointmentMemberEntity(appointment, user, currentAt);
     }
 
+    public Long getUserId() {
+        return user.getId();
+    }
+
 }

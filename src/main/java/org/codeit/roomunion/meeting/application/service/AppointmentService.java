@@ -5,6 +5,7 @@ import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.application.port.out.TimeHolder;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.application.port.in.AppointmentCommandUseCase;
+import org.codeit.roomunion.meeting.application.port.in.AppointmentQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.out.AppointmentRepository;
 import org.codeit.roomunion.meeting.domain.command.AppointmentCreateCommand;
@@ -19,11 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Service
 @Transactional(readOnly = true)
-public class AppointmentService implements AppointmentCommandUseCase {
+public class AppointmentService implements AppointmentCommandUseCase, AppointmentQueryUseCase {
 
     private final MeetingQueryUseCase meetingQueryUseCase;
     private final AppointmentRepository appointmentRepository;
@@ -101,6 +103,13 @@ public class AppointmentService implements AppointmentCommandUseCase {
     public void leave(CustomUserDetails userDetails, Long appointmentId) {
         User user = userDetails.getUser();
         appointmentRepository.leave(appointmentId, user);
+    }
+
+    @Override
+    public List<Appointment> getAppointments(Long meetingId, CustomUserDetails userDetails) {
+        meetingQueryUseCase.getByMeetingId(meetingId, userDetails);
+
+        return appointmentRepository.findAllBy(meetingId, userDetails);
     }
 
     private boolean hasImage(MultipartFile profileImage) {

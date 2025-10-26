@@ -1,6 +1,7 @@
 package org.codeit.roomunion.meeting.adapter.out.persistence;
 
 import jakarta.persistence.EntityManager;
+import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.AppointmentEntity;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
@@ -17,6 +18,7 @@ import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public class AppointmentRepositoryImpl implements AppointmentRepository {
@@ -96,5 +98,13 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
         }
 
         appointment.leave(user.getId());
+    }
+
+    @Override
+    public List<Appointment> findAllBy(Long meetingId, CustomUserDetails userDetails) {
+        return appointmentDslRepository.findAllBy(meetingId)
+            .stream()
+            .map(entity -> entity.toDomain(userDetails))
+            .toList();
     }
 }

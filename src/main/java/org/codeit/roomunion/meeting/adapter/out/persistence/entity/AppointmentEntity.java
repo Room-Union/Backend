@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.meeting.domain.command.AppointmentCreateCommand;
 import org.codeit.roomunion.meeting.domain.command.AppointmentModifyCommand;
 import org.codeit.roomunion.meeting.domain.model.Appointment;
@@ -73,6 +74,17 @@ public class AppointmentEntity {
 
     public Appointment toDomain() {
         return Appointment.of(id, title, maxMemberCount, scheduledAt, hasImage);
+    }
+
+    public Appointment toDomain(CustomUserDetails userDetails) {
+        List<Long> memberIds = members.stream()
+            .map(member -> member.getUser().getId())
+            .toList();
+        if (userDetails.isLoggedIn()) {
+            boolean isJoined = memberIds.contains(userDetails.getUser().getId());
+            return Appointment.of(id, title, maxMemberCount, scheduledAt, hasImage, memberIds, isJoined);
+        }
+        return Appointment.of(id, title, maxMemberCount, scheduledAt, hasImage, memberIds, false);
     }
 
     public boolean equalsById(Long appointmentId) {
