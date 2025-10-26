@@ -17,6 +17,8 @@ import org.hibernate.annotations.ColumnDefault;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(
@@ -53,14 +55,20 @@ public class MeetingEntity {
     @ColumnDefault("1")
     private int maxMemberCount;
 
+    @Column(nullable = false)
+    @ColumnDefault("0")
+    private int currentMemberCount;
+
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @OnDelete(action = OnDeleteAction.CASCADE) // DB에 ON DELETE CASCADE 설정할시 자식들에 delete 쿼리 안보냄
     private List<MeetingMemberEntity> meetingMembers = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "meeting_platform_urls", joinColumns = @JoinColumn(name = "meeting_id"))
     @Column(name = "platform_url", length = 500)
     @Builder.Default
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<String> platformUrls = new ArrayList<>();
 
     @Column(nullable = false)
@@ -73,6 +81,7 @@ public class MeetingEntity {
             .category(command.getCategory())
             .meetingImage(command.getImageUrl())
             .maxMemberCount(command.getMaxMemberCount())
+            .currentMemberCount(0)
             .platformUrls(command.getPlatformURL())
             .createdAt(command.getCreatedAt())
             .build();
@@ -106,7 +115,7 @@ public class MeetingEntity {
             this.getMeetingImage(),
             this.getCategory(),
             this.getMaxMemberCount(),
-            this.meetingMembers.size(),
+            this.getCurrentMemberCount(),
             this.getPlatformUrls(),
             this.getCreatedAt(),
             false,
@@ -115,8 +124,23 @@ public class MeetingEntity {
     }
 
     public void addMember(MeetingMemberEntity member) {
+        if (this.meetingMembers.size() >= this.maxMemberCount) {
+            throw new CustomException(MeetingErrorCode.MEETING_MEMBER_LIMIT_REACHED);
+        }
         this.meetingMembers.add(member);
+        this.currentMemberCount = this.meetingMembers.size();
     }
 
+    public void applyFromDomain(Meeting meeting) {
+        this.name = meeting.getName();
+        this.description = meeting.getDescription();
+        this.meetingImage = meeting.getMeetingImage();
+        this.category = meeting.getCategory();
+        this.maxMemberCount = meeting.getMaxMemberCount();
+        this.currentMemberCount = this.meetingMembers.size();
+
+        this.platformUrls.clear();
+        this.platformUrls.addAll(meeting.getPlatformURL());
+    }
 
 }
