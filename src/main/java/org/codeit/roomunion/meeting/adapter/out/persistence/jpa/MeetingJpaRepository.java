@@ -1,15 +1,18 @@
 package org.codeit.roomunion.meeting.adapter.out.persistence.jpa;
 
+import jakarta.persistence.LockModeType;
+import java.util.List;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
 
@@ -61,5 +64,31 @@ public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long>
             where m.id in :ids
         """)
     List<MeetingEntity> findAllWithPlatformUrlsByIdIn(@Param("ids") List<Long> ids);
+
+
+    @EntityGraph(attributePaths = {"meetingMembers", "meetingMembers.user"})
+    @Query("""
+           select m
+           from MeetingEntity m
+           join m.meetingMembers mm
+           where mm.user.id = :userId
+             and mm.meetingRole = :role
+           order by m.createdAt desc
+        """)
+    Page<MeetingEntity> findByUserAndRole(
+        @Param("userId") Long userId,
+        @Param("role") MeetingRole role,
+        Pageable pageable
+    );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            select m from MeetingEntity m
+            left join fetch m.meetingMembers mm
+            left join fetch mm.user
+            where m.id = :id
+        """)
+    Optional<MeetingEntity> findWithLockById(@Param("id") Long id);
+
 
 }

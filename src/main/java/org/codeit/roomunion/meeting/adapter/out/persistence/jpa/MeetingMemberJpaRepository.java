@@ -35,16 +35,8 @@ public interface MeetingMemberJpaRepository extends JpaRepository<MeetingMemberE
 
     int countByMeetingId(Long meetingId);
 
-    @Query("""
-            select case when exists (
-                select 1
-                from MeetingMemberEntity mm
-                where mm.meeting.id = :meetingId
-                  and mm.user.id = :userId
-            ) then true else false end
-        """)
-    boolean existsByMeetingIdAndUserId(@Param("meetingId") Long meetingId,
-                                       @Param("userId") Long userId);
+    // MeetingMemberEntity에 meeting_id, user_id로 매핑되어서 메소드명 이렇게 지어야함
+    boolean existsByMeeting_IdAndUser_Id(Long meetingId, Long userId);
 
     @Query("""
             select case when exists (

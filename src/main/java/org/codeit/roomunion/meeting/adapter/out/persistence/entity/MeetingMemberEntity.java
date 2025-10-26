@@ -46,11 +46,11 @@ public class MeetingMemberEntity {
         return this.meetingRole == MeetingRole.HOST;
     }
 
-    public static MeetingMemberEntity of(MeetingEntity meeting, UserEntity user, MeetingRole role) {
+    public static MeetingMemberEntity of(MeetingEntity meeting, UserEntity user) {
         return MeetingMemberEntity.builder()
             .meeting(meeting)
             .user(user)
-            .meetingRole(role)
+            .meetingRole(MeetingRole.MEMBER)
             .build();
     }
 

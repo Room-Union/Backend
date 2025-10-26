@@ -86,9 +86,7 @@ public class Meeting {
             throw new CustomException(MeetingErrorCode.MAX_COUNT_LESS_THAN_CURRENT);
         }
 
-        String nextImage = (command.getImageUrl() != null)
-            ? command.getImageUrl()
-            : this.meetingImage;
+        String nextImage = command.getImageUrl();
 
         return new Meeting(
             this.id,

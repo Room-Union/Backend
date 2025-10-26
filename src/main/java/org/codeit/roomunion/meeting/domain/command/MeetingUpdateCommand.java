@@ -18,6 +18,7 @@ public class MeetingUpdateCommand {
     private final Integer maxMemberCount;
     private final List<String> platformURL;
     private final String imageUrl;
+    private final String removeImageUrl;
 
     public static MeetingUpdateCommand of(MeetingUpdateCommand baseCommand, String imageUrl) {
         return MeetingUpdateCommand.builder()
@@ -27,6 +28,7 @@ public class MeetingUpdateCommand {
             .maxMemberCount(baseCommand.getMaxMemberCount())
             .platformURL(baseCommand.getPlatformURL())
             .imageUrl(imageUrl)
+            .removeImageUrl(baseCommand.getRemoveImageUrl())
             .build();
     }
 
