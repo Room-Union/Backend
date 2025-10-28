@@ -1,0 +1,113 @@
+package org.codeit.roomunion.meeting.adapter.out.persistence;
+
+import jakarta.persistence.EntityManager;
+import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
+import org.codeit.roomunion.common.exception.CustomException;
+import org.codeit.roomunion.meeting.adapter.out.persistence.entity.AppointmentEntity;
+import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
+import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.AppointmentDslRepository;
+import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingJpaRepository;
+import org.codeit.roomunion.meeting.application.port.out.AppointmentRepository;
+import org.codeit.roomunion.meeting.domain.command.AppointmentCreateCommand;
+import org.codeit.roomunion.meeting.domain.command.AppointmentModifyCommand;
+import org.codeit.roomunion.meeting.domain.model.Appointment;
+import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
+import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
+import org.codeit.roomunion.user.adapter.out.persistence.factory.ImageFactory;
+import org.codeit.roomunion.user.domain.model.User;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Repository
+public class AppointmentRepositoryImpl implements AppointmentRepository {
+
+    private final EntityManager entityManager;
+    private final MeetingJpaRepository meetingJpaRepository;
+    private final AppointmentDslRepository appointmentDslRepository;
+    private final ImageFactory imageFactory;
+
+    public AppointmentRepositoryImpl(EntityManager entityManager, MeetingJpaRepository meetingJpaRepository, AppointmentDslRepository appointmentDslRepository, ImageFactory imageFactory) {
+        this.entityManager = entityManager;
+        this.meetingJpaRepository = meetingJpaRepository;
+        this.appointmentDslRepository = appointmentDslRepository;
+        this.imageFactory = imageFactory;
+    }
+
+    @Override
+    public Appointment save(AppointmentCreateCommand command, User user, boolean hasImage, LocalDateTime currentAt) {
+        MeetingEntity meetingEntity = meetingJpaRepository.findByIdWithAppointments(command.getMeetingId())
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
+
+        UserEntity userProxy = entityManager.getReference(UserEntity.class, user.getId());
+        AppointmentEntity appointmentEntity = AppointmentEntity.from(command, hasImage, meetingEntity);
+        appointmentEntity.join(userProxy, currentAt);
+
+        meetingEntity.createAppointment(appointmentEntity);
+        String imagePath = imageFactory.createAppointmentImagePath(appointmentEntity);
+        entityManager.flush();
+
+        return appointmentEntity.toDomain(imagePath);
+    }
+
+    @Override
+    public Appointment modify(AppointmentModifyCommand command, User user, boolean hasImage, LocalDateTime currentAt) {
+        MeetingEntity meetingEntity = meetingJpaRepository.findByIdWithAppointments(command.getMeetingId())
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
+
+        AppointmentEntity appointmentEntity = meetingEntity.getAppointments()
+            .stream()
+            .filter(entity -> entity.equalsById(command.getAppointmentId()))
+            .findFirst()
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.APPOINTMENT_NOT_FOUND));
+
+        appointmentEntity.modify(command, hasImage);
+
+        String imagePath = imageFactory.createAppointmentImagePath(appointmentEntity);
+        return appointmentEntity.toDomain(imagePath);
+    }
+
+    @Override
+    public Appointment deleteAppointment(Long meetingId, Long appointmentId) {
+        AppointmentEntity appointmentEntity = meetingJpaRepository.findByIdWithAppointments(meetingId)
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND))
+            .deleteAppointment(appointmentId);
+        String imagePath = imageFactory.createAppointmentImagePath(appointmentEntity);
+        return appointmentEntity.toDomain(imagePath);
+    }
+
+    @Override
+    public void join(Long appointmentId, User user, LocalDateTime currentAt) {
+        AppointmentEntity appointment = appointmentDslRepository.findByIdWithMembers(appointmentId)
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.APPOINTMENT_NOT_FOUND));
+        if (appointment.isMember(user.getId())) {
+            throw new CustomException(MeetingErrorCode.APPOINTMENT_ALREADY_JOINED);
+        }
+
+        UserEntity userProxy = entityManager.getReference(UserEntity.class, user.getId());
+        appointment.join(userProxy, currentAt);
+    }
+
+    @Override
+    public void leave(Long appointmentId, User user) {
+        AppointmentEntity appointment = appointmentDslRepository.findByIdWithMembers(appointmentId)
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.APPOINTMENT_NOT_FOUND));
+        if (!appointment.isMember(user.getId())) {
+            throw new CustomException(MeetingErrorCode.APPOINTMENT_NOT_JOINED);
+        }
+
+        appointment.leave(user.getId());
+    }
+
+    @Override
+    public List<Appointment> findAllBy(Long meetingId, CustomUserDetails userDetails) {
+        return appointmentDslRepository.findAllBy(meetingId)
+            .stream()
+            .map(entity -> {
+                String imagePath = imageFactory.createAppointmentImagePath(entity);
+                return entity.toDomain(imagePath, userDetails);
+            })
+            .toList();
+    }
+}

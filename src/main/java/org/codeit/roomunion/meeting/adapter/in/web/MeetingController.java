@@ -3,8 +3,6 @@ package org.codeit.roomunion.meeting.adapter.in.web;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
@@ -14,9 +12,9 @@ import org.codeit.roomunion.meeting.adapter.in.web.request.UpdateMeetingRequest;
 import org.codeit.roomunion.meeting.adapter.in.web.response.MeetingResponse;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
-import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
+import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.codeit.roomunion.meeting.domain.model.MeetingSort;
@@ -26,6 +24,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @RestController

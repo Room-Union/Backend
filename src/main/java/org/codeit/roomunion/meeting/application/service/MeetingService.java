@@ -9,13 +9,9 @@ import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
-import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
-import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
-import org.codeit.roomunion.meeting.domain.model.MeetingBadge;
-import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
-import org.codeit.roomunion.meeting.domain.model.MeetingRole;
-import org.codeit.roomunion.meeting.domain.model.MeetingSort;
+import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
+import org.codeit.roomunion.meeting.domain.model.*;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
 import org.codeit.roomunion.user.domain.exception.UserErrorCode;
@@ -155,13 +151,15 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         Page<Meeting> pageResult = meetingRepository.findMyMeetings(role, page, size, currentUserId);
         return pageResult.map(this::getMeetingWithBadges);
     }
-
+    @Override
+    public boolean existsMemberBy(Long meetingId, User user) {
+        return meetingRepository.existsMemberBy(meetingId, user);
+    }
 
     private Meeting getMeetingWithBadges(Meeting meeting) {
         List<MeetingBadge> badges = calculateBadges(meeting, LocalDateTime.now());
         return meeting.withBadges(badges);
     }
-
 
     private List<MeetingBadge> calculateBadges(Meeting meeting, LocalDateTime now) {
         List<MeetingBadge> badges = new ArrayList<>();
@@ -191,6 +189,5 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
         }
 
         return badges;
-
     }
 }

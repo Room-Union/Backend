@@ -1,10 +1,11 @@
 package org.codeit.roomunion.common.adapter.in.web.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 @Getter
 @Builder

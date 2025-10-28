@@ -2,6 +2,7 @@ package org.codeit.roomunion.common.adapter.out.email;
 
 import lombok.extern.slf4j.Slf4j;
 import org.codeit.roomunion.common.application.port.out.EmailSender;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,10 @@ public class EmailSenderImpl implements EmailSender {
         simpleMailMessage.setSubject(subject);
         simpleMailMessage.setText(body);
 
-        mailSender.send(simpleMailMessage);
+        try {
+            mailSender.send(simpleMailMessage);
+        } catch (MailException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }

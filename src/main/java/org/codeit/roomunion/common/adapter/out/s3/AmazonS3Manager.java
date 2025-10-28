@@ -1,7 +1,6 @@
 package org.codeit.roomunion.common.adapter.out.s3;
 
 
-import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.codeit.roomunion.common.config.S3.S3Properties;
@@ -14,6 +13,7 @@ import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.net.URI;
 
 @Slf4j
 @Component
@@ -83,6 +83,14 @@ public class AmazonS3Manager {
         } catch (Exception e) {
             log.error("S3 URL 파싱 오류: {}", fileUrl, e);
             return null;
+        }
+    }
+
+    public void deleteFile(String keyName) {
+        try {
+            s3Client.deleteObject(builder -> builder.bucket(s3Properties.getBucket()).key(keyName));
+        } catch (Exception e) {
+            log.error("error at AmazonS3Manager deleteFile", e);
         }
     }
 }
