@@ -7,7 +7,6 @@ import org.codeit.roomunion.meeting.adapter.out.persistence.entity.AppointmentEn
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.AppointmentDslRepository;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingJpaRepository;
-import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingMemberDslRepository;
 import org.codeit.roomunion.meeting.application.port.out.AppointmentRepository;
 import org.codeit.roomunion.meeting.domain.command.AppointmentCreateCommand;
 import org.codeit.roomunion.meeting.domain.command.AppointmentModifyCommand;
@@ -26,20 +25,12 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
 
     private final EntityManager entityManager;
     private final MeetingJpaRepository meetingJpaRepository;
-    private final MeetingMemberDslRepository meetingMemberDslRepository;
     private final AppointmentDslRepository appointmentDslRepository;
     private final ImageFactory imageFactory;
 
-    public AppointmentRepositoryImpl(
-        EntityManager entityManager,
-        MeetingJpaRepository meetingJpaRepository,
-        MeetingMemberDslRepository meetingMemberDslRepository,
-        AppointmentDslRepository appointmentDslRepository,
-        ImageFactory imageFactory
-    ) {
+    public AppointmentRepositoryImpl(EntityManager entityManager, MeetingJpaRepository meetingJpaRepository, AppointmentDslRepository appointmentDslRepository, ImageFactory imageFactory) {
         this.entityManager = entityManager;
         this.meetingJpaRepository = meetingJpaRepository;
-        this.meetingMemberDslRepository = meetingMemberDslRepository;
         this.appointmentDslRepository = appointmentDslRepository;
         this.imageFactory = imageFactory;
     }
@@ -55,6 +46,8 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
 
         meetingEntity.createAppointment(appointmentEntity);
         String imagePath = imageFactory.createAppointmentImagePath(appointmentEntity);
+        entityManager.flush();
+
         return appointmentEntity.toDomain(imagePath);
     }
 
