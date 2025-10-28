@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.common.exception.CustomException;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
+import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingDslRepository;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingJpaRepository;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingMemberDslRepository;
 import org.codeit.roomunion.meeting.adapter.out.persistence.jpa.MeetingMemberJpaRepository;
@@ -38,6 +39,7 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     private final MeetingMemberJpaRepository meetingMemberJpaRepository;
     private final UserJpaRepository userJpaRepository;
     private final MeetingMemberDslRepository meetingMemberDslRepository;
+    private final MeetingDslRepository meetingDslRepository;
 
     @Override
     public Meeting createMeeting(MeetingCreateCommand command) {
@@ -171,5 +173,23 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     public boolean existsMemberBy(Long meetingId, User user) {
         return meetingMemberDslRepository.findBy(meetingId, user.getId())
             .isPresent();
+    }
+
+    @Override
+    public void deleteMember(Long meetingId, Long userId) {
+        MeetingEntity meeting = meetingJpaRepository.findByIdWithMembers(meetingId)
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_NOT_FOUND));
+
+        MeetingMemberEntity member = meeting.getMeetingMembers().stream()
+            .filter(meetingMemberEntity -> meetingMemberEntity.getUser().getId().equals(userId))
+            .findFirst()
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.MEETING_MEMBER_NOT_FOUND));
+
+        meeting.removeMember(member);
+    }
+
+    @Override
+    public Page<Meeting> searchByName(String name, int page, int size) {
+        return meetingDslRepository.searchByName(name, page, size);
     }
 }

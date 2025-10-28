@@ -1,5 +1,6 @@
 package org.codeit.roomunion.meeting.adapter.out.persistence.jpa;
 
+import java.util.Optional;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
 import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -48,4 +49,15 @@ public interface MeetingMemberJpaRepository extends JpaRepository<MeetingMemberE
             ) then true else false end
         """)
     boolean existsByMeetingIdAndUserIdAndRole(Long meetingId, Long userId, MeetingRole role);
+
+    @Query("""
+        select mm
+        from MeetingMemberEntity mm
+        where mm.meeting.id = :meetingId
+         and mm.user.id = :userId
+     """)
+    MeetingMemberEntity findByMeetingIdAndUserId(
+        @Param("meetingId") Long meetingId,
+        @Param("userId") Long userId
+    );
 }

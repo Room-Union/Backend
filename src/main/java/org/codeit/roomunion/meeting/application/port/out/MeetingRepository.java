@@ -35,4 +35,8 @@ public interface MeetingRepository {
     void deleteMeeting(Long meetingId);
 
     boolean existsMemberBy(Long meetingId, User user);
+
+    void deleteMember(Long meetingId, Long userId);
+
+    Page<Meeting> searchByName(String name, int page, int size);
 }
