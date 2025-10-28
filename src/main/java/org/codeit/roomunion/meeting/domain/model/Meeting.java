@@ -108,6 +108,7 @@ public class Meeting {
         return this.host.getId().equals(currentUserId);
     }
 
-
-
+    public boolean isNotHost(Long userId) {
+        return !isHost(userId);
+    }
 }

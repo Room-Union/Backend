@@ -7,7 +7,6 @@ import org.codeit.roomunion.common.jwt.JwtUtil;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.function.Function;
 
 @Service
@@ -32,14 +31,6 @@ public class JwtService {
         } catch (Exception e) {
             return true;
         }
-    }
-
-    public boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
     }
 
     private Claims extractAllClaims(String token) {

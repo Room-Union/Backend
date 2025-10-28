@@ -6,13 +6,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.codeit.roomunion.common.exception.CustomException;
-import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
+import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -70,6 +72,10 @@ public class MeetingEntity {
     @Builder.Default
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<String> platformUrls = new ArrayList<>();
+
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<AppointmentEntity> appointments = new ArrayList<>();
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -143,4 +149,22 @@ public class MeetingEntity {
         this.platformUrls.addAll(meeting.getPlatformURL());
     }
 
+    public void createAppointment(AppointmentEntity appointment) {
+        appointments.add(appointment);
+    }
+
+    public AppointmentEntity deleteAppointment(Long appointmentId) {
+        AppointmentEntity appointment = appointments.stream()
+            .filter(entity -> entity.equalsById(appointmentId))
+            .findFirst()
+            .orElseThrow(() -> new CustomException(MeetingErrorCode.APPOINTMENT_NOT_FOUND));
+
+        appointments.remove(appointment);
+        return appointment;
+    }
+
+    public void removeMember(MeetingMemberEntity member) {
+        this.meetingMembers.remove(member);
+        this.currentMemberCount = this.meetingMembers.size();
+    }
 }

@@ -1,6 +1,7 @@
 package org.codeit.roomunion.meeting.adapter.out.persistence.jpa;
 
 import jakarta.persistence.LockModeType;
+import java.util.List;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.MeetingRole;
@@ -12,7 +13,6 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
 
@@ -90,5 +90,13 @@ public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long>
         """)
     Optional<MeetingEntity> findWithLockById(@Param("id") Long id);
 
+
+    @Query("""
+            select meeting
+            from MeetingEntity meeting
+            left join fetch meeting.appointments appointments
+            where meeting.id = :meetingId
+        """)
+    Optional<MeetingEntity> findByIdWithAppointments(@Param("meetingId") Long meetingId);
 
 }

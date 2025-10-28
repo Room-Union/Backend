@@ -3,9 +3,9 @@ package org.codeit.roomunion.meeting.domain.command;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 
 import java.util.List;
-import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 
 @Getter
 @Builder

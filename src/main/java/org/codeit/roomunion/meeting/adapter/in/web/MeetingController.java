@@ -3,10 +3,7 @@ package org.codeit.roomunion.meeting.adapter.in.web;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.common.adapter.in.web.response.SimplePageResponse;
 import org.codeit.roomunion.meeting.adapter.in.web.request.CreateMeetingRequest;
@@ -14,9 +11,9 @@ import org.codeit.roomunion.meeting.adapter.in.web.request.UpdateMeetingRequest;
 import org.codeit.roomunion.meeting.adapter.in.web.response.MeetingResponse;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
-import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
+import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.MeetingRole;
 import org.codeit.roomunion.meeting.domain.model.MeetingSort;
@@ -26,6 +23,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @RestController
@@ -121,6 +121,33 @@ public class MeetingController {
         Page<MeetingResponse> response = meetings.map(MeetingResponse::from);
         return ResponseEntity.ok(SimplePageResponse.from(response));
     }
+
+    @Operation(summary = "모임 탈퇴(모임원만 가능)", description = "모임원일때만 모임 탈퇴 가능, 토큰 필수")
+    @DeleteMapping("/{meetingId}/leave")
+    public ResponseEntity<Map<String, String>> leaveMeeting(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @PathVariable Long meetingId
+    ) {
+        String meetingName = meetingCommandUseCase.leave(meetingId, userDetails);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", meetingName + " 모임을 탈퇴하였습니다.");
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "모임 검색(모임명 검색)", description = "모임명을 부분 일치(대소문자 무시)로 검색, 토큰 불필요.")
+    @GetMapping("/search")
+    public ResponseEntity<SimplePageResponse<MeetingResponse>> searchMeeting(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestParam(required = false) String meetingName,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<Meeting> meetings = meetingQueryUseCase.searchByName(meetingName, page, size, userDetails);
+        Page<MeetingResponse> response = meetings.map(MeetingResponse::from);
+        return ResponseEntity.ok(SimplePageResponse.from(response));
+    }
+
 
 
 }
