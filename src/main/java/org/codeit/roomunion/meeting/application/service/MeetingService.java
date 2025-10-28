@@ -6,6 +6,7 @@ import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.application.port.out.UuidRepository;
 import org.codeit.roomunion.common.domain.model.Uuid;
 import org.codeit.roomunion.common.exception.CustomException;
+import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
@@ -17,6 +18,7 @@ import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
 import org.codeit.roomunion.user.domain.exception.UserErrorCode;
 import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -131,6 +133,21 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     }
 
     @Override
+    @Transactional
+    public String leave(Long meetingId, CustomUserDetails userDetails) {
+        Long userId = userDetails.getUser().getId();
+        Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, userId);
+
+        if (meeting.isHost(userId)) {
+            throw new CustomException(MeetingErrorCode.MEETING_HOST_CANNOT_LEAVE);
+        }
+
+        meetingRepository.deleteMember(meetingId, userId);
+
+        return meeting.getName();
+    }
+
+    @Override
     public Meeting getByMeetingId(Long meetingId, CustomUserDetails userDetails) {
         Long currentUserId = userDetails.isLoggedIn() ? userDetails.getUser().getId() : 0L;
         Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, currentUserId);
@@ -154,6 +171,13 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     @Override
     public boolean existsMemberBy(Long meetingId, User user) {
         return meetingRepository.existsMemberBy(meetingId, user);
+    }
+
+    @Override
+    public Page<Meeting> searchByName(String name, int page, int size, CustomUserDetails userDetails) {
+        String trimmedName = name == null ? "" : name.trim();
+        Page<Meeting> pageResult = meetingRepository.searchByName(trimmedName, page, size);
+        return pageResult.map(this::getMeetingWithBadges);
     }
 
     private Meeting getMeetingWithBadges(Meeting meeting) {

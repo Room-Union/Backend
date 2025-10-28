@@ -14,4 +14,6 @@ public interface MeetingCommandUseCase {
     Meeting update(Long meetingId, CustomUserDetails userDetails, MeetingUpdateCommand command, MultipartFile image);
 
     void deleteMeeting(Long meetingId, CustomUserDetails userDetails);
+
+    String leave(Long meetingId, CustomUserDetails userDetails);
 }

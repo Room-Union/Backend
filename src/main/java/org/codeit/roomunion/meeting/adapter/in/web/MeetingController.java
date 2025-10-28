@@ -122,5 +122,32 @@ public class MeetingController {
         return ResponseEntity.ok(SimplePageResponse.from(response));
     }
 
+    @Operation(summary = "모임 탈퇴(모임원만 가능)", description = "모임원일때만 모임 탈퇴 가능, 토큰 필수")
+    @DeleteMapping("/{meetingId}/leave")
+    public ResponseEntity<Map<String, String>> leaveMeeting(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @PathVariable Long meetingId
+    ) {
+        String meetingName = meetingCommandUseCase.leave(meetingId, userDetails);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", meetingName + " 모임을 탈퇴하였습니다.");
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "모임 검색(모임명 검색)", description = "모임명을 부분 일치(대소문자 무시)로 검색, 토큰 불필요.")
+    @GetMapping("/search")
+    public ResponseEntity<SimplePageResponse<MeetingResponse>> searchMeeting(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestParam(required = false) String meetingName,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<Meeting> meetings = meetingQueryUseCase.searchByName(meetingName, page, size, userDetails);
+        Page<MeetingResponse> response = meetings.map(MeetingResponse::from);
+        return ResponseEntity.ok(SimplePageResponse.from(response));
+    }
+
+
 
 }

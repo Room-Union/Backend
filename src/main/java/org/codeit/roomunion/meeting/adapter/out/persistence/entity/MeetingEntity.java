@@ -160,4 +160,9 @@ public class MeetingEntity {
         appointments.remove(appointment);
         return appointment;
     }
+
+    public void removeMember(MeetingMemberEntity member) {
+        this.meetingMembers.remove(member);
+        this.currentMemberCount = this.meetingMembers.size();
+    }
 }

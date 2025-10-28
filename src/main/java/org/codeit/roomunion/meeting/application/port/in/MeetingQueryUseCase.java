@@ -17,4 +17,6 @@ public interface MeetingQueryUseCase {
     Page<Meeting> getMyMeetings(MeetingRole role, int page, int size, CustomUserDetails userDetails);
 
     boolean existsMemberBy(Long meetingId, User user);
+
+    Page<Meeting> searchByName(String keyword, int page, int size, CustomUserDetails userDetails);
 }
