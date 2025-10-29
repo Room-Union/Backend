@@ -1,12 +1,16 @@
 package org.codeit.roomunion.auth.application.service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.common.jwt.JwtUtil;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.function.Function;
 
 @Service
@@ -26,8 +30,15 @@ public class JwtService {
 
     public boolean isTokenInvalid(String token, UserDetails userDetails) {
         try {
-            final String username = extractUsername(token);
-            return !(username.equals(userDetails.getUsername()));
+            final Claims claims = extractAllClaims(token);
+            final String username = claims.get("email", String.class);
+            final Date expiration = claims.getExpiration();
+
+            return !username.equals(userDetails.getUsername()) || expiration.before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        } catch (MalformedJwtException | SignatureException e) {
+            return true;
         } catch (Exception e) {
             return true;
         }

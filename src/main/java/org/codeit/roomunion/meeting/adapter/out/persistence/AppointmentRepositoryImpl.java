@@ -84,6 +84,9 @@ public class AppointmentRepositoryImpl implements AppointmentRepository {
         if (appointment.isMember(user.getId())) {
             throw new CustomException(MeetingErrorCode.APPOINTMENT_ALREADY_JOINED);
         }
+        if (appointment.isFull()) {
+            throw new CustomException(MeetingErrorCode.APPOINTMENT_MEMBER_LIMIT_REACHED);
+        }
 
         UserEntity userProxy = entityManager.getReference(UserEntity.class, user.getId());
         appointment.join(userProxy, currentAt);
