@@ -135,19 +135,28 @@ public class MeetingController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "모임 검색(모임명 검색)", description = "모임명을 부분 일치(대소문자 무시)로 검색, 토큰 불필요.")
+    @Operation(summary = "모임 검색(토큰 없어도 가능)", description = "모임명을 부분 일치(대소문자 무시)로 검색, 토큰 불필요.")
     @GetMapping("/search")
     public ResponseEntity<SimplePageResponse<MeetingResponse>> searchMeeting(
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @RequestParam(required = false) String meetingName,
+        @RequestParam(required = false) MeetingCategory category,
+        @RequestParam(defaultValue = "LATEST") MeetingSort sort,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
-        Page<Meeting> meetings = meetingQueryUseCase.searchByName(meetingName, page, size, userDetails);
+        Page<Meeting> meetings = meetingQueryUseCase.searchByName(meetingName, category, sort, page, size, userDetails);
         Page<MeetingResponse> response = meetings.map(MeetingResponse::from);
         return ResponseEntity.ok(SimplePageResponse.from(response));
     }
 
-
+    @Operation(summary = "모임원들 조회(토큰 필요 없음)", description = "특정 모임의 모임원들 조회")
+    @GetMapping("/{meetingId}/members")
+    public ResponseEntity<List<MeetingMemberResponse>> getMeetingMembers(
+        @PathVariable Long meetingId
+    ) {
+        List<MeetingMemberResponse> response = meetingQueryUseCase.getMeetingMembers(meetingId);
+        return ResponseEntity.ok(response);
+    }
 
 }
