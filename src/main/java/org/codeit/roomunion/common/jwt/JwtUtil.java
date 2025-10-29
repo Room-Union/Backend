@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Component
@@ -30,6 +31,7 @@ public class JwtUtil {
         return Jwts.builder()
             .claim("sub", userId.toString())
             .claim("email", email)
+            .claim("jti", UUID.randomUUID().toString())
             .issuedAt(new Date(System.currentTimeMillis()))
             .expiration(new Date(System.currentTimeMillis() + expiration))
             .signWith(secretKey)

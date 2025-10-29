@@ -6,7 +6,8 @@ import org.codeit.roomunion.common.adapter.out.s3.AmazonS3Manager;
 import org.codeit.roomunion.common.application.port.out.UuidRepository;
 import org.codeit.roomunion.common.domain.model.Uuid;
 import org.codeit.roomunion.common.exception.CustomException;
-import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
+import org.codeit.roomunion.meeting.adapter.in.web.response.MeetingMemberResponse;
+import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
@@ -14,11 +15,11 @@ import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.*;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
+import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
 import org.codeit.roomunion.user.domain.exception.UserErrorCode;
 import org.codeit.roomunion.user.domain.model.User;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -174,10 +175,52 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     }
 
     @Override
-    public Page<Meeting> searchByName(String name, int page, int size, CustomUserDetails userDetails) {
-        String trimmedName = name == null ? "" : name.trim();
-        Page<Meeting> pageResult = meetingRepository.searchByName(trimmedName, page, size);
+    public Page<Meeting> searchByName(String name, MeetingCategory category, MeetingSort sort, int page, int size, CustomUserDetails userDetails) {
+        String cleanedName = cleanSearchKeyword(name);
+        Page<Meeting> pageResult = meetingRepository.searchByName(cleanedName, category, sort, page, size);
         return pageResult.map(this::getMeetingWithBadges);
+    }
+
+    @Override
+    public List<MeetingMemberResponse> getMeetingMembers(Long meetingId) {
+        boolean existsMeeting = meetingRepository.existsMeetingById(meetingId);
+
+        if (!existsMeeting) {
+            throw new CustomException(MeetingErrorCode.MEETING_NOT_FOUND);
+        }
+
+        List<MeetingMemberEntity> members = meetingRepository.getMeetingMembers(meetingId);
+
+        return members.stream()
+            .map(member -> {
+                String profileImageUrl = getProfileImageUrl(member);
+                return MeetingMemberResponse.from(member, profileImageUrl);
+            })
+            .toList();
+    }
+
+    private String getProfileImageUrl(MeetingMemberEntity member) {
+        UserEntity user = member.getUser();
+        String profileImageUrl = null;
+
+        if (user.isHasImage()) {
+            String key = String.format(User.PROFILE_IMAGE_PATH, user.getId());
+            profileImageUrl = s3Manager.getUrlByKey(key);
+        }
+        return profileImageUrl;
+    }
+
+    private String cleanSearchKeyword(String name) {
+        if (name == null) return "";
+
+        String cleanedKeyword = name.trim();
+        // 인젝션에 쓰일 수 있는 특수문자 정리
+        cleanedKeyword = cleanedKeyword.replaceAll("[\\'\\\"\\;\\=\\(\\)\\[\\]\\{\\}]", ""); // 위험 문자 제거
+        // LIKE 와일드카드 이스케이프
+        cleanedKeyword = cleanedKeyword.replace("\\", "\\\\")
+            .replace("%", "\\%")
+            .replace("_", "\\_");
+        return cleanedKeyword;
     }
 
     private Meeting getMeetingWithBadges(Meeting meeting) {

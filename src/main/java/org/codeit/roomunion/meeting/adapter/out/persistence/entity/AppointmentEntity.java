@@ -103,4 +103,8 @@ public class AppointmentEntity {
             this.hasImage = true;
         }
     }
+
+    public boolean isFull() {
+        return maxMemberCount <= members.size();
+    }
 }

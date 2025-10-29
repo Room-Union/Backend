@@ -1,6 +1,9 @@
 package org.codeit.roomunion.meeting.application.port.in;
 
+import java.util.List;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
+import org.codeit.roomunion.meeting.adapter.in.web.response.MeetingMemberResponse;
+import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
 import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
 import org.codeit.roomunion.meeting.domain.model.MeetingRole;
@@ -18,5 +21,7 @@ public interface MeetingQueryUseCase {
 
     boolean existsMemberBy(Long meetingId, User user);
 
-    Page<Meeting> searchByName(String keyword, int page, int size, CustomUserDetails userDetails);
+    Page<Meeting> searchByName(String keyword, MeetingCategory category, MeetingSort sort, int page, int size, CustomUserDetails userDetails);
+
+    List<MeetingMemberResponse> getMeetingMembers(Long meetingId);
 }

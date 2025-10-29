@@ -1,6 +1,9 @@
 package org.codeit.roomunion.auth.adapter.in.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,13 +54,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwtToken = authHeader.substring(7);
             String email;
 
-
             try {
-                email = extractEmailFromJwt(jwtToken, response);
+                email = extractEmailFromJwt(jwtToken);
+            } catch (ExpiredJwtException e) {
+                setErrorResponse(response, AuthErrorCode.EXPIRED_JWT);
+                return;
+            } catch (MalformedJwtException e) {
+                setErrorResponse(response, AuthErrorCode.MALFORMED_JWT);
+                return;
+            } catch (SignatureException e) {
+                setErrorResponse(response, AuthErrorCode.INVALID_JWT_SIGNATURE);
+                return;
             } catch (Exception e) {
                 setErrorResponse(response, AuthErrorCode.INVALID_JWT);
                 return;
             }
+
             LoginUserDetails userDetails = (LoginUserDetails) userDetailsService.loadUserByUsername(email);
 
             if (jwtService.isTokenInvalid(jwtToken, userDetails)) {
@@ -73,7 +85,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String extractEmailFromJwt(String jwtToken, HttpServletResponse response) throws IOException {
+    private String extractEmailFromJwt(String jwtToken) {
         return jwtService.extractUsername(jwtToken);
     }
 

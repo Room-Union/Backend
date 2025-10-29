@@ -49,6 +49,15 @@ public class AmazonS3Manager {
         }
     }
 
+    public String getUrlByKey(String keyName) {
+        return s3Client.utilities()
+            .getUrl(GetUrlRequest.builder()
+                .bucket(s3Properties.getBucket())
+                .key(keyName)
+                .build())
+            .toExternalForm();
+    }
+
     public void deleteObjectByUrl(String url) {
         try {
             String bucket = s3Properties.getBucket();
