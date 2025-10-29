@@ -189,7 +189,12 @@ public class MeetingRepositoryImpl implements MeetingRepository {
     }
 
     @Override
-    public Page<Meeting> searchByName(String name, int page, int size) {
-        return meetingDslRepository.searchByName(name, page, size);
+    public Page<Meeting> searchByName(String name, MeetingCategory category, MeetingSort sort, int page, int size) {
+        return meetingDslRepository.searchByName(name, category, sort, page, size);
+    }
+
+    @Override
+    public List<MeetingMemberEntity> getMeetingMembers(Long meetingId) {
+        return meetingMemberDslRepository.findMeetingMembers(meetingId);
     }
 }

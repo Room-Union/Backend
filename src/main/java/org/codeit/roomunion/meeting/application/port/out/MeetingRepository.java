@@ -1,5 +1,7 @@
 package org.codeit.roomunion.meeting.application.port.out;
 
+import java.util.List;
+import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
 import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
@@ -38,5 +40,7 @@ public interface MeetingRepository {
 
     void deleteMember(Long meetingId, Long userId);
 
-    Page<Meeting> searchByName(String name, int page, int size);
+    Page<Meeting> searchByName(String name, MeetingCategory category, MeetingSort sort, int page, int size);
+
+    List<MeetingMemberEntity> getMeetingMembers(Long meetingId);
 }

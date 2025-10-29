@@ -1,5 +1,7 @@
 package org.codeit.roomunion.meeting.adapter.out.persistence.jpa;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -7,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingEntity;
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.QMeetingEntity;
 import org.codeit.roomunion.meeting.domain.model.Meeting;
+import org.codeit.roomunion.meeting.domain.model.MeetingCategory;
+import org.codeit.roomunion.meeting.domain.model.MeetingSort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -19,18 +23,38 @@ public class MeetingDslRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public Page<Meeting> searchByName(String name, int page, int size) {
+    public Page<Meeting> searchByName(String name, MeetingCategory category, MeetingSort sort, int page, int size) {
         QMeetingEntity meeting = QMeetingEntity.meetingEntity;
         Pageable pageable = PageRequest.of(page, size);
 
-        BooleanExpression condition = (name == null || name.isBlank())
-            ? null
-            : meeting.name.containsIgnoreCase(name.trim());
+        BooleanBuilder builder = new BooleanBuilder();
+        if (name != null && !name.isBlank()) {
+            builder.and(meeting.name.containsIgnoreCase(name.trim()));
+        }
+        if (category != null) {
+            builder.and(meeting.category.eq(category));
+        }
+
+        OrderSpecifier<?>[] orderSpecifiers;
+
+        switch (sort) {
+            case MEMBER_DESC:
+                orderSpecifiers = new OrderSpecifier<?>[]{
+                    meeting.currentMemberCount.desc(),
+                    meeting.createdAt.desc()};
+                break;
+
+            case LATEST:
+            default:
+                orderSpecifiers = new OrderSpecifier<?>[]{
+                    meeting.createdAt.desc()};
+                break;
+        }
 
         List<MeetingEntity> contents = queryFactory
             .selectFrom(meeting)
-            .where(condition)
-            .orderBy(meeting.createdAt.desc())
+            .where(builder)
+            .orderBy(orderSpecifiers)
             .offset((long) page * size)
             .limit(size)
             .fetch();
