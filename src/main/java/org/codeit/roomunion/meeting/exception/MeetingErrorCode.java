@@ -28,6 +28,7 @@ public enum MeetingErrorCode implements BaseErrorCode {
     APPOINTMENT_NOT_FOUND("약속을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     APPOINTMENT_ALREADY_JOINED("이미 가입한 약속입니다.", HttpStatus.BAD_REQUEST),
     APPOINTMENT_NOT_JOINED("가입한 약속이 아닙니다.", HttpStatus.BAD_REQUEST),
+    APPOINTMENT_MEMBER_LIMIT_REACHED("약속 최대 멤버수에 도달하였습니다.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String message;
