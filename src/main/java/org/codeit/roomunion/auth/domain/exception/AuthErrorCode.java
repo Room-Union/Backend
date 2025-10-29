@@ -21,6 +21,10 @@ public enum AuthErrorCode implements BaseErrorCode {
 
     EXPIRED_JWT("만료된 JWT 토큰입니다.", HttpStatus.FORBIDDEN),
 
+    MALFORMED_JWT("형식이 잘못된 JWT 토큰입니다.", HttpStatus.FORBIDDEN),
+
+    INVALID_JWT_SIGNATURE("서명이 유효하지 않은 JWT 토큰입니다.", HttpStatus.FORBIDDEN),
+
     // 404
     USER_NOT_FOUND("유저를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
