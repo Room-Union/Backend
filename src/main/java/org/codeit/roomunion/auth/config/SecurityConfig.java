@@ -27,7 +27,6 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {"/v1/users/sign-up", "/v1/auth/login", "/v2/auth/login", "/v1/auth/refresh", "/v1/auth/email/send", "/v1/auth/email/verify", "/v1/auth/email/extend"};
     private static final String[] PUBLIC_GET_ENDPOINTS = {"/v1/meetings", "/v1/meetings/*", "/v1/meetings/*/appointments", "/v1/meetings/*/members"};
-    private static final String[] PUBLIC_ENDPOINTS = {"/v1/users/sign-up", "/v1/auth/login", "/v2/auth/login", "/v1/auth/refresh", "/v1/auth/email/send", "/v1/auth/email/verify", "/v1/auth/email/extend"};
     private static final String[] SWAGGER_ENDPOINTS = {"/swagger-ui/**", "/v3/api-docs/**"};
     private static final String[] AUTH_REQUIRED_GET_ENDPOINTS = {"/v1/meetings/mine"};
 
