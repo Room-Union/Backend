@@ -45,7 +45,7 @@ public class AuthV2Controller {
         cookie.setSecure(true);
         cookie.setPath("/api");
         cookie.setMaxAge(REFRESH_TOKEN_COOKIE_MAX_AGE);
-        cookie.setAttribute("SameSite", "Lax");
+        cookie.setAttribute("SameSite", "None");
         return cookie;
     }
 }
