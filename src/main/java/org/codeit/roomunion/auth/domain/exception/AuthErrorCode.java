@@ -25,6 +25,11 @@ public enum AuthErrorCode implements BaseErrorCode {
 
     INVALID_JWT_SIGNATURE("서명이 유효하지 않은 JWT 토큰입니다.", HttpStatus.FORBIDDEN),
 
+    // Refresh Token
+    INVALID_REFRESH_TOKEN("Refresh Token이 유효하지 않습니다.", HttpStatus.FORBIDDEN),
+    EXPIRED_REFRESH_TOKEN("Refresh Token이 만료되었습니다.", HttpStatus.FORBIDDEN),
+    REFRESH_TOKEN_NOT_FOUND("Refresh Token을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+
     // 404
     USER_NOT_FOUND("유저를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 

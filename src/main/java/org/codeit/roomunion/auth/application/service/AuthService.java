@@ -1,9 +1,13 @@
 package org.codeit.roomunion.auth.application.service;
 
 import org.codeit.roomunion.auth.application.port.in.AuthUseCase;
+import org.codeit.roomunion.auth.application.port.out.RefreshTokenRepository;
 import org.codeit.roomunion.auth.domain.event.EmailVerificationCodeEvent;
 import org.codeit.roomunion.auth.domain.exception.AuthErrorCode;
+import org.codeit.roomunion.auth.domain.model.LoginResult;
 import org.codeit.roomunion.auth.domain.model.LoginUserDetails;
+import org.codeit.roomunion.auth.domain.model.RefreshResult;
+import org.codeit.roomunion.auth.domain.model.RefreshToken;
 import org.codeit.roomunion.auth.domain.policy.EmailVerificationPolicy;
 import org.codeit.roomunion.common.application.port.out.EventPublisher;
 import org.codeit.roomunion.common.application.port.out.RandomNumberGenerator;
@@ -19,7 +23,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Service
@@ -29,8 +32,6 @@ public class AuthService implements AuthUseCase {
     private static final int VERIFICATION_CODE_BOUND = 1000000;
     private static final String ROOM_UNION_EMAIL_VERIFICATION_SUBJECT = "RoomUnion 회원가입 인증 코드";
     private static final String ROOM_UNION_EMAIL_VERIFICATION_BODY = "인증 코드: %s";
-    private static final String BEARER_TYPE = "Bearer %s";
-    private static final long JWT_EXPIRATION = Duration.ofHours(24).toMillis() * 7; // 7 days
 
     private final UserQueryUseCase userQueryUseCase;
     private final UserCommandUseCase userCommandUseCase;
@@ -39,8 +40,10 @@ public class AuthService implements AuthUseCase {
     private final EventPublisher eventPublisher;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public AuthService(UserQueryUseCase userQueryUseCase, UserCommandUseCase userCommandUseCase, RandomNumberGenerator randomNumberGenerator, TimeHolder timeHolder, EventPublisher eventPublisher, AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+    public AuthService(UserQueryUseCase userQueryUseCase, UserCommandUseCase userCommandUseCase, RandomNumberGenerator randomNumberGenerator, TimeHolder timeHolder, EventPublisher eventPublisher, AuthenticationManager authenticationManager, JwtUtil jwtUtil, JwtService jwtService, RefreshTokenRepository refreshTokenRepository) {
         this.userQueryUseCase = userQueryUseCase;
         this.userCommandUseCase = userCommandUseCase;
         this.randomNumberGenerator = randomNumberGenerator;
@@ -48,10 +51,13 @@ public class AuthService implements AuthUseCase {
         this.eventPublisher = eventPublisher;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.jwtService = jwtService;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     @Override
-    public String login(String email, String password) {
+    @Transactional
+    public LoginResult login(String email, String password) {
         try {
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password);
             Authentication authentication = authenticationManager.authenticate(authToken);
@@ -60,11 +66,42 @@ public class AuthService implements AuthUseCase {
             Long userId = userDetails.getId();
             String userEmail = userDetails.getUsername();
 
-            String jwt = jwtUtil.createJwt(userId, userEmail, JWT_EXPIRATION);
-            return BEARER_TYPE.formatted(jwt);
+            String accessToken = jwtUtil.createAccessToken(userId, userEmail);
+            String accessToken2 = jwtUtil.createAccessToken2(userId, userEmail);
+            String refreshToken = jwtUtil.createRefreshToken(userId, userEmail);
+
+            LocalDateTime currentAt = timeHolder.localDateTime();
+            LocalDateTime expiresAt = currentAt.plusSeconds(JwtUtil.REFRESH_TOKEN_EXPIRATION / 1000);
+            refreshTokenRepository.save(userId, refreshToken, expiresAt);
+
+            return LoginResult.of(accessToken, accessToken2, refreshToken);
         } catch (AuthenticationException e) {
             throw new CustomException(AuthErrorCode.INVALID_INPUT_VALUE);
         }
+    }
+
+    @Override
+    @Transactional
+    public RefreshResult refresh(String refreshToken) {
+        if (!jwtService.validateRefreshToken(refreshToken)) {
+            throw new CustomException(AuthErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        RefreshToken storedToken = refreshTokenRepository.getRefreshToken(refreshToken);
+        LocalDateTime currentAt = timeHolder.localDateTime();
+
+        if (storedToken.isExpired(currentAt)) {
+            refreshTokenRepository.deleteByUserId(storedToken.getUserId());
+            throw new CustomException(AuthErrorCode.EXPIRED_REFRESH_TOKEN);
+        }
+
+        Long userId = jwtService.extractUserId(refreshToken);
+        String email = jwtService.extractUsername(refreshToken);
+
+        String newAccessToken = jwtUtil.createAccessToken(userId, email);
+        String newAccessToken2 = jwtUtil.createAccessToken2(userId, email);
+
+        return RefreshResult.of(newAccessToken, newAccessToken2);
     }
 
     @Override

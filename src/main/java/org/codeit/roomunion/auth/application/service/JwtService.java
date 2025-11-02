@@ -28,6 +28,23 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
+    public Long extractUserId(String token) {
+        return extractClaim(token, claims -> Long.parseLong(claims.get("sub", String.class)));
+    }
+
+    public String extractTokenType(String token) {
+        return extractClaim(token, claims -> claims.get("type", String.class));
+    }
+
+    public boolean isRefreshToken(String token) {
+        try {
+            String tokenType = extractTokenType(token);
+            return "refresh".equals(tokenType);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public boolean isTokenInvalid(String token, UserDetails userDetails) {
         try {
             final Claims claims = extractAllClaims(token);
@@ -41,6 +58,26 @@ public class JwtService {
             return true;
         } catch (Exception e) {
             return true;
+        }
+    }
+
+    /**
+     * Refresh Token 유효성 검증
+     */
+    public boolean validateRefreshToken(String token) {
+        try {
+            final Claims claims = extractAllClaims(token);
+            final Date expiration = claims.getExpiration();
+            final String tokenType = claims.get("type", String.class);
+
+            // 만료 확인 및 타입 확인
+            return expiration.after(new Date()) && "refresh".equals(tokenType);
+        } catch (ExpiredJwtException e) {
+            return false;
+        } catch (MalformedJwtException | SignatureException e) {
+            return false;
+        } catch (Exception e) {
+            return false;
         }
     }
 
