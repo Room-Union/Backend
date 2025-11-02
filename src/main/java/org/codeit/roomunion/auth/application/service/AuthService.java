@@ -67,14 +67,13 @@ public class AuthService implements AuthUseCase {
             String userEmail = userDetails.getUsername();
 
             String accessToken = jwtUtil.createAccessToken(userId, userEmail);
-            String accessToken2 = jwtUtil.createAccessToken2(userId, userEmail);
             String refreshToken = jwtUtil.createRefreshToken(userId, userEmail);
 
             LocalDateTime currentAt = timeHolder.localDateTime();
             LocalDateTime expiresAt = currentAt.plusSeconds(JwtUtil.REFRESH_TOKEN_EXPIRATION / 1000);
             refreshTokenRepository.save(userId, refreshToken, expiresAt);
 
-            return LoginResult.of(accessToken, accessToken2, refreshToken);
+            return LoginResult.of(accessToken, refreshToken);
         } catch (AuthenticationException e) {
             throw new CustomException(AuthErrorCode.INVALID_INPUT_VALUE);
         }
@@ -99,9 +98,8 @@ public class AuthService implements AuthUseCase {
         String email = jwtService.extractUsername(refreshToken);
 
         String newAccessToken = jwtUtil.createAccessToken(userId, email);
-        String newAccessToken2 = jwtUtil.createAccessToken2(userId, email);
 
-        return RefreshResult.of(newAccessToken, newAccessToken2);
+        return RefreshResult.of(newAccessToken);
     }
 
     @Override
