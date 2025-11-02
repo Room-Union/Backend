@@ -21,11 +21,15 @@ public class SimplePageResponse<T> {
     @Schema(description = "페이지당 데이터 개수", example = "10")
     private int size;
 
+    @Schema(description = "마지막 페이지인지 유무", example = "true")
+    private boolean last;
+
     public static <T> SimplePageResponse<T> from(Page<T> page) {
         return SimplePageResponse.<T>builder()
             .content(page.getContent())
             .page(page.getNumber())
             .size(page.getSize())
+            .last(page.isLast())
             .build();
     }
 }
