@@ -36,7 +36,7 @@ public class AuthV2Controller {
         Cookie refreshTokenCookie = createRefreshTokenCookie(loginResult.getRefreshToken(), response);
         response.addCookie(refreshTokenCookie);
 
-        return ResponseEntity.ok(TokenResponse.of(loginResult.getAccessToken(), loginResult.getAccessToken2()));
+        return ResponseEntity.ok(TokenResponse.of(loginResult.getAccessToken()));
     }
 
     private Cookie createRefreshTokenCookie(String refreshToken, HttpServletResponse response) {

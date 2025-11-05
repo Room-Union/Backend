@@ -40,7 +40,7 @@ public class AuthController {
         }
 
         RefreshResult refreshResult = authUsecase.refresh(refreshToken);
-        return ResponseEntity.ok(TokenResponse.of(refreshResult.getAccessToken(), refreshResult.getAccessToken2()));
+        return ResponseEntity.ok(TokenResponse.of(refreshResult.getAccessToken()));
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {
