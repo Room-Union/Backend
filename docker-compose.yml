@@ -1,4 +1,16 @@
 services:
+  backend:
+    build: .                 # 같은 폴더의 Dockerfile 기반 빌드
+    container_name: backend
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env           # 로컬 개발용 환경변수
+    depends_on:
+      - mysql
+      - redis
+
   mysql:
     image: mysql:8.0 # 생성이미지:버전
     container_name: mysql

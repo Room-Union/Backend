@@ -1,0 +1,28 @@
+services:
+  backend:
+    image: 875707075077.dkr.ecr.ap-northeast-2.amazonaws.com/roomunion-server
+    container_name: backend
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env.prod
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7.0
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: [ "redis-server", "--requirepass", "${DOCKER_REDIS_PASSWORD}" ]
+    environment:
+      TZ: ${DOCKER_TZ}
+    volumes:
+      - ./db/redis/data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "${DOCKER_REDIS_PASSWORD}", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5

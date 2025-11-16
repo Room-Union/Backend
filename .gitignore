@@ -147,3 +147,6 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij+all,gradle
 
 .env
+.env.prod
+db/mysql/
+db/redis/
