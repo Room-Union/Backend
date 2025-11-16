@@ -26,29 +26,6 @@ jobs:
       - name: Grant execute permission for gradlew  # gradlew 실행 권한 부여
         run: chmod +x gradlew
 
-      - name: Set up Gradle  # 최신 권장 방식의 Gradle 설정
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Build with Gradle  # Gradle 빌드 실행 (테스트 제외)
-        run: ./gradlew clean build -x test
-
-      - name: Upload build artifact  # 빌드된 아티팩트 업로드
-        uses: actions/upload-artifact@v4
-        with:
-          name: serverTest
-          path: build/libs/*.jar
-
-  deploy:
-    needs: build  # build 작업이 성공적으로 완료된 후 실행
-    runs-on: ubuntu-24.04
-
-    steps:
-      - name: Download build artifact  # 이전 단계에서 업로드한 아티팩트 다운로드
-        uses: actions/download-artifact@v4
-        with:
-          name: serverTest
-          path: build/libs/
-
       # ECR에 접근할 수 있는 권한을 허용받기 위해
       - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
         uses: aws-actions/configure-aws-credentials@v4
@@ -71,7 +48,16 @@ jobs:
 
       - name: ECR에 Docker 이미지 Push하기
         run: docker push ${{ steps.login-ecr.outputs.registry }}/roomunion-server:latest
+    outputs:
+      ecr_registry: ${{ steps.login-ecr.outputs.registry }}
 
+
+
+  deploy:
+    needs: build  # build 작업이 성공적으로 완료된 후 실행
+    runs-on: ubuntu-24.04
+
+    steps:
       - name: SSH(원격 접속)로 EC2에 접속하기
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -81,7 +67,11 @@ jobs:
           script_stop: true
           script: |
             cd roomunion-server
+            
+            # (ECR이 private이므로)EC2에서 ECR 로그인 – EC2에 AWS CLI + 권한 있어야 함
+            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ needs.build.outputs.ecr_registry }}
+            
             docker compose down --rmi all
-            docker pull ${{ steps.login-ecr.outputs.registry }}/roomunion-server:latest
+            docker pull ${{ needs.build.outputs.ecr_registry }}/roomunion-server:latest
             docker compose up -d    
-
+            
