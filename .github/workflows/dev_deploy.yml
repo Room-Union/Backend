@@ -24,7 +24,12 @@ jobs:
         shell: bash
 
       - name: Grant execute permission for gradlew  # gradlew 실행 권한 부여
-        run: chmod +x gradlew
+        run: | 
+          chmod +x gradlew
+          ./gradlew clean build
+        
+        
+
 
       # ECR에 접근할 수 있는 권한을 허용받기 위해
       - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
