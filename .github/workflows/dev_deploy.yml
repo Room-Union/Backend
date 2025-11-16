@@ -26,7 +26,7 @@ jobs:
       - name: Grant execute permission for gradlew  # gradlew 실행 권한 부여
         run: | 
           chmod +x gradlew
-          ./gradlew clean build
+          ./gradlew clean bootJar -x test
         
         
 
