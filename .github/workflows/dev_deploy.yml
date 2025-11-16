@@ -49,19 +49,39 @@ jobs:
           name: serverTest
           path: build/libs/
 
-      - name: Deploy to EC2  # EC2에 배포
-        env:
-          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-        run: |
-          echo "$EC2_SSH_KEY" > private_key.pem
-          chmod 600 private_key.pem
-          jar_file=$(find build/libs -name '*.jar' ! -name '*plain.jar' | head -n 1)
-          scp -i private_key.pem -o StrictHostKeyChecking=no "$jar_file" $EC2_USERNAME@$EC2_HOST:/home/$EC2_USERNAME/serverTest.jar
-          ssh -i private_key.pem -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_HOST "
-            pgrep java | xargs -r kill -15  # 기존에 실행 중인 Java 프로세스 종료
-            sleep 10
-            nohup java -jar /home/$EC2_USERNAME/serverTest.jar > app.log 2>&1 &  # 새 버전 애플리케이션 실행
-          "
-          rm -f private_key.pem  # 민감한 정보 삭제
+      # ECR에 접근할 수 있는 권한을 허용받기 위해
+      - name: AWS Resource에 접근할 수 있게 AWS credentials 설정
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-northeast-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: ECR에 로그인하기
+        id: login-ecr
+        # 라이브러리가 있음
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Docker 이미지 생성
+        run: docker build -t roomunion-server .
+        # . 은 현재 경로의 Dockerfile을 기반으로 이미지 파일 생성
+
+      - name: Docker 이미지에 Tag 붙이기
+        run: docker tag roomunion-server ${{ steps.login-ecr.outputs.registry }}/roomunion-server:latest
+
+      - name: ECR에 Docker 이미지 Push하기
+        run: docker push ${{ steps.login-ecr.outputs.registry }}/roomunion-server:latest
+
+      - name: SSH(원격 접속)로 EC2에 접속하기
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            cd roomunion-server
+            docker compose down --rmi all
+            docker pull ${{ steps.login-ecr.outputs.registry }}/roomunion-server:latest
+            docker compose up -d    
+
