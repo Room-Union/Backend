@@ -1,5 +1,6 @@
 package org.codeit.roomunion.meeting.adapter.in.web;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.codeit.roomunion.auth.domain.model.CustomUserDetails;
 import org.codeit.roomunion.meeting.adapter.in.web.request.CreateAppointmentRequest;
 import org.codeit.roomunion.meeting.adapter.in.web.request.ModifyAppointmentRequest;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/meetings")
+@Tag(name = "모임 약속 API", description = "모임 약속 전용 API")
 public class AppointmentController {
 
     private final AppointmentCommandUseCase appointmentCommandUseCase;

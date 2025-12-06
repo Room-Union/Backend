@@ -5,6 +5,7 @@ server:
     max-swallow-size: -1
 
 spring:
+
   servlet:
     multipart:
       max-file-size: 30MB
@@ -62,3 +63,7 @@ cloud:
     credentials:
       access-key: ${AWS_ACCESS_KEY_ID}
       secret-key: ${AWS_SECRET_ACCESS_KEY}
+
+app:
+  cookie:
+    secure: ${COOKIE_SECURE:true}
