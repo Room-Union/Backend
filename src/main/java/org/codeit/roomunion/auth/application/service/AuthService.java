@@ -1,5 +1,6 @@
 package org.codeit.roomunion.auth.application.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.codeit.roomunion.auth.application.port.in.AuthUseCase;
 import org.codeit.roomunion.auth.application.port.out.RefreshTokenRepository;
 import org.codeit.roomunion.auth.domain.event.EmailVerificationCodeEvent;
@@ -27,6 +28,7 @@ import java.time.LocalDateTime;
 
 @Service
 @Transactional(readOnly = true)
+@Slf4j
 public class AuthService implements AuthUseCase {
 
     private static final int VERIFICATION_CODE_BOUND = 1000000;
@@ -75,6 +77,7 @@ public class AuthService implements AuthUseCase {
 
             return LoginResult.of(accessToken, refreshToken);
         } catch (AuthenticationException e) {
+            log.error("login error", e);
             throw new CustomException(AuthErrorCode.INVALID_INPUT_VALUE);
         }
     }
