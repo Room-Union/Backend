@@ -17,10 +17,10 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Make application.yml  # application.yml 파일 생성
+      - name: Make compose.yml  # docker compose.yml 생성
         run: |
           cd ./src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
+          echo "${{ secrets.compose_yml }}" > ./compose.yml
         shell: bash
 
       - name: Grant execute permission for gradlew  # gradlew 실행 권한 부여
@@ -71,6 +71,28 @@ jobs:
           script_stop: true
           script: |
             cd roomunion-server
+            
+            echo "=== Generate .env (overwrite) ==="
+            cat <<EOF > .env
+            # Redis
+            DOCKER_REDIS_PASSWORD=${{ secrets.DOCKER_REDIS_PASSWORD }}
+            DOCKER_TZ=Asia/Seoul
+
+            # Database
+            DB_URL=${{ secrets.DB_URL }}
+            DB_USERNAME=${{ secrets.DB_USERNAME }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+
+            # Mail
+            GMAIL_APP_ADDRESS=${{ secrets.GMAIL_APP_ADDRESS }}
+            GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}
+
+            # AWS / S3
+            CLOUD_AWS_S3_BUCKET=${{ secrets.CLOUD_AWS_S3_BUCKET }}
+            CLOUD_AWS_REGION_STATIC=${{ secrets.CLOUD_AWS_REGION_STATIC }}
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            EOF
             
             # (ECR이 private이므로)EC2에서 ECR 로그인 – EC2에 AWS CLI + 권한 있어야 함
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ needs.build.outputs.ecr_registry }}
