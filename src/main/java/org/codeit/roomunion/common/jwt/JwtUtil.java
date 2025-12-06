@@ -18,7 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JwtUtil {
 
-    public static final long ACCESS_TOKEN_EXPIRATION = Duration.ofMinutes(5).toMillis();
+    public static final long ACCESS_TOKEN_EXPIRATION = Duration.ofHours(1).toMillis();
 
     public static final long REFRESH_TOKEN_EXPIRATION = Duration.ofDays(7).toMillis();
 

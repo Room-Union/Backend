@@ -6,6 +6,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final String ACCESS_TOKEN_COOKIE_NAME = "accessToken";
+
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     private final ObjectMapper objectMapper;
@@ -40,72 +43,91 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         @NonNull HttpServletResponse response,
         @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        final String authHeader = request.getHeader("Authorization");
 
-        if (isNotBearerToken(authHeader)) {
+        String jwtToken = resolveToken(request);
+
+        // 토큰이 아예 없으면 -> UnknownUser 혹은 그냥 다음 필터로 넘김
+        if (jwtToken == null) {
             CustomUserDetails unknownUserDetails = UnknownUserDetails.getInstance();
-            UsernamePasswordAuthenticationToken unknownToken = new UsernamePasswordAuthenticationToken(unknownUserDetails, null);
+            UsernamePasswordAuthenticationToken unknownToken = new UsernamePasswordAuthenticationToken(unknownUserDetails, null, unknownUserDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(unknownToken);
+
             filterChain.doFilter(request, response);
             return;
         }
 
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            String jwtToken = authHeader.substring(7);
-            String email;
-
-            try {
-                email = extractEmailFromJwt(jwtToken);
-            } catch (ExpiredJwtException e) {
-                setErrorResponse(response, AuthErrorCode.EXPIRED_JWT);
-                return;
-            } catch (MalformedJwtException e) {
-                setErrorResponse(response, AuthErrorCode.MALFORMED_JWT);
-                return;
-            } catch (SignatureException e) {
-                setErrorResponse(response, AuthErrorCode.INVALID_JWT_SIGNATURE);
-                return;
-            } catch (Exception e) {
-                setErrorResponse(response, AuthErrorCode.INVALID_JWT);
-                return;
-            }
-
-            LoginUserDetails userDetails = (LoginUserDetails) userDetailsService.loadUserByUsername(email);
-
-            if (jwtService.isTokenInvalid(jwtToken, userDetails)) {
-                setErrorResponse(response, AuthErrorCode.INVALID_JWT);
-                return;
-            }
-
-            UsernamePasswordAuthenticationToken authToken = createUserPasswordAuthenticationToken(userDetails);
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+        // 이미 인증된 상태면 패스
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            filterChain.doFilter(request, response);
+            return;
         }
+
+
+        String email;
+        try {
+            email = jwtService.extractUsername(jwtToken);
+        } catch (ExpiredJwtException e) {
+            setErrorResponse(response, AuthErrorCode.EXPIRED_JWT);
+            return;
+        } catch (MalformedJwtException e) {
+            setErrorResponse(response, AuthErrorCode.MALFORMED_JWT);
+            return;
+        } catch (SignatureException e) {
+            setErrorResponse(response, AuthErrorCode.INVALID_JWT_SIGNATURE);
+            return;
+        } catch (Exception e) {
+            setErrorResponse(response, AuthErrorCode.INVALID_JWT);
+            return;
+        }
+
+        LoginUserDetails userDetails =
+            (LoginUserDetails) userDetailsService.loadUserByUsername(email);
+
+        if (jwtService.isTokenInvalid(jwtToken, userDetails)) {
+            setErrorResponse(response, AuthErrorCode.INVALID_JWT);
+            return;
+        }
+
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
+
+        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
     }
 
-    private String extractEmailFromJwt(String jwtToken) {
-        return jwtService.extractUsername(jwtToken);
-    }
+    /**
+     * 1순위: 쿠키 accessToken
+     * 2순위: Authorization: Bearer ...
+     */
+    private String resolveToken(HttpServletRequest request) {
+        // 쿠키 먼저
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (ACCESS_TOKEN_COOKIE_NAME.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
 
-    private UsernamePasswordAuthenticationToken createUserPasswordAuthenticationToken(CustomUserDetails userDetails) {
-        return new UsernamePasswordAuthenticationToken(
-            userDetails,
-            null,
-            userDetails.getAuthorities()
-        );
-    }
+        // 그다음 Authorization 헤더(Bearer)도 허용
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
 
-    private boolean isNotBearerToken(String authHeader) {
-        return authHeader == null || !authHeader.startsWith("Bearer ");
+        return null;
     }
 
     private void setErrorResponse(HttpServletResponse response, BaseErrorCode errorCode) throws IOException {
         String errorResponse = objectMapper.writeValueAsString(createErrorResponse(errorCode));
         response.setStatus(errorCode.getStatusValue());
         response.setContentType("application/json; charset=UTF-8");
-
         response.getWriter().write(errorResponse);
     }
 
