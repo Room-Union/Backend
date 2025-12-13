@@ -51,7 +51,6 @@ public class AuthController {
         @RequestBody LoginRequest request,
         HttpServletResponse response
     ) {
-        log.info("[AuthController] /login called. body={}", request); // 추가
         LoginResult loginResult = authUsecase.login(request.email(), request.password());
 
         Cookie accessTokenCookie = createAccessTokenCookie(loginResult.getAccessToken());
