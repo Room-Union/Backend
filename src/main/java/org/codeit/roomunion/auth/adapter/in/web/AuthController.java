@@ -84,7 +84,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refresh(HttpServletRequest request) {
+    public ResponseEntity<Void> refresh(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = extractRefreshTokenFromCookie(request);
 
         if (refreshToken == null) {
@@ -92,7 +92,10 @@ public class AuthController {
         }
 
         RefreshResult refreshResult = authUsecase.refresh(refreshToken);
-        return ResponseEntity.ok(TokenResponse.of(refreshResult.getAccessToken()));
+
+        Cookie accessTokenCookie = createAccessTokenCookie(refreshResult.getAccessToken());
+        response.addCookie(accessTokenCookie);
+        return ResponseEntity.noContent().build();
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {
