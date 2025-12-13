@@ -158,7 +158,9 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
     @Override
     public Page<Meeting> search(MeetingCategory category, MeetingSort sort, int page, int size, CustomUserDetails userDetails) {
-        Long currentUserId = userDetails.isLoggedIn() ? userDetails.getUser().getId() : 0L;
+        Long currentUserId = (userDetails != null && userDetails.isLoggedIn())
+            ? userDetails.getUser().getId()
+            : 0L;
         Page<Meeting> pageResult = meetingRepository.search(category, sort, page, size, currentUserId);
         return pageResult.map(this::getMeetingWithBadges);
     }
