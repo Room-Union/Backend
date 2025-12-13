@@ -12,6 +12,10 @@ public enum AuthErrorCode implements BaseErrorCode {
     // 400
     INVALID_INPUT_VALUE("입력값이 잘못되었습니다.", HttpStatus.BAD_REQUEST),
 
+    //401
+    UNAUTHORIZED_TOKEN("토큰이 없거나 만료되었습니다.", HttpStatus.UNAUTHORIZED),
+
+
     // 403,
     LOGIN_FAIL("로그인에 실패했습니다.", HttpStatus.FORBIDDEN),
 

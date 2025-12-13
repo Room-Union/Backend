@@ -3,6 +3,7 @@ package org.codeit.roomunion.auth.config;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.auth.adapter.in.filter.JwtAuthenticationFilter;
 import org.codeit.roomunion.auth.adapter.in.filter.LoginFilter;
+import org.codeit.roomunion.auth.adapter.security.JwtAuthenticationEntryPoint;
 import org.codeit.roomunion.common.jwt.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +35,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -44,6 +46,7 @@ public class SecurityConfig {
             .formLogin(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(SecurityConfig::authorizeHttpRequests)
+            .exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint)) // 토큰 없을때(만료) 403 -> 41
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
