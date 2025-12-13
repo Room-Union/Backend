@@ -46,12 +46,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String jwtToken = resolveToken(request);
 
-        // 토큰이 아예 없으면 -> UnknownUser 혹은 그냥 다음 필터로 넘김
+        // 토큰이 없으면 인증 세팅하지 말고 그냥 통과
         if (jwtToken == null) {
-            CustomUserDetails unknownUserDetails = UnknownUserDetails.getInstance();
-            UsernamePasswordAuthenticationToken unknownToken = new UsernamePasswordAuthenticationToken(unknownUserDetails, null, unknownUserDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(unknownToken);
-
             filterChain.doFilter(request, response);
             return;
         }
