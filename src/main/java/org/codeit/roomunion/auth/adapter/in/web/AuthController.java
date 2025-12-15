@@ -66,7 +66,7 @@ public class AuthController {
         Cookie cookie = new Cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken);
         cookie.setHttpOnly(true);
         cookie.setSecure(cookieSecure);
-        cookie.setPath("/api");
+        cookie.setPath("/");
         cookie.setMaxAge(ACCESS_TOKEN_COOKIE_MAX_AGE);
         cookie.setAttribute("SameSite", "None");
         return cookie;
@@ -76,7 +76,7 @@ public class AuthController {
         Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
         cookie.setHttpOnly(true);
         cookie.setSecure(cookieSecure);
-        cookie.setPath("/api");
+        cookie.setPath("/");
         cookie.setMaxAge(REFRESH_TOKEN_COOKIE_MAX_AGE);
         cookie.setAttribute("SameSite", "Lax");
         return cookie;
@@ -121,7 +121,7 @@ public class AuthController {
         Cookie cookie = new Cookie(name, null);
         cookie.setHttpOnly(true);
         cookie.setSecure(cookieSecure);
-        cookie.setPath("/api");
+        cookie.setPath("/");
         cookie.setMaxAge(0);
         cookie.setAttribute("SameSite", sameSite);
         response.addCookie(cookie);
