@@ -150,7 +150,9 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
 
     @Override
     public Meeting getByMeetingId(Long meetingId, CustomUserDetails userDetails) {
-        Long currentUserId = userDetails.isLoggedIn() ? userDetails.getUser().getId() : 0L;
+        Long currentUserId = (userDetails != null && userDetails.isLoggedIn())
+            ? userDetails.getUser().getId()
+            : 0L;
         Meeting meeting = meetingRepository.findByIdWithJoined(meetingId, currentUserId);
         return getMeetingWithBadges(meeting);
     }
