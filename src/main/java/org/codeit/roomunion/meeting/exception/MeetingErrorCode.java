@@ -17,6 +17,7 @@ public enum MeetingErrorCode implements BaseErrorCode {
     MEETING_MEMBER_LIMIT_REACHED("모임 최대 멤버수에 도달하였습니다.", HttpStatus.BAD_REQUEST),
     ALREADY_JOINED("이미 가입한 모임입니다.", HttpStatus.BAD_REQUEST),
     NOT_JOINED("가입한 모임이 아닙니다.", HttpStatus.BAD_REQUEST),
+    JOIN_CONFLICT("동시 가입 요청으로 인해 잠시 실패했습니다. 다시 시도해주세요.", HttpStatus.CONFLICT),
 
     MEETING_HOST_CANNOT_LEAVE("모임장은 탈퇴할 수 없습니다.", HttpStatus.FORBIDDEN),
     MEETING_MODIFY_FORBIDDEN("모임장만 수정할 수 있습니다.", HttpStatus.FORBIDDEN),

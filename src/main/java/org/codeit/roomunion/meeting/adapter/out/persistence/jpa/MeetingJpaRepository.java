@@ -81,14 +81,13 @@ public interface MeetingJpaRepository extends JpaRepository<MeetingEntity, Long>
         Pageable pageable
     );
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    //    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
             select m from MeetingEntity m
             left join fetch m.meetingMembers mm
-            left join fetch mm.user
             where m.id = :id
         """)
-    Optional<MeetingEntity> findWithLockById(@Param("id") Long id);
+    Optional<MeetingEntity> findForJoinById(@Param("id") Long id);
 
 
     @Query("""

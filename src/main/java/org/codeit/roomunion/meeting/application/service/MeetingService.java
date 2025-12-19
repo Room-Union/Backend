@@ -19,6 +19,8 @@ import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
 import org.codeit.roomunion.user.application.port.in.UserQueryUseCase;
 import org.codeit.roomunion.user.domain.exception.UserErrorCode;
 import org.codeit.roomunion.user.domain.model.User;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,8 +76,37 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
             throw new CustomException(MeetingErrorCode.ALREADY_JOINED);
         }
 
-        Meeting meeting = meetingRepository.insertMember(meetingId, userId);
-        return getMeetingWithBadges(meeting);
+        int maxRetry = 3;
+
+        for(int i = 0; i < maxRetry; i++) {
+            try {
+                // 모임 가입 시도
+                //    - MeetingEntity에 @Version이 걸려 있어
+                //      동시에 다른 트랜잭션이 수정하면 OptimisticLockException 발생
+                Meeting meeting = meetingRepository.insertMember(meetingId, userId);
+                return getMeetingWithBadges(meeting);
+            } catch (OptimisticLockingFailureException e) {
+                // 낙관적 락 충돌 발생
+                // → 다른 트랜잭션이 동일한 Meeting을 먼저 수정하여 버전이 변경됨
+                // → 최신 상태 기준으로 다시 처리하기 위해 재시도
+
+                if (i == maxRetry - 1) {
+                    // 모든 재시도 실패 시
+                    // -> 경쟁이 계속 발생한 경우이므로 충돌 에러 반환
+                    throw new CustomException(MeetingErrorCode.JOIN_CONFLICT);
+                }
+
+                //아직 재시도 횟수가 남아있으면 다음 루프로 이동
+                continue;
+            } catch (DataIntegrityViolationException e) {
+                // DB UNIQUE 제약 위반
+                //    (meeting_id, user_id) 중복 → 이미 가입한 사용자
+                //    → 서버 로직이 아닌 DB 차원에서 중복 가입 완전 차단
+                throw new CustomException(MeetingErrorCode.ALREADY_JOINED);
+            }
+        }
+
+        throw new CustomException(MeetingErrorCode.JOIN_CONFLICT);
     }
 
     @Override

@@ -80,6 +80,9 @@ public class MeetingEntity {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Version
+    private Long version;
+
     public static MeetingEntity from(MeetingCreateCommand command, UserEntity hostUser) {
         MeetingEntity meeting = MeetingEntity.builder()
             .name(command.getName())
@@ -130,11 +133,11 @@ public class MeetingEntity {
     }
 
     public void addMember(MeetingMemberEntity member) {
-        if (this.meetingMembers.size() >= this.maxMemberCount) {
+        if (this.currentMemberCount  >= this.maxMemberCount) {
             throw new CustomException(MeetingErrorCode.MEETING_MEMBER_LIMIT_REACHED);
         }
         this.meetingMembers.add(member);
-        this.currentMemberCount = this.meetingMembers.size();
+        this.currentMemberCount += 1;
     }
 
     public void applyFromDomain(Meeting meeting) {
@@ -165,6 +168,6 @@ public class MeetingEntity {
 
     public void removeMember(MeetingMemberEntity member) {
         this.meetingMembers.remove(member);
-        this.currentMemberCount = this.meetingMembers.size();
+        this.currentMemberCount -= 1;
     }
 }
