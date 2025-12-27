@@ -10,9 +10,11 @@ import org.codeit.roomunion.meeting.adapter.in.web.response.MeetingMemberRespons
 import org.codeit.roomunion.meeting.adapter.out.persistence.entity.MeetingMemberEntity;
 import org.codeit.roomunion.meeting.application.port.in.MeetingCommandUseCase;
 import org.codeit.roomunion.meeting.application.port.in.MeetingQueryUseCase;
+import org.codeit.roomunion.meeting.application.port.in.notification.NotificationUseCase;
 import org.codeit.roomunion.meeting.application.port.out.MeetingRepository;
 import org.codeit.roomunion.meeting.domain.command.MeetingCreateCommand;
 import org.codeit.roomunion.meeting.domain.command.MeetingUpdateCommand;
+import org.codeit.roomunion.meeting.domain.command.notification.CreateAndSendNotificationCommand;
 import org.codeit.roomunion.meeting.domain.model.*;
 import org.codeit.roomunion.meeting.exception.MeetingErrorCode;
 import org.codeit.roomunion.user.adapter.out.persistence.entity.UserEntity;
@@ -40,6 +42,7 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
     private final AmazonS3Manager s3Manager;
     private final UuidRepository uuidRepository;
     private final UserQueryUseCase userQueryUseCase;
+    private final NotificationUseCase notificationUseCase;
 
     @Override
     @Transactional
@@ -159,9 +162,33 @@ public class MeetingService implements MeetingCommandUseCase, MeetingQueryUseCas
             throw new CustomException(MeetingErrorCode.MEETING_DELETE_FORBIDDEN);
         }
 
-        deleteMeetingImage(meeting.getMeetingImage());
+        // 알림에 필요한 값은 삭제 전에 확보
+        String meetingName = meeting.getName();
+        String meetingImageUrl = meeting.getMeetingImage();
 
+        // 삭제 알림 받을 대상자(모임 참여자) 목록 추출
+        List<Long> targetUserIds = meetingRepository.getMeetingMembers(meetingId).stream()
+                .map(meetingMemberEntity -> meetingMemberEntity.getUser().getId())
+                    .distinct()
+                    .toList();
+
+        deleteMeetingImage(meeting.getMeetingImage());
         meetingRepository.deleteMeeting(meetingId);
+
+        String message = "참여 중이던 " + meetingName + " 모임이 모임장에 의해 삭제되었습니다.";
+        String targetUrl = "/gathering/detail/" + meetingId;
+
+        for (Long targetId: targetUserIds) {
+            notificationUseCase.createAndSend(
+                CreateAndSendNotificationCommand.of(
+                    targetId,
+                    NotificationType.MEETING_DELETED,
+                    message,
+                    targetUrl,
+                    meetingImageUrl
+                )
+            );
+        }
     }
 
     @Override
