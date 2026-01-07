@@ -10,7 +10,6 @@ import org.codeit.roomunion.meeting.domain.command.notification.CreateAndSendNot
 import org.codeit.roomunion.meeting.domain.command.notification.ReadNotificationCommand;
 import org.codeit.roomunion.meeting.domain.command.notification.SubscribeNotificationCommand;
 import org.codeit.roomunion.meeting.domain.model.Notification;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
