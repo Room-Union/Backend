@@ -10,7 +10,6 @@ import org.codeit.roomunion.meeting.domain.command.notification.CreateAndSendNot
 import org.codeit.roomunion.meeting.domain.command.notification.ReadNotificationCommand;
 import org.codeit.roomunion.meeting.domain.command.notification.SubscribeNotificationCommand;
 import org.codeit.roomunion.meeting.domain.model.Notification;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -23,6 +22,7 @@ public class NotificationService implements NotificationUseCase {
 
     private final NotificationRepository notificationRepository;
     private final NotificationSsePort notificationSsePort;
+    private final NotificationAsyncService notificationAsyncService;
 
     @Override
     public SseEmitter subscribe(SubscribeNotificationCommand command) {
@@ -30,21 +30,13 @@ public class NotificationService implements NotificationUseCase {
         SseEmitter emitter = notificationSsePort.connect(userId);
 
         // 연결 직후: 미읽음 알림 밀어넣기(비동기)
-        pushUnreadAsync(userId, emitter);
+        notificationAsyncService.pushUnreadOnConnect(userId, emitter);
 
         return emitter;
     }
 
-    @Async
-    protected void pushUnreadAsync(Long userId, SseEmitter emitter) {
-        List<Notification> unreadNotification = notificationRepository.findUnread(userId);
-        if (!unreadNotification.isEmpty()) {
-            notificationSsePort.sendUnreadOnConnect(userId, emitter, unreadNotification);
-        }
-    }
-
-
     @Override
+    @Transactional
     public void createAndSend(CreateAndSendNotificationCommand command) {
         Long userId = command.getUserId();
 
@@ -69,6 +61,7 @@ public class NotificationService implements NotificationUseCase {
     }
 
     @Override
+    @Transactional
     public void read(ReadNotificationCommand command) {
         LocalDateTime readAt = (command.getReadAt() == null) ? LocalDateTime.now() : command.getReadAt();
 
