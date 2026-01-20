@@ -1,5 +1,6 @@
 package org.codeit.roomunion.auth.config;
 
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.codeit.roomunion.auth.adapter.in.filter.JwtAuthenticationFilter;
 import org.codeit.roomunion.auth.adapter.in.filter.LoginFilter;
@@ -45,9 +46,20 @@ public class SecurityConfig {
             .httpBasic(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(SecurityConfig::authorizeHttpRequests)
-            .exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint)) // 토큰 없을때(만료) 403 -> 41
+
+            // ✅ 추가 1) async 디스패치에서 security가 다시 막지 않게
+            .securityContext(sc -> sc.requireExplicitSave(false))
+
+            .authorizeHttpRequests(req -> {
+                authorizeHttpRequests(req);
+
+                // ✅ 추가 2) SSE/Async 재디스패치 통과(이게 진짜로 많이 해결함)
+                req.dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll();
+            })
+
+            .exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint))
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
