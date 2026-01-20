@@ -100,12 +100,12 @@ public class NotificationSseAdapter implements NotificationSsePort {
             } catch (IOException io) {
                 // 연결이 이미 끊어진 경우 emitter를 종료하고 정리한다.
                 log.debug("Keep-alive 전송 실패 (IOException) for user {}", userId);
-                completeEmitterSafely(emitter);
+//                completeEmitterSafely(emitter);
                 cleanup(userId, emitter, "keep-alive io");
             } catch (Exception ex) {
                 // 예외 발생 시 emitter를 종료하고 정리한다.
                 log.debug("Keep-alive 전송 실패 (Exception) for user {}: {}", userId, ex.getMessage());
-                completeEmitterSafely(emitter);
+//                completeEmitterSafely(emitter);
                 cleanup(userId, emitter, "keep-alive error");
             }
         }, HEARTBEAT_SECONDS, HEARTBEAT_SECONDS, TimeUnit.SECONDS);
@@ -148,7 +148,7 @@ public class NotificationSseAdapter implements NotificationSsePort {
             } catch (Exception e) {
                 // 전송 중 문제가 발생하면 해당 emitter를 종료하고 정리한다.
                 log.debug("Notification 전송 실패 for user {}: {}", userId, e.getMessage());
-                completeEmitterSafely(emitter);
+//                completeEmitterSafely(emitter);
                 cleanup(userId, emitter, "send failed");
             }
         }
@@ -172,7 +172,7 @@ public class NotificationSseAdapter implements NotificationSsePort {
         } catch (Exception e) {
             // 미읽음 알림 전송 중 문제가 발생하면 emitter를 종료하고 정리한다.
             log.debug("Unread notifications 전송 실패 for user {}: {}", userId, e.getMessage());
-            completeEmitterSafely(emitter);
+//            completeEmitterSafely(emitter);
             cleanup(userId, emitter, "send unread failed");
         }
     }
