@@ -62,7 +62,10 @@ public class NotificationSseAdapter implements NotificationSsePort {
         emitter.onTimeout(() -> cleanup(userId, emitter, "timeout"));
 
         // 네트워크 오류 등으로 에러가 발생했을 때 호출된다.
-        emitter.onError(e -> cleanup(userId, emitter, "error"));
+        emitter.onError(e -> {
+            log.debug("SSE emitter onError 콜백 실행 for user {}: {}", userId, e.getMessage());
+            cleanup(userId, emitter, "error");
+        });
 
         // 클라이언트에게 연결이 정상적으로 되었음을 알리는 이벤트를 전송한다.
         // 프론트엔드에서 SSE 연결 성공 여부를 확인하는 용도로 사용된다.
@@ -73,16 +76,24 @@ public class NotificationSseAdapter implements NotificationSsePort {
                     .id(String.valueOf(Instant.now().toEpochMilli()))
                     .data("connected as " + userId)
             );
+            log.debug("SSE INIT 이벤트 전송 성공 for user {}", userId);
         } catch (IOException e) {
             // 초기 이벤트 전송에 실패했다면 이미 연결이 끊어진 상태이므로
             // emitter를 종료하고 정리 작업을 수행한다.
+            log.error("SSE INIT 이벤트 전송 실패 for user {}: {}", userId, e.getMessage());
             emitter.completeWithError(e);
             cleanup(userId, emitter, "init failed");
             return emitter;
+        } catch (Exception e) {
+            // 기타 예외 처리
+            log.error("SSE 연결 중 예외 발생 for user {}: {}", userId, e.getMessage());
+            emitter.completeWithError(e);
+            cleanup(userId, emitter, "init exception");
+            return emitter;
         }
 
-        // 일정 주기로 데이터를 전송하여 연결이 유지되도록 한다.
-        // 중간 네트워크 장비나 브라우저가 유휴 연결을 끊는 것을 방지한다.
+        // INIT 이벤트 전송 성공 후에만 keep-alive 스케줄러를 등록한다.
+        // 첫 PING은 HEARTBEAT_SECONDS 후에 전송 (즉시 전송하지 않음)
         ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> {
             try {
                 emitter.send(
@@ -90,21 +101,25 @@ public class NotificationSseAdapter implements NotificationSsePort {
                         .name("PING")
                         .data("keep-alive")
                 );
+                log.trace("SSE PING 전송 성공 for user {}", userId);
             } catch (IOException io) {
-                // 연결이 이미 끊어진 경우 emitter를 종료하고 정리한다.
-                emitter.complete();
+                // IOException = 클라이언트가 이미 연결을 끊음 (Broken pipe)
+                // complete()를 호출하면 오히려 에러가 발생하므로 그냥 정리만 수행
+                log.debug("Keep-alive 전송 실패 (IOException) for user {} - 클라이언트 연결 종료", userId);
                 cleanup(userId, emitter, "keep-alive io");
             } catch (Exception ex) {
-                // 예외 발생 시 emitter를 종료하고 정리한다.
-                emitter.complete();
+                // 기타 예외
+                log.debug("Keep-alive 전송 실패 (Exception) for user {}: {}", userId, ex.getMessage());
                 cleanup(userId, emitter, "keep-alive error");
             }
-        }, 0, HEARTBEAT_SECONDS, TimeUnit.SECONDS);
+        }, HEARTBEAT_SECONDS, HEARTBEAT_SECONDS, TimeUnit.SECONDS); // 첫 실행도 15초 후
 
         // emitter와 해당 emitter의 keep-alive 작업을 함께 관리한다.
         // emitter 종료 시 heartbeat 작업도 같이 중단하기 위해 필요하다.
         keepAliveTasks.put(emitter, future);
 
+        log.debug("SSE 연결 완료 for user {}", userId);
+        
         // 컨트롤러에서 이 emitter를 반환하면
         // 클라이언트와 서버 간 SSE 연결이 완성된다.
         return emitter;
@@ -136,9 +151,13 @@ public class NotificationSseAdapter implements NotificationSsePort {
                         .id(String.valueOf(notification.getId()))
                         .data(notification)
                 );
+            } catch (IOException io) {
+                // IOException = 클라이언트가 이미 연결을 끊음
+                log.debug("Notification 전송 실패 (IOException) for user {} - 클라이언트 연결 종료", userId);
+                cleanup(userId, emitter, "send failed - io");
             } catch (Exception e) {
-                // 전송 중 문제가 발생하면 해당 emitter를 종료하고 정리한다.
-                emitter.complete();
+                // 기타 예외
+                log.debug("Notification 전송 실패 (Exception) for user {}: {}", userId, e.getMessage());
                 cleanup(userId, emitter, "send failed");
             }
         }
@@ -159,9 +178,13 @@ public class NotificationSseAdapter implements NotificationSsePort {
                         .data(n)
                 );
             }
+        } catch (IOException io) {
+            // IOException = 클라이언트가 이미 연결을 끊음
+            log.debug("Unread notifications 전송 실패 (IOException) for user {} - 클라이언트 연결 종료", userId);
+            cleanup(userId, emitter, "send unread failed - io");
         } catch (Exception e) {
-            // 미읽음 알림 전송 중 문제가 발생하면 emitter를 종료하고 정리한다.
-            emitter.complete();
+            // 기타 예외
+            log.debug("Unread notifications 전송 실패 (Exception) for user {}: {}", userId, e.getMessage());
             cleanup(userId, emitter, "send unread failed");
         }
     }
@@ -184,18 +207,5 @@ public class NotificationSseAdapter implements NotificationSsePort {
         } catch (Exception ignored) {}
 
         log.debug("SSE cleanup done: user={}, reason={}", userId, reason);
-    }
-
-    /**
-     * emitter를 안전하게 종료하는 헬퍼 메서드.
-     * 이미 종료된 emitter에 대해 complete()를 호출하려고 할 때 발생하는 예외를 방지한다.
-     */
-    private void completeEmitterSafely(SseEmitter emitter) {
-        try {
-            emitter.complete();
-        } catch (Exception e) {
-            // 이미 종료된 emitter에 대한 complete() 호출 시도 시 발생하는 예외 무시
-            log.trace("Emitter already completed or in error state: {}", e.getMessage());
-        }
     }
 }
