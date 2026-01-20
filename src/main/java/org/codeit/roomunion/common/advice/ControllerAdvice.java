@@ -1,6 +1,5 @@
 package org.codeit.roomunion.common.advice;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.codeit.roomunion.common.advice.response.ErrorResponse;
 import org.codeit.roomunion.common.exception.BaseErrorCode;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RestControllerAdvice(basePackages = "org.codeit.roomunion")
+@RestControllerAdvice
 public class ControllerAdvice {
 
     @ExceptionHandler(CustomException.class)
