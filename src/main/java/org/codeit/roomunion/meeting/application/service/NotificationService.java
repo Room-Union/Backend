@@ -24,7 +24,6 @@ public class NotificationService implements NotificationUseCase {
 
     private final NotificationRepository notificationRepository;
     private final NotificationSsePort notificationSsePort;
-    private final NotificationAsyncService notificationAsyncService;
 
     @Override
     public SseEmitter subscribe(SubscribeNotificationCommand command) {
