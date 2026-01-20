@@ -3,6 +3,7 @@ package org.codeit.roomunion.meeting.application.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.codeit.roomunion.meeting.application.port.in.notification.NotificationUseCase;
 import org.codeit.roomunion.meeting.application.port.out.notification.NotificationRepository;
 import org.codeit.roomunion.meeting.application.port.out.notification.NotificationSsePort;
@@ -16,6 +17,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationService implements NotificationUseCase {
@@ -29,8 +31,18 @@ public class NotificationService implements NotificationUseCase {
         Long userId = command.getUserId();
         SseEmitter emitter = notificationSsePort.connect(userId);
 
-        // 연결 직후: 미읽음 알림 밀어넣기(비동기)
-        notificationAsyncService.pushUnreadOnConnect(userId, emitter);
+        // 연결 직후: 미읽음 알림 밀어넣기
+        // 비동기로 하면 emitter 반환 후 에러 발생 시 문제가 될 수 있음!
+        // 참고 코드처럼 동기로 처리
+        try {
+            List<Notification> unread = notificationRepository.findUnread(userId);
+            if (!unread.isEmpty()) {
+                notificationSsePort.sendUnreadOnConnect(userId, emitter, unread);
+            }
+        } catch (Exception e) {
+            log.error("미읽음 알림 전송 중 예외 발생 for user {}: {}", userId, e.getMessage());
+            // 에러가 발생해도 emitter는 반환 (연결 자체는 유지)
+        }
 
         return emitter;
     }
