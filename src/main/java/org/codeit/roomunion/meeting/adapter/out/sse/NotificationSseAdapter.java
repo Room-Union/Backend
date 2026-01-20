@@ -76,20 +76,13 @@ public class NotificationSseAdapter implements NotificationSsePort {
         } catch (IOException e) {
             // 초기 이벤트 전송에 실패했다면 이미 연결이 끊어진 상태이므로
             // emitter를 종료하고 정리 작업을 수행한다.
-            log.error("SSE INIT 이벤트 전송 실패 for user {}: {}", userId, e.getMessage());
             emitter.completeWithError(e);
             cleanup(userId, emitter, "init failed");
             return emitter;
-        } catch (Exception e) {
-            // 기타 예외 처리
-            log.error("SSE 연결 중 예외 발생 for user {}: {}", userId, e.getMessage());
-            emitter.completeWithError(e);
-            cleanup(userId, emitter, "init exception");
-            return emitter;
         }
 
-        // INIT 이벤트 전송 성공 후에만 keep-alive 스케줄러를 등록한다.
-        // 이렇게 하면 연결 실패 시 불필요한 스케줄러 실행을 방지할 수 있다.
+        // 일정 주기로 데이터를 전송하여 연결이 유지되도록 한다.
+        // 중간 네트워크 장비나 브라우저가 유휴 연결을 끊는 것을 방지한다.
         ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(() -> {
             try {
                 emitter.send(
@@ -99,16 +92,14 @@ public class NotificationSseAdapter implements NotificationSsePort {
                 );
             } catch (IOException io) {
                 // 연결이 이미 끊어진 경우 emitter를 종료하고 정리한다.
-                log.debug("Keep-alive 전송 실패 (IOException) for user {}", userId);
-//                completeEmitterSafely(emitter);
+                emitter.complete();
                 cleanup(userId, emitter, "keep-alive io");
             } catch (Exception ex) {
                 // 예외 발생 시 emitter를 종료하고 정리한다.
-                log.debug("Keep-alive 전송 실패 (Exception) for user {}: {}", userId, ex.getMessage());
-//                completeEmitterSafely(emitter);
+                emitter.complete();
                 cleanup(userId, emitter, "keep-alive error");
             }
-        }, HEARTBEAT_SECONDS, HEARTBEAT_SECONDS, TimeUnit.SECONDS);
+        }, 0, HEARTBEAT_SECONDS, TimeUnit.SECONDS);
 
         // emitter와 해당 emitter의 keep-alive 작업을 함께 관리한다.
         // emitter 종료 시 heartbeat 작업도 같이 중단하기 위해 필요하다.
@@ -147,8 +138,7 @@ public class NotificationSseAdapter implements NotificationSsePort {
                 );
             } catch (Exception e) {
                 // 전송 중 문제가 발생하면 해당 emitter를 종료하고 정리한다.
-                log.debug("Notification 전송 실패 for user {}: {}", userId, e.getMessage());
-//                completeEmitterSafely(emitter);
+                emitter.complete();
                 cleanup(userId, emitter, "send failed");
             }
         }
@@ -171,8 +161,7 @@ public class NotificationSseAdapter implements NotificationSsePort {
             }
         } catch (Exception e) {
             // 미읽음 알림 전송 중 문제가 발생하면 emitter를 종료하고 정리한다.
-            log.debug("Unread notifications 전송 실패 for user {}: {}", userId, e.getMessage());
-//            completeEmitterSafely(emitter);
+            emitter.complete();
             cleanup(userId, emitter, "send unread failed");
         }
     }
