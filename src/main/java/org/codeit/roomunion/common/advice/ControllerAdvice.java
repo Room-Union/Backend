@@ -81,8 +81,14 @@ public class ControllerAdvice {
     public ResponseEntity<ErrorResponse> handleException(Exception e, HttpServletRequest request) {
         // SSE 요청인 경우 예외를 다시 던져서 SSE 연결이 종료되도록 함
         if (isSseRequest(request)) {
-            log.error("SSE 요청 중 예외 발생: ", e);
-            throw new RuntimeException("Error in SSE request", e);
+            // Broken pipe나 disconnected client는 정상적인 연결 종료이므로 DEBUG 레벨로
+            if (isBrokenPipeException(e)) {
+                log.debug("SSE 클라이언트 연결 종료 (Broken pipe): {}", e.getMessage());
+            } else {
+                log.error("SSE 요청 중 예외 발생: ", e);
+            }
+            // 예외를 다시 던지지 않고 그냥 리턴 (Spring이 알아서 정리)
+            return null;
         }
         
         BaseErrorCode errorCode = GlobalErrorCode.INTERNAL_SERVER_ERROR;
@@ -108,5 +114,37 @@ public class ControllerAdvice {
         // URL에 /sse/가 포함되어 있으면 SSE 요청으로 판단
         return (accept != null && accept.contains("text/event-stream")) 
             || (requestUri != null && requestUri.contains("/sse/"));
+    }
+
+    /**
+     * Broken pipe 또는 클라이언트 연결 종료 예외인지 확인
+     */
+    private boolean isBrokenPipeException(Exception e) {
+        // 1. 메시지로 판단
+        String message = e.getMessage();
+        if (message != null) {
+            if (message.contains("Broken pipe") 
+                || message.contains("disconnected client")
+                || message.contains("Connection reset")
+                || message.contains("Connection timed out")) {
+                return true;
+            }
+        }
+        
+        // 2. Cause 체인에서 찾기
+        Throwable cause = e.getCause();
+        while (cause != null) {
+            if (cause instanceof java.io.IOException) {
+                String causeMessage = cause.getMessage();
+                if (causeMessage != null && 
+                    (causeMessage.contains("Broken pipe") 
+                     || causeMessage.contains("Connection reset"))) {
+                    return true;
+                }
+            }
+            cause = cause.getCause();
+        }
+        
+        return false;
     }
 }
