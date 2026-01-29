@@ -34,7 +34,7 @@ public class AuthController {
     private static final String ACCESS_TOKEN_COOKIE_NAME = "accessToken";
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
 
-    private static final int REFRESH_TOKEN_COOKIE_MAX_AGE = (int) (JwtUtil.REFRESH_TOKEN_EXPIRATION / 1000); // 7일
+    private static final int REFRESH_TOKEN_COOKIE_MAX_AGE = (int) (JwtUtil.REFRESH_TOKEN_EXPIRATION / 1000); // 2시간 (임시로)
     private static final int ACCESS_TOKEN_COOKIE_MAX_AGE = (int) (JwtUtil.ACCESS_TOKEN_EXPIRATION / 1000); // 1시간
 
     @Value("${app.cookie.secure:true}")
