@@ -64,7 +64,7 @@ public class AuthController {
 
     private Cookie createAccessTokenCookie(String accessToken) {
         Cookie cookie = new Cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken);
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false); // false로 바꿔야함. 요청 헤더에 accessToken 넣기 위해서
         cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(ACCESS_TOKEN_COOKIE_MAX_AGE);
