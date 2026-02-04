@@ -112,14 +112,14 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
-        deleteCookie(ACCESS_TOKEN_COOKIE_NAME, "None", response);
+        deleteCookie(ACCESS_TOKEN_COOKIE_NAME, "Lax", response);
         deleteCookie(REFRESH_TOKEN_COOKIE_NAME, "Lax", response);
         return ResponseEntity.noContent().build();
     }
 
     private void deleteCookie(String name, String sameSite, HttpServletResponse response) {
         Cookie cookie = new Cookie(name, null);
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false);
         cookie.setSecure(cookieSecure);
         cookie.setPath("/");
         cookie.setMaxAge(0);
